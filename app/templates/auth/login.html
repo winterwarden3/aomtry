@@ -195,6 +195,13 @@ body {
             <button type="submit" class="btn-login">
                 <i class="bi bi-box-arrow-in-right"></i> Login
             </button>
+
+            {% if remaining_attempts is defined and remaining_attempts > 0 %}
+                <div class="alert alert-warning text-center small">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    {{ remaining_attempts }} login attempt(s) remaining
+                </div>
+             {% endif %}
         </form>
 
         <a href="{{ url_for('auth.forgot_password', type=user_type) }}" class="forgot-link">
