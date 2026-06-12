@@ -1,0 +1,289 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Add Expense - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    --shadow-md: 0 8px 20px rgba(0,0,0,0.10);
+
+    --success: #16a34a;
+    --danger: #dc2626;
+    --warning: #f59e0b;
+
+    --border: #e5e7eb;
+    --muted: #64748b;
+
+    --transition: 0.25s ease;
+}
+
+/* ===== Cards ===== */
+
+.card-ui {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    contain: layout paint;
+    padding: 24px;
+}
+
+/* ===== Typography ===== */
+
+.section-title {
+    margin: 30px 0 20px;
+}
+
+.section-title h5 {
+    position: relative;
+    display: inline-block;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.section-title h5::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+}
+
+/* ===== Buttons ===== */
+
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-ui:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary-ui {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    padding: 11px 18px;
+    width: 100%;
+}
+
+.btn-primary-ui:hover {
+    color: white;
+    box-shadow: 0 6px 18px rgba(19,138,82,0.25);
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 16px;
+}
+
+.btn-outline-ui:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-sm-ui {
+    padding: 7px 12px;
+    font-size: 0.75rem;
+    border-radius: var(--radius-sm);
+}
+
+/* ===== Forms ===== */
+
+.form-control-ui {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    font-size: .9rem;
+    transition: all var(--transition);
+    background: white;
+}
+
+.form-control-ui:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+select.form-control-ui {
+    cursor: pointer;
+}
+
+textarea.form-control-ui {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-label-ui {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--primary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* ===== Utilities ===== */
+
+.text-danger { color: var(--danger) !important; }
+.text-muted { color: var(--muted) !important; }
+
+/* ===== Mobile ===== */
+
+@media (max-width: 768px) {
+
+    .container-fluid {
+        padding: 0 12px !important;
+    }
+
+    .card-ui {
+        padding: 16px;
+    }
+
+    h1 {
+        font-size: 1.4rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .card-ui {
+        padding: 14px;
+    }
+}
+</style>
+
+<div class="container-fluid px-md-3">
+
+<!-- HEADER -->
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+    <div>
+        <h1 class="fw-bold mb-1" style="font-size: 1.8rem;">
+            <i class="bi bi-cash-stack"></i>
+            Add New Expense
+        </h1>
+
+        <p class="text-muted mb-0">
+            Record business expense details
+        </p>
+    </div>
+
+    <a href="{{ url_for('admin.expenses_list') }}"
+       class="btn-ui btn-outline-ui">
+
+        <i class="bi bi-arrow-left"></i>
+        Back to Expenses
+    </a>
+
+</div>
+
+<!-- FORM -->
+
+<div class="row justify-content-center">
+
+    <div class="col-md-8 col-lg-6">
+
+        <div class="card-ui">
+
+            <form method="POST">
+
+                <!-- CATEGORY -->
+                <div class="mb-3">
+                    <label class="form-label-ui">
+                        <i class="bi bi-tag"></i> Category <span class="text-danger">*</span>
+                    </label>
+
+                    <select class="form-control-ui"
+                            name="category"
+                            required>
+
+                        <option value="">Select Category</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Raw Material Purchase">Raw Material Purchase</option>
+                        <option value="Other">Other</option>
+
+                    </select>
+                </div>
+
+                <!-- AMOUNT -->
+                <div class="mb-3">
+                    <label class="form-label-ui">
+                        <i class="bi bi-currency-rupee"></i> Amount <span class="text-danger">*</span>
+                    </label>
+
+                    <input type="number"
+                           name="amount"
+                           class="form-control-ui"
+                           step="0.01"
+                           min="0"
+                           placeholder="Enter amount"
+                           required>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="mb-3">
+                    <label class="form-label-ui">
+                        <i class="bi bi-pencil"></i> Description
+                    </label>
+
+                    <input type="text"
+                           name="description"
+                           class="form-control-ui"
+                           placeholder="What was this expense for?">
+                </div>
+
+                <!-- NOTES -->
+                <div class="mb-4">
+                    <label class="form-label-ui">
+                        <i class="bi bi-journal-text"></i> Notes
+                    </label>
+
+                    <textarea class="form-control-ui"
+                              name="notes"
+                              rows="3"
+                              placeholder="Optional additional details..."></textarea>
+                </div>
+
+                <!-- SUBMIT -->
+                <button type="submit"
+                        class="btn-ui btn-primary-ui">
+
+                    <i class="bi bi-check-circle"></i>
+                    Save Expense
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

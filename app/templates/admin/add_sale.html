@@ -1,0 +1,1202 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Add New Sale - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+/* Professional Add Sale UI - Larger Fonts */
+:root {
+    --primary: #0C5B3F;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.container-fluid {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 6px;
+}
+
+.page-header p {
+    font-size: 0.95rem;
+    color: var(--gray-500);
+}
+
+/* Form Card */
+.form-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.form-section {
+    padding: 28px;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    margin-bottom: 24px;
+}
+
+.section-title h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.section-title p {
+    font-size: 0.85rem;
+    color: var(--gray-400);
+    margin-top: 4px;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+}
+
+.form-label .required {
+    color: var(--danger);
+}
+
+.form-control, .form-select {
+    padding: 12px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+.form-control[readonly] {
+    background: var(--gray-50);
+    color: var(--gray-600);
+}
+
+/* Advance Alert */
+.advance-alert {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.advance-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.advance-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+.advance-amount {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--info);
+}
+
+.advance-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.advance-checkbox input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Items Table */
+.items-table-wrapper {
+    overflow-x: auto;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table th {
+    text-align: left;
+    padding: 14px 12px;
+    background: var(--gray-50);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.items-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+}
+
+/* Fix action button alignment */
+.items-table td:last-child {
+    text-align: center;
+    vertical-align: middle;
+    width: 60px;
+}
+
+.items-table input, 
+.items-table select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    height: 42px;
+    box-sizing: border-box;
+}
+
+.items-table input:focus, 
+.items-table select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.remove-item:hover {
+    color: var(--danger);
+    background: var(--gray-100);
+}
+
+.add-item-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: none;
+    border: 1px dashed var(--gray-300);
+    border-radius: var(--radius-md);
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-item-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #f0fdf4;
+}
+
+/* Byproduct Exchange */
+.exchange-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.exchange-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+}
+
+.exchange-checkbox input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+/* Fluctuating rate indicator */
+.rate[data-fluctuating="true"] {
+    border-right: 3px solid #f59e0b;
+    background: #fffbeb;
+}
+
+.rate[data-fluctuating="true"]:focus {
+    border-color: var(--accent);
+    border-right: 3px solid var(--accent);
+}
+
+/* Payment Row */
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    margin-top: 24px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.toggle-checkbox {
+    width: 44px;
+    height: 22px;
+    appearance: none;
+    background: var(--gray-300);
+    border-radius: 22px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-checkbox:checked {
+    background: var(--success);
+}
+
+.toggle-checkbox::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+}
+
+.toggle-checkbox:checked::before {
+    transform: translateX(22px);
+}
+
+/* Submit Button */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #059669;
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Readonly fields */
+input[readonly] {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+#grandTotal, #dueAmount {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Suggestions Dropdown */
+.suggestions-dropdown {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    max-height: 220px;
+    overflow-y: auto;
+    width: 100%;
+    margin-top: 4px;
+    box-shadow: var(--shadow-md);
+}
+
+.suggestion-item {
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+    background: var(--gray-50);
+}
+
+.position-relative {
+    position: relative;
+}
+
+/* Cancel button */
+.btn-icon {
+    background: none;
+    border: 1px solid var(--gray-200);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--gray-50);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+    
+    .payment-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .items-table thead {
+        display: none;
+    }
+    
+    .items-table tbody tr {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: 16px;
+    }
+    
+    .items-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border: none;
+    }
+    
+    .items-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        min-width: 100px;
+    }
+    
+    .items-table td:last-child {
+        justify-content: center;
+    }
+    
+    .advance-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+    
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<div class="container-fluid px-md-3 py-3">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1><i class="bi bi-plus-lg"></i> New Sale</h1>
+                <p>Create a new sales invoice</p>
+            </div>
+            <a href="{{ url_for('admin.sales_list') }}" class="btn-icon">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.add_sale') }}" id="saleForm">
+        <!-- Form Token - Prevents duplicate submissions -->
+        <input type="hidden" name="form_token" value="{{ form_token }}">
+        
+        <div class="form-card">
+
+            <!-- Customer Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <h3>Customer Information</h3>
+                    <p>Select or search for a customer</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group position-relative">
+                        <label class="form-label">Customer Name <span class="required">*</span></label>
+                        <input type="text" name="customer_name" id="customer_input" class="form-control" autocomplete="off" required>
+                        <input type="hidden" name="customer_id" id="customer_id">
+                        <div id="suggestions" class="suggestions-dropdown" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" id="customer_email" class="form-control" placeholder="for invoice">
+                    </div>
+                </div>
+
+                <!-- Advance Balance Alert -->
+                <div id="advanceBalanceSection" style="display: none;">
+                    <div class="advance-alert">
+                        <div class="advance-info">
+                            <div>
+                                <span class="advance-label">Advance Balance Available</span>
+                                <div class="advance-amount" id="advanceBalanceDisplay">Rs 0.00</div>
+                            </div>
+                            <label class="advance-checkbox">
+                                <input type="checkbox" id="useAdvanceCheckbox">
+                                <span>Use advance balance</span>
+                            </label>
+                        </div>
+                        <div id="advanceAmountSection" style="display: none; margin-top: 12px;">
+                            <label class="form-label">Amount to use</label>
+                            <input type="number" name="advance_used" id="advanceAmount" class="form-control" step="0.01" min="0" value="0">
+                            <small class="text-muted" id="advanceMaxLabel">Max available: Rs 0.00</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <h3>Order Items</h3>
+                    <p>Add products to this invoice</p>
+                </div>
+                
+                <div class="items-table-wrapper">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%">Product</th>
+                                <th style="width: 15%">Quantity</th>
+                                <th style="width: 15%">Unit</th>
+                                <th style="width: 15%">Rate (Rs)</th>
+                                <th style="width: 15%">Subtotal</th>
+                                <th style="width: 5%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemBody">
+                            <tr>
+                                <td data-label="Product">
+                                    <input name="product[]" class="product-input" placeholder="Search product..." autocomplete="off" required>
+                                    <div class="suggestions-dropdown product-suggestions" style="display: none;"></div>
+                                 </td>
+                                <td data-label="Quantity">
+                                    <input name="qty[]" type="number" class="qty" step="any" value="0" required>
+                                 </td>
+                                <td data-label="Unit">
+                                    <select name="unit[]" class="form-select unit">
+                                        <option value="Kg">Kg</option>
+                                        <option value="Liter">Liter</option>
+                                        <option value="Piece">Piece</option>
+                                        <option value="Quintal">Quintal</option>
+                                    </select>
+                                 </td>
+                                <td data-label="Rate">
+                                    <input name="rate[]" type="number" class="rate" step="any" required>
+                                 </td>
+                                <td data-label="Subtotal">
+                                    <input name="subtotal[]" class="subtotal" readonly style="background: var(--gray-50);">
+                                 </td>
+                                <td data-label="Action" style="text-align: center; vertical-align: middle;">
+                                    <button type="button" class="remove-item" onclick="removeRow(this)">✕</button>
+                                 </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button type="button" class="add-item-btn" onclick="addRow()">
+                    <i class="bi bi-plus"></i> Add another item
+                </button>
+            </div>
+
+            <!-- Byproduct Exchange - Hidden by default, shows only when relevant product exists -->
+            <div class="form-section" id="byproductSection" style="display: none;">
+                <div class="section-title">
+                    <h3>Byproduct Exchange</h3>
+                    <p>Check if customer left byproduct, matching service becomes FREE</p>
+                </div>
+                <div class="exchange-options">
+                    <label class="exchange-checkbox" id="mustardCakeOption" style="display: none;">
+                        <input type="checkbox" name="exchange_mustard_cake" id="exchangeMustardCake">
+                        <span>Customer left <strong>Mustard Cake</strong> → Mustard Oil Extraction FREE</span>
+                    </label>
+                    <label class="exchange-checkbox" id="riceBranOption" style="display: none;">
+                        <input type="checkbox" name="exchange_rice_bran" id="exchangeRiceBran">
+                        <span>Customer left <strong>Rice Bran</strong> → Others service FREE</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <h3>Payment Details</h3>
+                    <p>Record payment information</p>
+                </div>
+                
+                <div class="payment-grid">
+                    <div class="form-group">
+                        <label class="form-label">Total Amount</label>
+                        <input type="text" id="grandTotal" name="total_amount" class="form-control" readonly style="background: var(--gray-50); font-weight: 600;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cash Payment</label>
+                        <input type="number" name="paid_amount" id="paidAmount" class="form-control" step="1" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due / Advance</label>
+                        <input type="text" id="dueAmount" class="form-control" readonly style="background: var(--gray-50);">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Payment Mode</label>
+                    <select name="payment_mode" class="form-select">
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Khalti">Khalti</option>
+                        <option value="eSewa">eSewa</option>
+                    </select>
+                </div>
+
+                <!-- Email Toggle -->
+                <div class="toggle-switch">
+                    <div class="toggle-label">
+                        <i class="bi bi-envelope"></i>
+                        Send invoice email to customer
+                    </div>
+                    <input type="checkbox" id="sendInvoiceToggle" name="send_invoice" class="toggle-checkbox">
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="form-section" style="background: var(--gray-50);">
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <i class="bi bi-check-lg"></i> Create Invoice
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Product list for suggestions
+const PRODUCTS = [
+    "Mustard Oil Extraction", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Rice Bran", "Mustard Cake","Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
+    "Turmeric Powder", "Others"
+];
+
+// ========== PRODUCT DEFAULTS ==========
+const PRODUCT_DEFAULTS = {
+    // Services
+    "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
+    "Wheat Grinding": { rate: 4, unit: "Kg" },
+    "Paddy Grinding": { rate: 4, unit: "Kg" },
+    "Turmeric Grinding": { rate: 40, unit: "Kg" },
+    "Spice Grinding": { rate: 40, unit: "Kg" },
+    "Others": { rate: 0, unit: "Kg" },
+    
+    // Products
+    "Rice Bran": { rate: 45, unit: "Kg", fluctuates: true },
+    "Mustard Cake": { rate: 45, unit: "Kg", fluctuates: true },
+    "Wheat Flour": { rate: 80, unit: "Kg", fluctuates: true },
+    "Rice": { rate: 90, unit: "Kg", fluctuates: true },
+    "Mustard Seed": { rate: 120, unit: "Kg" },
+    "Wheat": { rate: 50, unit: "Kg", fluctuates: true },
+    "Mustard Oil": { rate: 400, unit: "Liter", fluctuates: true },
+    "Paddy": { rate: 40, unit: "Kg", fluctuates: true },
+    "Spices": { rate: 100, unit: "Kg", fluctuates: true },
+    "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
+    
+};
+
+function setProductDefaults(productName, row) {
+    const defaults = PRODUCT_DEFAULTS[productName];
+    if (defaults) {
+        const rateInput = row.querySelector('.rate');
+        const unitSelect = row.querySelector('.unit');
+        
+        // Set rate
+        if (rateInput && (!rateInput.value || parseFloat(rateInput.value) === 0)) {
+            rateInput.value = defaults.rate;
+            rateInput.dataset.originalRate = defaults.rate;
+        }
+        
+        // Set unit - auto select based on product
+        if (unitSelect && defaults.unit) {
+            for (let i = 0; i < unitSelect.options.length; i++) {
+                if (unitSelect.options[i].value === defaults.unit) {
+                    unitSelect.value = defaults.unit;
+                    break;
+                }
+            }
+        }
+        
+        // Add visual indicator for fluctuating rates
+        if (defaults.fluctuates && rateInput && !rateInput.hasAttribute('data-fluctuating')) {
+            rateInput.setAttribute('data-fluctuating', 'true');
+            rateInput.title = 'Rate fluctuates - can be changed';
+        }
+        
+        // Recalculate subtotal
+        const qty = parseFloat(row.querySelector('.qty')?.value) || 0;
+        const rate = parseFloat(rateInput?.value) || 0;
+        const subtotal = row.querySelector('.subtotal');
+        if (subtotal) subtotal.value = (qty * rate).toFixed(2);
+        updateGrandTotal();
+    }
+}
+
+function isMustardExtraction(name) {
+    return (name || '').toLowerCase() === 'mustard oil extraction';
+}
+
+function isOthersProduct(name) {
+    return (name || '').toLowerCase() === 'others';
+}
+
+function rememberOriginalRate(rateInput) {
+    if (rateInput && !rateInput.dataset.originalRate) {
+        rateInput.dataset.originalRate = rateInput.value || '0';
+    }
+}
+
+function applyExchangeToRows() {
+    const mustardChecked = document.getElementById('exchangeMustardCake')?.checked;
+    const riceChecked = document.getElementById('exchangeRiceBran')?.checked;
+
+    document.querySelectorAll('#itemBody tr').forEach(row => {
+        const product = row.querySelector('.product-input')?.value || '';
+        const rateInput = row.querySelector('.rate');
+        const qtyInput = row.querySelector('.qty');
+        const subtotalInput = row.querySelector('.subtotal');
+        if (!rateInput || !subtotalInput) return;
+
+        rememberOriginalRate(rateInput);
+        let rate = parseFloat(rateInput.dataset.originalRate) || 0;
+
+        if (mustardChecked && isMustardExtraction(product)) {
+            rate = 0;
+        }
+        if (riceChecked && isOthersProduct(product)) {
+            rate = 0;
+        }
+
+        rateInput.value = rate;
+        const qty = parseFloat(qtyInput?.value) || 0;
+        subtotalInput.value = (qty * rate).toFixed(2);
+    });
+
+    updateGrandTotal();
+}
+
+// ========== HIDE/SHOW EXCHANGE OPTIONS BASED ON PRODUCTS ==========
+function updateExchangeVisibility() {
+    const products = document.querySelectorAll('.product-input');
+    let hasMustardOil = false;
+    let hasOthers = false;
+    
+    products.forEach(input => {
+        const value = input.value.toLowerCase().trim();
+        if (value === 'mustard oil extraction') {
+            hasMustardOil = true;
+        }
+        if (value === 'others') {
+            hasOthers = true;
+        }
+    });
+    
+    const mustardOption = document.getElementById('mustardCakeOption');
+    const riceOption = document.getElementById('riceBranOption');
+    const byproductSection = document.getElementById('byproductSection');
+    const mustardCheckbox = document.getElementById('exchangeMustardCake');
+    const riceCheckbox = document.getElementById('exchangeRiceBran');
+    
+    if (mustardOption) {
+        if (hasMustardOil) {
+            mustardOption.style.display = 'flex';
+        } else {
+            mustardOption.style.display = 'none';
+            if (mustardCheckbox) mustardCheckbox.checked = false;
+        }
+    }
+    
+    if (riceOption) {
+        if (hasOthers) {
+            riceOption.style.display = 'flex';
+        } else {
+            riceOption.style.display = 'none';
+            if (riceCheckbox) riceCheckbox.checked = false;
+        }
+    }
+    
+    // Show/hide entire byproduct section
+    if (byproductSection) {
+        const anyVisible = (hasMustardOil || hasOthers);
+        byproductSection.style.display = anyVisible ? 'block' : 'none';
+    }
+    
+    // Recalculate totals after visibility change
+    applyExchangeToRows();
+}
+
+let currentAdvanceBalance = 0;
+let selectedCustomerId = null;
+let isSubmitting = false;
+
+// Product Suggestions
+function handleProductInput(e) {
+    let input = e.target;
+    let row = input.closest("tr");
+    let box = row.querySelector(".product-suggestions");
+    let query = input.value.toLowerCase().trim();
+    
+    if (!query) {
+        box.style.display = "none";
+        return;
+    }
+    
+    let matches = PRODUCTS.filter(p => p.toLowerCase().includes(query));
+    box.innerHTML = "";
+    
+    if (matches.length > 0) {
+        box.style.display = "block";
+        matches.forEach(p => {
+            let div = document.createElement("div");
+            div.className = "suggestion-item";
+            div.innerText = p;
+            div.onclick = () => {
+                input.value = p;
+                box.style.display = "none";
+                setProductDefaults(p, row);
+                updateExchangeVisibility();
+                applyExchangeToRows();
+            };
+            box.appendChild(div);
+        });
+    } else {
+        box.style.display = "none";
+    }
+}
+
+function attachProductListeners() {
+    document.querySelectorAll('.product-input').forEach(input => {
+        input.removeEventListener('input', handleProductInput);
+        input.addEventListener('input', handleProductInput);
+    });
+}
+
+// Calculations
+function updateGrandTotal() {
+    let total = 0;
+    document.querySelectorAll(".subtotal").forEach(el => {
+        total += parseFloat(el.value) || 0;
+    });
+    document.getElementById("grandTotal").value = total.toFixed(2);
+    
+    // Auto-fill cash payment with total amount if not manually edited
+    let cashInput = document.getElementById("paidAmount");
+    if (!cashInput.hasAttribute('data-manual')) {
+        cashInput.value = total.toFixed(2);
+    }
+    
+    updatePaymentCalculation();
+}
+
+function updatePaymentCalculation() {
+    let total = parseFloat(document.getElementById("grandTotal").value) || 0;
+    let cashPaid = parseFloat(document.getElementById("paidAmount").value) || 0;
+    let advanceUsed = parseFloat(document.getElementById("advanceAmount")?.value) || 0;
+    
+    let totalPaid = cashPaid + advanceUsed;
+    let due = total - totalPaid;
+    let dueInput = document.getElementById("dueAmount");
+    
+    if (due < 0) {
+        dueInput.value = `Advance: Rs ${Math.abs(due).toFixed(2)}`;
+        dueInput.style.color = "#3b82f6";
+    } else if (due === 0) {
+        dueInput.value = "Fully Paid";
+        dueInput.style.color = "#10b981";
+    } else {
+        dueInput.value = `Due: Rs ${due.toFixed(2)}`;
+        dueInput.style.color = "#ef4444";
+    }
+    
+    let advanceInput = document.getElementById("advanceAmount");
+    if (advanceInput) {
+        let maxAdvance = Math.min(currentAdvanceBalance, total - cashPaid);
+        if (maxAdvance < 0) maxAdvance = 0;
+        advanceInput.max = maxAdvance;
+        let maxLabel = document.getElementById("advanceMaxLabel");
+        if (maxLabel) maxLabel.innerHTML = `Max available: Rs ${maxAdvance.toFixed(2)}`;
+    }
+}
+
+function addRow() {
+    let row = `
+        <tr>
+            <td data-label="Product">
+                <input name="product[]" class="product-input" placeholder="Search product..." autocomplete="off" required>
+                <div class="suggestions-dropdown product-suggestions" style="display: none;"></div>
+              </td>
+            <td data-label="Quantity">
+                <input name="qty[]" type="number" class="qty" step="any" value="1" required>
+              </td>
+            <td data-label="Unit">
+                <select name="unit[]" class="form-select unit">
+                    <option value="Kg">Kg</option>
+                    <option value="Liter">Liter</option>
+                    <option value="Piece">Piece</option>
+                    <option value="Quintal">Quintal</option>
+                </select>
+              </td>
+            <td data-label="Rate">
+                <input name="rate[]" type="number" class="rate" step="any" required>
+              </td>
+            <td data-label="Subtotal">
+                <input name="subtotal[]" class="subtotal" readonly style="background: var(--gray-50);">
+              </td>
+            <td data-label="Action" style="text-align: center; vertical-align: middle;">
+                <button type="button" class="remove-item" onclick="removeRow(this)">✕</button>
+              </td>
+         </tr>
+    `;
+    document.getElementById("itemBody").insertAdjacentHTML("beforeend", row);
+    attachProductListeners();
+    updateExchangeVisibility();
+}
+
+function removeRow(btn) {
+    let row = btn.closest("tr");
+    let rows = document.querySelectorAll("#itemBody tr");
+    if (rows.length > 1) {
+        row.remove();
+        updateExchangeVisibility();
+        updateGrandTotal();
+    }
+}
+
+// Event listeners for calculations
+document.addEventListener("input", function(e) {
+    if (e.target.classList.contains("qty") || e.target.classList.contains("rate")) {
+        let row = e.target.closest("tr");
+        let rateInput = row.querySelector(".rate");
+        if (e.target.classList.contains("rate") && rateInput) {
+            rateInput.dataset.originalRate = rateInput.value || '0';
+        }
+        let qty = parseFloat(row.querySelector(".qty").value) || 0;
+        let rate = parseFloat(rateInput?.value) || 0;
+        let subtotal = row.querySelector(".subtotal");
+        if (subtotal) subtotal.value = (qty * rate).toFixed(2);
+        updateGrandTotal();
+    }
+});
+
+document.getElementById('exchangeMustardCake')?.addEventListener('change', applyExchangeToRows);
+document.getElementById('exchangeRiceBran')?.addEventListener('change', applyExchangeToRows);
+
+// Customer search
+const customerInput = document.getElementById("customer_input");
+const suggestionsDiv = document.getElementById("suggestions");
+
+customerInput.addEventListener("input", async function() {
+    let q = this.value.trim();
+    if (q.length < 2) {
+        suggestionsDiv.style.display = "none";
+        return;
+    }
+    try {
+        let response = await fetch(`{{ url_for('admin.search_customers') }}?q=${q}`);
+        let customers = await response.json();
+        suggestionsDiv.innerHTML = "";
+        suggestionsDiv.style.display = "block";
+        customers.forEach(customer => {
+            let item = document.createElement("div");
+            item.className = "suggestion-item";
+            item.innerHTML = `<strong>${escapeHtml(customer.name)}</strong> ${customer.email ? `<small>(${escapeHtml(customer.email)})</small>` : ''}`;
+            item.onclick = async () => {
+                customerInput.value = customer.name;
+                document.getElementById("customer_id").value = customer.id;
+                document.getElementById("customer_email").value = customer.email || "";
+                suggestionsDiv.style.display = "none";
+                
+                let balanceRes = await fetch(`{{ url_for('admin.api_get_advance_balance', customer_id=0) }}`.replace('0', customer.id));
+                let balanceData = await balanceRes.json();
+                currentAdvanceBalance = balanceData.advance_balance;
+                
+                let advanceSection = document.getElementById("advanceBalanceSection");
+                if (currentAdvanceBalance > 0) {
+                    advanceSection.style.display = "block";
+                    document.getElementById("advanceBalanceDisplay").innerHTML = `Rs ${currentAdvanceBalance.toFixed(2)}`;
+                } else {
+                    advanceSection.style.display = "none";
+                }
+                updatePaymentCalculation();
+            };
+            suggestionsDiv.appendChild(item);
+        });
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+document.addEventListener("click", function(e) {
+    if (e.target !== customerInput && !suggestionsDiv.contains(e.target)) {
+        suggestionsDiv.style.display = "none";
+    }
+});
+
+// Allow manual edit of cash payment
+document.getElementById("paidAmount").addEventListener('input', function() {
+    this.setAttribute('data-manual', 'true');
+    updatePaymentCalculation();
+});
+
+// Advance checkbox
+const useAdvanceCheckbox = document.getElementById("useAdvanceCheckbox");
+if (useAdvanceCheckbox) {
+    useAdvanceCheckbox.addEventListener("change", function() {
+        let advanceSection = document.getElementById("advanceAmountSection");
+        if (this.checked) {
+            advanceSection.style.display = "block";
+            let total = parseFloat(document.getElementById("grandTotal").value) || 0;
+            let cashPaid = parseFloat(document.getElementById("paidAmount").value) || 0;
+            let max = Math.min(currentAdvanceBalance, total - cashPaid);
+            if (max < 0) max = 0;
+            let advanceAmount = document.getElementById("advanceAmount");
+            advanceAmount.max = max;
+            advanceAmount.value = max;
+        } else {
+            advanceSection.style.display = "none";
+            document.getElementById("advanceAmount").value = 0;
+        }
+        updatePaymentCalculation();
+    });
+}
+
+const advanceAmountInput = document.getElementById("advanceAmount");
+if (advanceAmountInput) {
+    advanceAmountInput.addEventListener("input", updatePaymentCalculation);
+}
+
+// Watch for changes in the items table to update exchange visibility
+const itemObserver = new MutationObserver(function() {
+    updateExchangeVisibility();
+});
+
+const itemBodyElement = document.getElementById('itemBody');
+if (itemBodyElement) {
+    itemObserver.observe(itemBodyElement, { childList: true, subtree: true });
+}
+
+// ========== PREVENT DUPLICATE SUBMISSIONS ==========
+document.getElementById('saleForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // If already submitting, block
+    if (isSubmitting) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Validate customer name
+    const customerName = document.getElementById('customer_input').value.trim();
+    if (!customerName) {
+        alert('Please enter customer name');
+        e.preventDefault();
+        return false;
+    }
+    
+    // Validate at least one product
+    const products = document.querySelectorAll('.product-input');
+    let hasProduct = false;
+    products.forEach(p => {
+        if (p.value.trim()) hasProduct = true;
+    });
+    
+    if (!hasProduct) {
+        alert('Please add at least one product');
+        e.preventDefault();
+        return false;
+    }
+    
+    // Validate at least one item has quantity > 0
+    const quantities = document.querySelectorAll('.qty');
+    let hasValidQty = false;
+    quantities.forEach(q => {
+        if (parseFloat(q.value) > 0) hasValidQty = true;
+    });
+    
+    if (!hasValidQty) {
+        alert('Please enter valid quantity for at least one product');
+        e.preventDefault();
+        return false;
+    }
+    
+    // Mark as submitting and disable button
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Creating Invoice...';
+    
+    // Safety: Re-enable after 15 seconds (in case of network timeout)
+    setTimeout(() => {
+        if (isSubmitting) {
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';
+        }
+    }, 15000);
+    
+    // Form will submit normally
+});
+
+attachProductListeners();
+updateExchangeVisibility();
+updateGrandTotal();
+</script>
+
+{% endblock %}

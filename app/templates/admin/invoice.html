@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            color: #000;
+            background: #fff;
+        }
+
+        .box {
+            border: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0;
+        }
+
+        .business-info {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 14px;
+            gap: 20px;
+        }
+
+        .meta div {
+            width: 48%;
+        }
+
+        .byproduct-note {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 15px 0;
+            color: #92400e;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .byproduct-note i {
+            font-size: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f5f5f5;
+        }
+
+        .payment {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .payment-box {
+            width: 280px;
+            text-align: right;
+            font-size: 15px;
+            padding: 12px;
+            border: 1px solid #eee;
+            background: #fafafa;
+        }
+
+        .payment-box p {
+            margin: 8px 0;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .print-btn {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        @media print {
+            .print-btn {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        @page {
+            margin: 10mm;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- PRINT BUTTON -->
+<div class="print-btn">
+    <button onclick="window.print()"
+            style="padding:8px 15px; border:1px solid #000; background:#fff; cursor:pointer;">
+        🖶 Print Invoice
+    </button>
+</div>
+
+<div class="box">
+
+    <!-- BUSINESS HEADER -->
+    <h2>{{ business_name }}</h2>
+
+    <div class="business-info">
+        <div><b>Address:</b> Mainapokhar, Bardiya, Nepal</div>
+        <div><b>Phone:</b> +977-9848023150</div>
+        <div><b>Email:</b> adarshoilbusiness@gmail.com</div>
+    </div>
+
+    <hr>
+
+    <h3 style="text-align:center;">INVOICE</h3>
+
+    <!-- META INFO - WITH CUSTOMER ADDRESS & PHONE -->
+    <div class="meta">
+
+        <div>
+            <p>
+                <b>Invoice No:</b>
+                {{ sale.get('invoice_number', '') }}
+            </p>
+
+            <p>
+                <b>Date:</b>
+                {{ sale.get('date', '')[:10] }}
+            </p>
+        </div>
+
+        <div>
+            <p>
+                <b>Customer:</b>
+                {{ sale.get('customer_name', 'Walk-in Customer') }}
+            </p>
+
+            {% if sale.get('customer_phone') %}
+            <p>
+                <b>Phone:</b>
+                {{ sale.get('customer_phone', '') }}
+            </p>
+            {% endif %}
+
+            {% if sale.get('customer_address') %}
+            <p>
+                <b>Address:</b>
+                {{ sale.get('customer_address', '') }}
+            </p>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+
+    <!-- ITEM TABLE -->
+    <table>
+
+        <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Total</th>
+        </tr>
+
+        {% for item in sale.get('items', []) %}
+
+        <tr>
+
+            <td>
+                {{ item.get('product_name', '') }}
+            </td>
+
+            <td>
+                {{ item.get('quantity', 0) }}
+            </td>
+
+            <td>
+                Rs {{ "%.2f"|format(item.get('rate', 0)) }}
+            </td>
+
+            <td>
+                Rs {{ "%.2f"|format(item.get('subtotal', 0)) }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        <!-- GRAND TOTAL -->
+        <tr>
+
+            <td colspan="3" style="text-align:right;">
+                <b>Grand Total</b>
+            </td>
+
+            <td>
+                <b>
+                    Rs {{ "%.2f"|format(sale.get('total_amount', 0)) }}
+                </b>
+            </td>
+
+        </tr>
+
+    </table>
+    <!-- ========== BYPRODUCT EXCHANGE NOTE ========== -->
+    {% if sale.get('notes') %}
+    <div class="byproduct-note">
+        <span></span>
+        <span>{{ sale.get('notes') }}</span>
+    </div>
+    {% endif %}
+    <!-- ============================================= -->
+
+
+    <small><i class="bi bi-info-circle"> note*: zero quantity & zero paid = byproduct exchange (mustard Cake/ bran), transaction is fully settled.</small> </i>
+
+    <div class="payment">
+
+        <div class="payment-box">
+
+            {% set total = sale.get('total_amount', 0) %}
+            {% set cash_paid = sale.get('paid_amount', 0) %}
+            {% set advance_used = sale.get('advance_used', 0) %}
+            {% set due = sale.get('due_amount', 0) %}
+            {% set advance_amount = sale.get('advance_amount', 0) %}
+
+            <p>
+                <b>Total:</b>
+                Rs {{ "%.2f"|format(total) }}
+            </p>
+
+            <p>
+                <b>Cash Paid:</b>
+                Rs {{ "%.2f"|format(cash_paid) }}
+            </p>
+
+            {% if advance_used > 0 %}
+            <p>
+                <b>Advance Used:</b>
+                Rs {{ "%.2f"|format(advance_used) }}
+            </p>
+            {% endif %}
+
+            <p>
+                <b>Total Paid:</b>
+                Rs {{ "%.2f"|format(cash_paid + advance_used) }}
+            </p>
+
+            {% if due > 0 %}
+            <p style="color: #dc2626;">
+                <b>Due Amount:</b>
+                Rs {{ "%.2f"|format(due) }}
+            </p>
+            {% elif advance_amount > 0 %}
+            <p style="color: #3b82f6;">
+                <b>Advance Credit:</b>
+                Rs {{ "%.2f"|format(advance_amount) }}
+            </p>
+            {% elif due == 0 and (cash_paid > 0 or advance_used > 0) %}
+            <p style="color: #16a34a;">
+                <b>Status:</b> Fully Paid
+            </p>
+            {% endif %}
+
+        </div>
+
+    </div>
+    
+     
+    <!-- FOOTER -->
+    <div class="footer">
+
+       
+
+        <p>
+            <b>You can view your invoices anytime from your account.</b>
+        </p>
+
+        <p>
+            <b>Thank you for your business. Visit again!</b>
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>

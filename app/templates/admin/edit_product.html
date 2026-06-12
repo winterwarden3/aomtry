@@ -1,0 +1,150 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Edit Product - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+    .preview-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    .current-image {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        background: #f9f9f9;
+        text-align: center;
+    }
+    .image-preview-container {
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        background: #f9f9f9;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- Header - Using Bootstrap classes -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">
+                <i class="bi bi-pencil-square"></i> Edit Product
+            </h2>
+            <small class="text-muted">Update product information</small>
+        </div>
+        <a href="{{ url_for('admin_products.product_list') }}" class="btn btn-light">
+            <i class="bi bi-arrow-left"></i> Back to Products
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form method="POST" enctype="multipart/form-data">
+                
+                <div class="row g-4">
+                    
+                    <!-- Product Name -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Product Name *</label>
+                        <input type="text" name="name" class="form-control" required value="{{ product.name }}">
+                    </div>
+                    
+                    <!-- Category -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Category *</label>
+                        <select name="category" class="form-select" required>
+                            <option value="">Select Category</option>
+                            <option value="Food" {% if product.category == 'Food' %}selected{% endif %}>Food Products</option>
+                            <option value="Oil" {% if product.category == 'Oil' %}selected{% endif %}>Oil Products</option>
+                            <option value="By-Product" {% if product.category == 'By-Product' %}selected{% endif %}>By-Products</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Price (Rs.)</label>
+                        <input type="number" name="price" class="form-control" step="0.01" value="{{ product.price or '' }}">
+                        <small class="text-muted">Optional - leave empty if price varies</small>
+                    </div>
+                    
+                    <!-- Current Image -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Current Image</label>
+                        <div class="current-image">
+                            {% if product.image_url %}
+                                <img src="{{ product.image_url }}" class="preview-image" alt="{{ product.name }}">
+                                <p class="mt-2 small text-muted mb-0">Current image</p>
+                            {% else %}
+                                <i class="bi bi-image" style="font-size: 48px; color: #ccc;"></i>
+                                <p class="mt-2 text-muted mb-0">No image uploaded</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- New Image (optional) -->
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Change Image (Optional)</label>
+                        <input type="file" name="image" class="form-control" accept="image/*" id="imageInput">
+                        <small class="text-muted">Leave empty to keep current image. Supported: JPG, PNG, GIF</small>
+                        <div class="image-preview-container" id="previewContainer" style="display: none;">
+                            <img id="imagePreview" class="preview-image" src="" alt="New Image Preview">
+                            <p class="mt-2 small text-muted mb-0">New image preview</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Description</label>
+                        <textarea name="description" class="form-control" rows="4">{{ product.description or '' }}</textarea>
+                    </div>
+                    
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Update Product
+                    </button>
+                    <a href="{{ url_for('admin_products.product_list') }}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Image preview functionality
+    const imageInput = document.getElementById('imageInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.style.display = 'none';
+            imagePreview.src = '';
+        }
+    });
+</script>
+{% endblock %}

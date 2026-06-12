@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block title %}My Activity - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+/* ============================================
+   CUSTOMER MY ACTIVITY PAGE - GLASSMORPHISM
+   ============================================ */
+
+:root {
+    --primary: #0C5B3F;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 4px;
+}
+
+.page-header p {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.stat-footer {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin-top: 4px;
+}
+
+/* Activity Timeline */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gray-200);
+}
+
+.activity-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 18px;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
+}
+
+.activity-dot {
+    position: absolute;
+    left: -26px;
+    top: 22px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--gray-200);
+}
+
+.activity-dot.sale { background: var(--success); }
+.activity-dot.advance { background: var(--info); }
+.activity-dot.payment { background: var(--warning); }
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.activity-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.activity-title i {
+    margin-right: 6px;
+}
+
+.activity-date {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+}
+
+.activity-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-100);
+}
+
+.detail-item {
+    font-size: 0.8rem;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--gray-500);
+    margin-right: 6px;
+}
+
+.detail-value {
+    color: var(--gray-700);
+}
+
+.amount-positive {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.amount-negative {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 30px;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.badge-paid { background: #e8f5e9; color: #2e7d32; }
+.badge-partial { background: #fff3e0; color: #ed6c02; }
+.badge-credit { background: #ffebee; color: #d32f2f; }
+.badge-advance { background: #e3f2fd; color: #1976d2; }
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: var(--gray-300);
+    margin-bottom: 16px;
+}
+
+.empty-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+}
+
+.empty-desc {
+    font-size: 0.85rem;
+    color: var(--gray-400);
+}
+
+/* Back Button */
+.btn-back {
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--gray-600);
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .timeline {
+        padding-left: 20px;
+    }
+    
+    .activity-header {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .activity-details {
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="container py-3">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="fw-bold mb-1" style="font-size: 1.5rem;">
+                <i class="bi bi-activity"></i> My Activity
+            </h1>
+            <p class="text-muted mb-0" style="font-size: 0.8rem;">Your complete transaction history</p>
+        </div>
+        <a href="{{ url_for('customer.dashboard') }}" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Purchases</div>
+            <div class="stat-value">Rs {{ total_purchases|round(2) }}</div>
+            <div class="stat-footer">Lifetime spending</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Paid</div>
+            <div class="stat-value" style="color: var(--success);">Rs {{ total_paid|round(2) }}</div>
+            <div class="stat-footer">Amount paid</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Advance Balance</div>
+            <div class="stat-value" style="color: var(--info);">Rs {{ current_advance_balance|round(2) }}</div>
+            <div class="stat-footer">Your credit</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Advance Used</div>
+            <div class="stat-value" style="color: var(--warning);">Rs {{ total_advance_used|round(2) }}</div>
+            <div class="stat-footer">Redeemed from balance</div>
+        </div>
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="section-header mb-3">
+        <h3 class="fw-bold" style="font-size: 1.1rem;">Activity Timeline</h3>
+    </div>
+
+    {% if activities %}
+    <div class="timeline">
+        {% for activity in activities %}
+        <div class="activity-item">
+            {% if activity.type == 'sale' %}
+                <div class="activity-dot sale"></div>
+                <div class="activity-header">
+                    <div class="activity-title">
+                        <i class="bi bi-cart-check" style="color: var(--success);"></i> {{ activity.title }}
+                    </div>
+                    <div class="activity-date">
+                        <i class="bi bi-calendar3"></i> {{ activity.date[:10] if activity.date else '' }}
+                    </div>
+                </div>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Invoice:</span>
+                        <span class="detail-value">#{{ activity.description.split('#')[1].split(' ')[0] if '#' in activity.description else 'N/A' }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Total:</span>
+                        <span class="detail-value amount-positive">Rs {{ activity.amount|round(2) }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cash Paid:</span>
+                        <span class="detail-value">Rs {{ activity.cash_paid|round(2) }}</span>
+                    </div>
+                    {% if activity.advance_used > 0 %}
+                    <div class="detail-item">
+                        <span class="detail-label">Advance Used:</span>
+                        <span class="detail-value" style="color: var(--info);">Rs {{ activity.advance_used|round(2) }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="badge-status 
+                            {% if activity.status == 'paid' %}badge-paid
+                            {% elif activity.status == 'partial' %}badge-partial
+                            {% elif activity.status == 'advance' %}badge-advance
+                            {% else %}badge-credit{% endif %}">
+                            {{ activity.status|title }}
+                        </span>
+                    </div>
+                </div>
+            {% elif activity.type == 'advance' %}
+                <div class="activity-dot advance"></div>
+                <div class="activity-header">
+                    <div class="activity-title">
+                        <i class="bi bi-wallet2" style="color: var(--info);"></i> {{ activity.title }}
+                    </div>
+                    <div class="activity-date">
+                        <i class="bi bi-calendar3"></i> {{ activity.date[:10] if activity.date else '' }}
+                    </div>
+                </div>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value {% if activity.transaction_type == 'deposit' %}amount-positive{% else %}amount-negative{% endif %}">
+                            {% if activity.transaction_type == 'deposit' %}+{% else %}-{% endif %}
+                            Rs {{ activity.amount|round(2) }}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Notes:</span>
+                        <span class="detail-value">{{ activity.description }}</span>
+                    </div>
+                </div>
+            {% elif activity.type == 'payment' %}
+                <div class="activity-dot payment"></div>
+                <div class="activity-header">
+                    <div class="activity-title">
+                        <i class="bi bi-cash-stack" style="color: var(--warning);"></i> {{ activity.title }}
+                    </div>
+                    <div class="activity-date">
+                        <i class="bi bi-calendar3"></i> {{ activity.date[:10] if activity.date else '' }}
+                    </div>
+                </div>
+                <div class="activity-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value amount-positive">Rs {{ activity.amount|round(2) }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Mode:</span>
+                        <span class="detail-value">{{ activity.payment_mode }}</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-activity"></i></div>
+        <div class="empty-title">No Activity Found</div>
+        <div class="empty-desc">You haven't made any transactions yet.</div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Invoices - {{ customer.name }} - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-receipt"></i> Invoices - {{ customer.name }}
+            </h3>
+            <p class="text-muted mb-0">View all purchase invoices</p>
+        </div>
+        <a href="{{ url_for('admin.customers_list') }}" class="btn btn-light">
+            <i class="bi bi-arrow-left"></i> Back to Customers
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Items</th>
+                            <th>Exchange Note</th>
+                            <th>Total (Rs.)</th>
+                            <th>Paid (Rs.)</th>
+                            <th>Due (Rs.)</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td>
+                                <span class="fw-bold">
+                                    {{ sale.invoice_number }}
+                                </span>
+                                <br>
+                                <small class="text-muted">{{ sale.date[:10] if sale.date else '' }}</small>
+                            </td>
+
+                            <td>
+                                {% if sale.get('items') and sale.get('items')|length > 0 %}
+                                    {{ sale.get('items')[0].get('product_name', '') }}
+                                    {% if sale.get('items')|length > 1 %}
+                                        <span class="text-muted">+{{ sale.get('items')|length - 1 }} more</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if sale.get('notes') %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-weight:500;white-space:normal;text-align:left;">
+                                        {{ sale.get('notes') }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="fw-bold">Rs. {{ "%.2f"|format(sale.total_amount) }}</td>
+                            <td>Rs. {{ "%.2f"|format(sale.paid_amount) }}</td>
+
+                            <td>
+                                {% if sale.due_amount > 0 %}
+                                    <span class="fw-bold text-danger">
+                                        Rs. {{ "%.2f"|format(sale.due_amount) }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">Rs. 0</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if sale.payment_status == "paid" %}
+                                    <span class="badge bg-success">Paid</span>
+                                {% elif sale.payment_status == "partial" %}
+                                    <span class="badge bg-warning text-dark">Partial</span>
+                                {% elif sale.payment_status == "advance" %}
+                                    <span class="badge bg-info text-white">Advance</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Credit</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center">
+                                <a href="{{ url_for('admin.invoice_view', sale_id=sale.id) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                                <p class="text-muted mt-3 mb-0">No invoices found for this customer</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

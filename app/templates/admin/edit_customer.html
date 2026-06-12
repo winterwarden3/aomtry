@@ -1,0 +1,140 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Edit Customer - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER - Using Bootstrap classes -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">
+                <i class="bi bi-person-badge"></i> Edit Customer
+            </h2>
+            <small class="text-muted">Update customer details safely</small>
+        </div>
+        <a href="{{ url_for('admin.customers_list') }}" class="btn btn-light">
+            <i class="bi bi-arrow-left"></i> Back to Customers
+        </a>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4 shadow-sm mb-4">
+                    <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- FORM CARD -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+
+                    <form method="POST">
+                        <div class="row g-3">
+
+                            <!-- NAME -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Name *</label>
+                                <input type="text"
+                                       name="name"
+                                       class="form-control"
+                                       value="{{ customer.name }}"
+                                       required
+                                       placeholder="Enter full name">
+                            </div>
+
+                            <!-- USERNAME -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Username *</label>
+                                <input type="text"
+                                       name="username"
+                                       class="form-control"
+                                       value="{{ customer.username }}"
+                                       required
+                                       placeholder="Enter username">
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email"
+                                       name="email"
+                                       class="form-control"
+                                       value="{{ customer.email or '' }}"
+                                       placeholder="customer@example.com">
+                            </div>
+
+                            <!-- PHONE -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Phone</label>
+                                <input type="text"
+                                       name="phone"
+                                       class="form-control"
+                                       value="{{ customer.phone or '' }}"
+                                       placeholder="Phone number">
+                            </div>
+
+                            <!-- STATUS - Active Toggle -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Status</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="is_active"
+                                           id="is_active"
+                                           {% if customer.is_active %}checked{% endif %}>
+                                    <label class="form-check-label fw-bold" for="is_active">
+                                        {% if customer.is_active %}
+                                            <span class="text-success">Active</span>
+                                        {% else %}
+                                            <span class="text-danger">Inactive</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                <small class="text-muted">Inactive customers cannot log in</small>
+                            </div>
+
+                            <!-- ADDRESS -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Address</label>
+                                <textarea name="address"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Customer address">{{ customer.address or '' }}</textarea>
+                            </div>
+
+                        </div>
+
+                        <!-- UPDATE BUTTON -->
+                        <button type="submit" class="btn btn-primary w-100 mt-4">
+                            <i class="bi bi-save"></i> Update Customer
+                        </button>
+                    </form>
+
+                    <!-- DELETE BUTTON -->
+                    <form method="POST"
+                          action="{{ url_for('admin.delete_customer', customer_id=customer.id) }}"
+                          onsubmit="return confirm('⚠️ Are you sure you want to delete this customer? This action cannot be undone.');"
+                          class="mt-2">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="bi bi-trash"></i> Delete Customer
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

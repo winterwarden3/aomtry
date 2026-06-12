@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}{{ business_name }}{% endblock %}</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- ================= ERP GLOBAL THEME ================= -->
+    <style>
+
+        :root {
+            --primary: #0C5B3F;
+            --accent: #138A52;
+            --dark-bg: #454838;
+            --main-bg: #FAFAF7;
+            --secondary-bg: #F4F4F2;
+            --heading: #1F1A17;
+            --secondary-text: #7C685B;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0dcaf0;
+        }
+
+        body {
+            background: var(--main-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--heading);
+        }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            background: var(--primary) !important;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+        }
+
+        .navbar-brand i {
+            color: var(--accent);
+        }
+
+        .nav-link {
+            border-radius: 8px;
+            font-size: 14px;
+            padding: 8px 15px;
+            transition: 0.2s ease;
+            color: rgba(255,255,255,0.9) !important;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            color: white !important;
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            background: var(--accent);
+            color: white !important;
+        }
+
+        /* ================= MAIN ================= */
+        main {
+            min-height: 80vh;
+            padding-bottom: 40px;
+        }
+
+        /* ================= CARDS ================= */
+        .card {
+            border: none;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: 0.25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 2px solid var(--secondary-bg);
+            font-weight: 600;
+            color: var(--heading);
+        }
+
+        /* ================= BUTTONS ================= */
+        .btn {
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            border: none;
+        }
+
+        .btn-success {
+            background: var(--accent);
+            border: none;
+        }
+
+        .btn-outline-primary {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ================= TABLE ================= */
+        .table thead th {
+            background: var(--secondary-bg);
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--heading);
+        }
+
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        /* ================= PAGE HEADER ================= */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(12, 91, 63, 0.2);
+        }
+
+        /* ================= FORM ================= */
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            padding: 10px 12px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(12, 91, 63, 0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--heading);
+            margin-bottom: 8px;
+        }
+
+        /* ================= ALERT ================= */
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: var(--secondary-text);
+        }
+
+        /* ================= BADGES ================= */
+        .badge {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .bg-success {
+            background: var(--accent) !important;
+        }
+
+        /* ================= SIDEBAR MENU ================= */
+        .sidebar-menu {
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .sidebar-menu .nav-link {
+            color: var(--heading) !important;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu .nav-link:hover {
+            background: var(--secondary-bg);
+            color: var(--primary) !important;
+        }
+
+        /* ================= MOBILE ================= */
+        @media (max-width: 768px) {
+            main {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            .page-header {
+                padding: 15px;
+            }
+        }
+
+    </style>
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+
+
+
+
+
+<!-- Loading Animation for Vercel -->
+<div id="appLoader" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0C5B3F 0%, #138A52 100%);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+">
+    <div style="text-align: center;">
+        <!-- Oil Drop -->
+        <div style="
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: dropFloat 1.5s ease-in-out infinite;
+            position: relative;
+        ">
+            <div style="
+                position: absolute;
+                width: 25px;
+                height: 25px;
+                background: #fef3c7;
+                border-radius: 50%;
+                top: 18px;
+                left: 30px;
+                animation: dropShine 2s ease-in-out infinite;
+            "></div>
+        </div>
+        
+        <!-- Spinner -->
+        <div style="
+            width: 45px;
+            height: 45px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top: 3px solid #fbbf24;
+            border-radius: 50%;
+            animation: spinRing 0.8s linear infinite;
+            margin: 15px auto;
+        "></div>
+        
+        <!-- Text -->
+        <p style="color: white; font-weight: 600; margin-top: 10px;">Adarsh Oil Mill</p>
+        <p style="color: rgba(255,255,255,0.8); font-size: 12px;" id="loadingMsg">Loading Admin Panel...</p>
+    </div>
+</div>
+
+<style>
+    @keyframes dropFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    @keyframes dropShine {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
+    }
+    @keyframes spinRing {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    // Rotating messages
+    const messages = ["🛢️ Loading...", "📊 Fetching data...", "⚙️ Almost ready..."];
+    let i = 0;
+    setInterval(() => {
+        const el = document.getElementById('loadingMsg');
+        if (el) { i = (i + 1) % messages.length; el.innerHTML = messages[i]; }
+    }, 1500);
+    
+    // Hide loader when page loads
+    window.addEventListener('load', function() {
+        const loader = document.getElementById('appLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+    });
+    
+    // Fallback hide after 4 seconds
+    setTimeout(() => {
+        const loader = document.getElementById('appLoader');
+        if (loader && loader.parentNode) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+    }, 1000);
+</script>
+
+
+
+
+
+
+
+<!-- ================= NAVBAR ================= -->
+{% if current_user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+
+    <div class="container-fluid">
+
+        <a class="navbar-brand" href="{{ url_for('admin.dashboard') }}">
+            <i class="bi bi-droplet"></i> {{ business_name }}
+        </a>
+
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="nav">
+
+            <ul class="navbar-nav me-auto">
+
+                {% if current_user.role == 'admin' %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.sales_list') }}">
+                        <i class="bi bi-cart-check"></i> Sales
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.expenses_list') }}">
+                        <i class="bi bi-cash-stack"></i> Expenses
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.customers_list') }}">
+                        <i class="bi bi-people"></i> Customers
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_products.product_list') }}">
+                        <i class="bi bi-box"></i> Products
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.reports') }}">
+                        <i class="bi bi-graph-up"></i> Reports
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin.profit_analysis') }}">
+                        <i class="bi bi-currency-rupee"></i> Profit
+                    </a>
+                </li>
+
+                {% else %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer.dashboard') }}">
+                        <i class="bi bi-house"></i> My Dashboard
+                    </a>
+                </li>
+
+                {% endif %}
+
+            </ul>
+
+            <ul class="navbar-nav">
+
+                <li class="nav-item dropdown">
+
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> {{ current_user.name }}
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end p-2">
+
+                        <li class="px-3 small text-muted">
+                            Role: {{ current_user.role|title }}
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('auth.change_password') }}">
+                                <i class="bi bi-key"></i> Change Password
+                            </a>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+{% endif %}
+
+<!-- ================= FLASH ================= -->
+<!-- TOAST FLASH MESSAGES -->
+<div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<style>
+.toast-glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    min-width: 280px;
+    max-width: 350px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-left: 4px solid;
+    animation: slideInRight 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Poppins', sans-serif;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+        display: none;
+    }
+}
+
+.toast-glass.success {
+    border-left-color: #22c55e;
+}
+.toast-glass.success i {
+    color: #22c55e;
+}
+
+.toast-glass.danger {
+    border-left-color: #ef4444;
+}
+.toast-glass.danger i {
+    color: #ef4444;
+}
+
+.toast-glass.warning {
+    border-left-color: #f59e0b;
+}
+.toast-glass.warning i {
+    color: #f59e0b;
+}
+
+.toast-glass.info {
+    border-left-color: #0C5B3F;
+}
+.toast-glass.info i {
+    color: #0C5B3F;
+}
+
+.toast-glass i {
+    font-size: 1.2rem;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: #555;
+}
+</style>
+
+<script>
+function showToast(message, category) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-glass ${category}`;
+    
+    let icon = 'bi-info-circle';
+    let title = 'Notice';
+    
+    if (category === 'success') {
+        icon = 'bi-check-circle-fill';
+        title = 'Success!';
+    } else if (category === 'danger') {
+        icon = 'bi-exclamation-triangle-fill';
+        title = 'Error!';
+    } else if (category === 'warning') {
+        icon = 'bi-exclamation-circle-fill';
+        title = 'Warning!';
+    } else {
+        icon = 'bi-info-circle-fill';
+        title = 'Info';
+    }
+    
+    toast.innerHTML = `
+        <i class="bi ${icon}"></i>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast && toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+// Show flash messages as toasts
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            showToast("{{ message|safe }}", "{{ category }}");
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+</script>
+
+<!-- ================= CONTENT ================= -->
+<main class="{% if current_user.is_authenticated %}container-fluid mt-4 px-3{% endif %}">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="py-3 mt-4 text-center">
+
+    <div class="container">
+
+        <small class="text-muted">
+
+            © {{ current_year }} {{ business_name }}
+
+            ·
+
+            {% if current_user.role == 'admin' %}
+
+                Admin Dashboard
+
+            {% else %}
+
+                Customer Dashboard.
+
+            {% endif %}
+
+        </small>
+
+    </div>
+
+</footer>
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

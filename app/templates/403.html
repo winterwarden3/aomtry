@@ -1,0 +1,96 @@
+{% extends "base_public.html" %}
+
+{% block title %}Access Denied - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+.error-container {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.error-card {
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.error-code {
+    font-size: 100px;
+    font-weight: 800;
+    color: #f59e0b;
+    line-height: 1;
+    margin-bottom: 20px;
+}
+
+.error-icon {
+    font-size: 80px;
+    color: #f59e0b;
+    margin-bottom: 20px;
+}
+
+.error-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+
+.error-message {
+    color: #6b7280;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    padding: 12px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-home:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(12,91,63,0.25);
+    color: white;
+}
+</style>
+
+<div class="error-container">
+    <div class="error-card">
+        
+        <div class="error-icon">
+            <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        
+        <div class="error-code">
+            403
+        </div>
+        
+        <h1 class="error-title">
+            Access Denied
+        </h1>
+        
+        <p class="error-message">
+            You don't have permission to access this page. Please login with appropriate credentials.
+        </p>
+        
+        <a href="{{ url_for('auth.login') }}" class="btn-home">
+            <i class="bi bi-box-arrow-in-right"></i>
+            Login to Account
+        </a>
+        
+    </div>
+</div>
+
+{% endblock %}

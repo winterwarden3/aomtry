@@ -1,0 +1,212 @@
+{% extends "base_public.html" %}
+
+{% block title %}
+    {% if user_type == 'admin' %}
+        Admin Login - {{ business_name }}
+    {% else %}
+        Customer Login - {{ business_name }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+body {
+    background: linear-gradient(135deg, #0C5B3F 0%, #138A52 100%);
+    min-height: 100vh;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 35px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.login-card h3 {
+    color: #0C5B3F;
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.login-type-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.toggle-btn {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn.customer {
+    background: #f0f0f0;
+    color: #0C5B3F;
+    border: 1px solid #0C5B3F;
+}
+
+.toggle-btn.customer.active {
+    background: #138A52;
+    color: white;
+}
+
+.toggle-btn.admin {
+    background: #f0f0f0;
+    color: #0C5B3F;
+    border: 1px solid #0C5B3F;
+}
+
+.toggle-btn.admin.active {
+    background: #0C5B3F;
+    color: white;
+}
+
+.toggle-btn:hover {
+    transform: translateY(-2px);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group-text {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
+}
+
+.form-control:focus {
+    border-color: #0C5B3F;
+    box-shadow: none;
+}
+
+.btn-login {
+    background: #0C5B3F;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 600;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    background: #138A52;
+    transform: translateY(-2px);
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-link a {
+    color: #666;
+    text-decoration: none;
+}
+
+.back-link a:hover {
+    color: #0C5B3F;
+}
+
+.forgot-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #0C5B3F;
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.footer-text {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 12px;
+    color: #888;
+}
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        
+
+        <!-- Toggle Buttons -->
+        <div class="login-type-toggle">
+            <a href="{{ url_for('auth.login', type='customer') }}" 
+               class="toggle-btn customer {% if user_type == 'customer' %}active{% endif %}">
+                <i class="bi bi-person"></i> Customer
+            </a>
+            <a href="{{ url_for('auth.login', type='admin') }}" 
+               class="toggle-btn admin {% if user_type == 'admin' %}active{% endif %}">
+                <i class="bi bi-shield-lock"></i> Admin
+            </a>
+        </div>
+
+        <h3>
+            {% if user_type == 'admin' %}
+                Admin Login
+            {% else %}
+                Customer Login
+            {% endif %}
+        </h3>
+
+        <form method="POST">
+            <input type="hidden" name="login_type" value="{{ user_type }}">
+            
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-person"></i>
+                </span>
+                <input type="text" class="form-control" name="username" placeholder="Username" required>
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-lock"></i>
+                </span>
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </button>
+        </form>
+
+        <a href="{{ url_for('auth.forgot_password', type=user_type) }}" class="forgot-link">
+            Forgot Password?
+        </a>
+
+        <div class="footer-text">
+            <i class="bi bi-shield-check"></i> Secure Access
+        </div>
+
+
+    </div>
+</div>
+
+{% endblock %}

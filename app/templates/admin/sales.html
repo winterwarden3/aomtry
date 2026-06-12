@@ -1,0 +1,655 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Sales Management - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+/* ============================================
+   PROFESSIONAL UI - CONSISTENT WITH NEW SALE PAGE
+   ============================================ */
+
+:root {
+    --primary: #0C5B3F;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Cards */
+.stat-card, .card-ui {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.stat-card {
+    padding: 20px;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-ui {
+    padding: 0;
+    overflow: hidden;
+}
+
+.stat-card h6 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--gray-800);
+}
+
+.stat-footer {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin-top: 6px;
+}
+
+.icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Buttons - Matching New Sale Page */
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+}
+
+.btn-primary-ui {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary-ui:hover {
+    background: var(--accent);
+    transform: translateY(-1px);
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+}
+
+.btn-outline-ui:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-danger-ui {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+.btn-danger-ui:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* Search */
+.search-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+/* Sales Table */
+.sales-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sales-table th {
+    text-align: left;
+    padding: 14px 12px;
+    background: var(--gray-50);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    border-bottom: 1px solid var(--gray-200);
+    font-family: inherit;
+}
+
+.sales-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.85rem;
+    vertical-align: middle;
+    font-family: inherit;
+}
+
+.sales-table tr:last-child td {
+    border-bottom: none;
+}
+
+.sales-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+/* Invoice Number */
+.invoice-num {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.85rem;
+}
+
+/* Customer Name */
+.customer-name {
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+/* Items Summary */
+.items-summary {
+    max-width: 200px;
+}
+
+.items-main {
+    font-weight: 500;
+    color: var(--gray-700);
+    font-size: 0.85rem;
+}
+
+.items-more {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin-top: 2px;
+}
+
+/* Amounts */
+.amount {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.amount-total {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.amount-due {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.amount-paid {
+    color: var(--success);
+}
+
+.amount-advance {
+    color: var(--info);
+    font-weight: 600;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.status-paid {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-partial {
+    background: #fff3e0;
+    color: #ed6c02;
+}
+
+.status-credit {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.status-advance {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+/* Action Buttons Group */
+.action-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 20px;
+    padding: 16px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.page-link {
+    padding: 6px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.page-link:hover,
+.page-link.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: var(--gray-300);
+    margin-bottom: 16px;
+}
+
+.empty-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+}
+
+.empty-desc {
+    font-size: 0.85rem;
+    color: var(--gray-400);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .sales-table th:nth-child(4),
+    .sales-table td:nth-child(4) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .sales-table thead {
+        display: none;
+    }
+    
+    .sales-table tbody tr {
+        display: block;
+        margin-bottom: 16px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        background: white;
+    }
+    
+    .sales-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .sales-table td:last-child {
+        border-bottom: none;
+    }
+    
+    .sales-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--gray-500);
+        min-width: 100px;
+    }
+    
+    .action-group {
+        justify-content: flex-end;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+    }
+    
+    .icon-box {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-wrapper {
+        flex-direction: column;
+    }
+    
+    .action-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-ui {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="container-fluid px-md-3 py-3">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="fw-bold mb-1" style="font-size: 1.5rem;">
+                <i class="bi bi-cart-check"></i> Sales
+            </h1>
+            <p class="text-muted mb-0" style="font-size: 0.8rem;">Manage all sales transactions</p>
+        </div>
+        <a href="{{ url_for('admin.add_sale') }}" class="btn-ui btn-primary-ui">
+            <i class="bi bi-plus-lg"></i> New Sale
+        </a>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Total Sales</h6>
+                        <div class="stat-value">{{ sales.total }}</div>
+                        <div class="stat-footer">invoices</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Paid</h6>
+                        <div class="stat-value" style="color: #16a34a;">{{ paid_sales_count }}</div>
+                        <div class="stat-footer">fully paid</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(22,163,74,0.1); color: #16a34a;">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Pending</h6>
+                        <div class="stat-value" style="color: #ed6c02;">{{ pending_sales_count }}</div>
+                        <div class="stat-footer">partial + credit</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(237,108,2,0.1); color: #ed6c02;">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Advance</h6>
+                        <div class="stat-value" style="color: #1976d2;">{{ advance_sales_count }}</div>
+                        <div class="stat-footer">advance credit</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(25,118,210,0.1); color: #1976d2;">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="card-ui mb-4" style="padding: 16px;">
+        <form method="GET" action="{{ url_for('admin.sales_list') }}">
+            <div class="search-wrapper">
+                <input type="text" class="search-input" name="search" placeholder="Search by invoice number or customer..." value="{{ search }}">
+                <button type="submit" class="btn-ui btn-primary-ui" style="padding: 10px 20px;">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="card-ui">
+        <div style="overflow-x: auto;">
+            <table class="sales-table">
+                <thead>
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Cash Paid</th>
+                        <th>Advance Used</th>
+                        <th>Due</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales.items %}
+                    {% set cash_paid = sale.get('paid_amount', 0) %}
+                    {% set advance_used = sale.get('advance_used', 0) %}
+                    {% set due = sale.get('due_amount', 0) %}
+                    {% set total = sale.get('total_amount', 0) %}
+                    {% set status = sale.get('payment_status', 'credit') %}
+                    {% set items = sale.get('items', []) %}
+                    <tr>
+                        <td data-label="Invoice">
+                            <span class="invoice-num">#{{ sale.get('invoice_number', '') }}</span>
+                        </td>
+                        <td data-label="Date">
+                            {{ sale.get('date', '')[:10] if sale.get('date') else '' }}
+                        </td>
+                        <td data-label="Customer">
+                            <span class="customer-name">{{ sale.get('customer_name', 'Walk-in') }}</span>
+                        </td>
+                        <td data-label="Items">
+                            {% if items %}
+                                <div class="items-summary">
+                                    <div class="items-main">{{ items[0].get('product_name', '') }}</div>
+                                    {% if items|length > 1 %}
+                                        <div class="items-more">+{{ items|length - 1 }} more</div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Total" class="amount amount-total">Rs {{ "%.2f"|format(total) }}</td>
+                        <td data-label="Cash Paid" class="amount amount-paid">Rs {{ "%.2f"|format(cash_paid) }}</td>
+                        <td data-label="Advance Used" class="amount">
+                            {% if advance_used > 0 %}
+                                <span class="amount-advance">Rs {{ "%.2f"|format(advance_used) }}</span>
+                            {% else %}
+                                <span class="text-muted">Rs 0</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Due" class="amount">
+                            {% if due > 0 %}
+                                <span class="amount-due">Rs {{ "%.2f"|format(due) }}</span>
+                            {% else %}
+                                <span class="text-muted">Rs 0</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Status">
+                            {% if status == "paid" %}
+                                <span class="status-badge status-paid">Paid</span>
+                            {% elif status == "partial" %}
+                                <span class="status-badge status-partial">Partial</span>
+                            {% elif status == "advance" %}
+                                <span class="status-badge status-advance">Advance</span>
+                            {% else %}
+                                <span class="status-badge status-credit">Credit</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Actions">
+                            <div class="action-group">
+                                <a href="{{ url_for('admin.invoice_view', sale_id=sale.get('id')) }}" class="btn-ui btn-outline-ui">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                <a href="{{ url_for('admin.edit_sale', sale_id=sale.get('id')) }}" class="btn-ui btn-outline-ui">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <button type="button" class="btn-ui btn-danger-ui delete-sale-btn" 
+                                        data-sale-id="{{ sale.get('id') }}" 
+                                        data-invoice="{{ sale.get('invoice_number') }}">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="bi bi-receipt"></i></div>
+                                <div class="empty-title">No sales found</div>
+                                <div class="empty-desc">Create your first sale to get started</div>
+                                <a href="{{ url_for('admin.add_sale') }}" class="btn-ui btn-primary-ui mt-3">
+                                    <i class="bi bi-plus-lg"></i> New Sale
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if sales.pages > 1 %}
+        <div class="pagination">
+            {% if sales.has_prev %}
+                <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.prev_num, search=search) }}">←</a>
+            {% endif %}
+            {% for page_num in sales.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+                {% if page_num %}
+                    <a class="page-link {% if page_num == sales.page %}active{% endif %}" href="{{ url_for('admin.sales_list', page=page_num, search=search) }}">{{ page_num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if sales.has_next %}
+                <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.next_num, search=search) }}">→</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+// Delete Sale Confirmation
+document.querySelectorAll('.delete-sale-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const saleId = this.dataset.saleId;
+        const invoiceNumber = this.dataset.invoice;
+        
+        if (confirm(`⚠️ DELETE SALE\n\nAre you sure you want to delete invoice #${invoiceNumber}?\n\nThis action cannot be undone.\nAny advance used will be refunded to the customer.`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/delete-sale/${saleId}`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+});
+</script>
+
+{% endblock %}

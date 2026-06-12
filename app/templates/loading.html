@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading - Adarsh Oil Mill</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0C5B3F 0%, #138A52 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .loading-container {
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Oil drop animation */
+        .oil-drop {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50% 50% 50% 50%;
+            margin: 0 auto 30px;
+            position: relative;
+            animation: drip 1.5s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .oil-drop::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #fef3c7;
+            border-radius: 50%;
+            top: 20px;
+            left: 40px;
+            opacity: 0.6;
+            animation: shine 2s ease-in-out infinite;
+        }
+        
+        .oil-drop::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 30px;
+            background: #fbbf24;
+            bottom: -35px;
+            left: 56px;
+            border-radius: 4px;
+            animation: pour 1.5s ease-in-out infinite;
+        }
+        
+        /* Spinner ring */
+        .spinner-ring {
+            width: 80px;
+            height: 80px;
+            margin: 30px auto 20px;
+            border: 4px solid rgba(255,255,255,0.2);
+            border-top: 4px solid #fbbf24;
+            border-right: 4px solid #f59e0b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        /* Loading text */
+        .loading-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .loading-dots {
+            display: inline-block;
+            width: 60px;
+            text-align: left;
+        }
+        
+        .loading-dots span {
+            animation: blink 1.4s infinite;
+            animation-fill-mode: both;
+        }
+        
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        /* Message */
+        .loading-message {
+            color: rgba(255,255,255,0.8);
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 280px;
+            margin: 30px auto 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            border-radius: 4px;
+            animation: progress 2s ease-out forwards;
+        }
+        
+        /* Animations */
+        @keyframes drip {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-15px) scale(1.05);
+            }
+        }
+        
+        @keyframes pour {
+            0%, 100% {
+                height: 30px;
+                opacity: 1;
+            }
+            50% {
+                height: 45px;
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes shine {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+        
+        @keyframes blink {
+            0%, 20% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            30% { width: 45%; }
+            60% { width: 75%; }
+            100% { width: 100%; }
+        }
+        
+        /* Fun facts */
+        .fun-fact {
+            margin-top: 40px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            max-width: 300px;
+            text-align: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .oil-drop {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .oil-drop::before {
+                width: 25px;
+                height: 25px;
+                top: 15px;
+                left: 28px;
+            }
+            
+            .oil-drop::after {
+                left: 36px;
+            }
+            
+            .loading-text {
+                font-size: 1.2rem;
+            }
+            
+            .spinner-ring {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <!-- Oil drop animation -->
+        <div class="oil-drop"></div>
+        
+        <!-- Spinner -->
+        <div class="spinner-ring"></div>
+        
+        <!-- Loading text with dots -->
+        <div class="loading-text">
+            Loading
+            <div class="loading-dots">
+                <span>.</span><span>.</span><span>.</span>
+            </div>
+        </div>
+        
+        <!-- Progress bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <!-- Rotating message -->
+        <div class="loading-message" id="loadingMessage">
+            🛢️ Loading pure goodness...
+        </div>
+        
+        <!-- Fun fact -->
+        <div class="fun-fact" id="funFact">
+            💡 Did you know? Adarsh Oil Mill has been serving quality since 2062 BS!
+        </div>
+    </div>
+    
+    <script>
+        // Rotating messages (changes every 2 seconds)
+        const messages = [
+            "🛢️ Loading pure goodness...",
+            "🌟 Preparing fresh products for you...",
+            "⚙️ Crushing mustard seeds...",
+            "📦 Packing your order...",
+            "✨ Almost there...",
+            "🌾 Sourcing the finest grains...",
+            "🏭 Traditional methods, modern quality...",
+            "💚 100% natural, no chemicals..."
+        ];
+        
+        const funFacts = [
+            "💡 Did you know? Adarsh Oil Mill has been serving quality since 2062 BS!",
+            "🌿 Our mustard oil is cold-pressed for maximum nutrients!",
+            "🏆 Trusted by 5000+ happy customers across Nepal!",
+            "📦 We deliver fresh products every morning!",
+            "💎 No preservatives, no additives - just pure goodness!",
+            "🌍 Serving families from Pokhara to Kathmandu!",
+            "👨‍🌾 Locally sourced grains from Nepali farmers!",
+            "⭐ Rated 5 stars by our loyal customers!"
+        ];
+        
+        let messageIndex = 0;
+        let factIndex = 0;
+        
+        // Rotate message every 2 seconds
+        setInterval(() => {
+            messageIndex = (messageIndex + 1) % messages.length;
+            const messageEl = document.getElementById('loadingMessage');
+            if (messageEl) {
+                messageEl.style.opacity = '0';
+                setTimeout(() => {
+                    messageEl.innerHTML = messages[messageIndex];
+                    messageEl.style.opacity = '1';
+                }, 300);
+            }
+        }, 2000);
+        
+        // Rotate fun facts every 3 seconds
+        setInterval(() => {
+            factIndex = (factIndex + 1) % funFacts.length;
+            const factEl = document.getElementById('funFact');
+            if (factEl) {
+                factEl.style.opacity = '0';
+                setTimeout(() => {
+                    factEl.innerHTML = funFacts[factIndex];
+                    factEl.style.opacity = '1';
+                }, 300);
+            }
+        }, 3000);
+        
+        // Detect when page is actually loading
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    if (document.readyState === 'complete') {
+                        // Page loaded, but we keep showing until redirect
+                    }
+                }, 500);
+            });
+        }
+    </script>
+</body>
+</html>

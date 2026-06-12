@@ -1,0 +1,811 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Customer Dues - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    --shadow-md: 0 8px 20px rgba(0,0,0,0.10);
+
+    --success: #16a34a;
+    --danger: #dc2626;
+    --warning: #f59e0b;
+    --info: #2563eb;
+
+    --border: #e5e7eb;
+    --muted: #64748b;
+
+    --transition: 0.25s ease;
+}
+
+.stat-card,
+.card-ui {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    contain: layout paint;
+}
+
+.stat-card {
+    padding: 20px;
+    transition: all var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-ui {
+    padding: 20px;
+}
+
+.stat-card h6 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    min-height: 44px;
+    padding: 10px 14px;
+}
+
+.btn-ui:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary-ui {
+    background: linear-gradient(135deg, #0C5B3F, #138A52);
+    color: white;
+}
+
+.btn-primary-ui:hover {
+    color: white;
+    box-shadow: 0 6px 18px rgba(19,138,82,0.25);
+}
+
+.btn-success-ui {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    color: white;
+}
+
+.btn-success-ui:hover {
+    color: white;
+    box-shadow: 0 6px 18px rgba(22,163,74,0.25);
+}
+
+.btn-danger-ui {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+}
+
+.btn-danger-ui:hover {
+    color: white;
+    box-shadow: 0 6px 18px rgba(220,38,38,0.25);
+}
+
+.advance-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+}
+
+.table-ui {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-ui thead th {
+    position: sticky;
+    top: 0;
+    background: #f9fafb;
+    color: #0C5B3F;
+    padding: 14px 12px;
+    font-size: .82rem;
+    font-weight: 700;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-ui tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: .88rem;
+    vertical-align: top;
+}
+
+.table-ui tbody tr:hover {
+    background: #f8faff;
+}
+
+.modal-content {
+    border-radius: 16px;
+    border: none;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #0C5B3F, #138A52);
+    color: white;
+    border-radius: 16px 16px 0 0;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-title {
+    font-weight: 700;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 16px 24px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #0C5B3F;
+    margin-bottom: 8px;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #138A52;
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+.warning-box {
+    background: #fef3c7;
+    padding: 12px;
+    border-radius: 8px;
+    color: #92400e;
+    margin-bottom: 15px;
+}
+
+.advance-info-box {
+    background: #e0f2fe;
+    padding: 12px;
+    border-radius: 8px;
+    color: #0369a1;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.advance-amount {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0 12px !important;
+    }
+    .stat-card, .card-ui {
+        padding: 16px;
+    }
+    .stat-value {
+        font-size: 1.4rem;
+    }
+    .table-ui thead {
+        display: none;
+    }
+    .table-ui, .table-ui tbody, .table-ui tr, .table-ui td {
+        display: block;
+        width: 100%;
+    }
+    .table-ui tr {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        margin-bottom: 14px;
+        padding: 10px;
+    }
+    .table-ui td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 4px;
+        border: none;
+        gap: 16px;
+    }
+    .table-ui td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #0C5B3F;
+        min-width: 90px;
+    }
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    .action-buttons .btn-ui {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.text-success { color: var(--success) !important; }
+.text-danger { color: var(--danger) !important; }
+.text-muted { color: var(--muted) !important; }
+.text-info { color: #3b82f6 !important; }
+</style>
+
+<div class="container-fluid px-md-3">
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="fw-bold mb-1" style="font-size: 1.8rem;">
+            <i class="bi bi-currency-rupee"></i>
+            Customer Dues & Advance
+        </h1>
+        <p class="text-muted mb-0">View customer dues and manage advance balances</p>
+    </div>
+</div>
+
+<!-- STATS -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <h6>Customers with Dues</h6>
+            <div class="stat-value text-danger">
+                {{ customers_with_dues|length }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <h6>Total Due Amount</h6>
+            <div class="stat-value text-danger">
+                Rs {{ "%.2f"|format(total_due_amount) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <h6>Average Due</h6>
+            <div class="stat-value text-warning">
+                {% if customers_with_dues|length > 0 %}
+                    Rs {{ "%.2f"|format(total_due_amount / customers_with_dues|length) }}
+                {% else %}
+                    Rs 0
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+            <h6>Total Advance Balance</h6>
+            <div class="stat-value text-info">
+                Rs {{ "%.2f"|format(total_advance_balance) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLE -->
+<div class="card-ui">
+    <div class="table-responsive">
+        <table class="table-ui">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Total</th>
+                    <th>Paid</th>
+                    <th>Due</th>
+                    <th>Advance Bal.</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for customer in customers_with_dues %}
+                <tr>
+                    <td data-label="#"> {{ loop.index }} </td>
+                    <td data-label="Customer">
+                        <i class="bi bi-person-circle"></i> {{ customer.name }}
+                        {% if customer.advance_balance and customer.advance_balance > 0 %}
+                            <span class="advance-badge"><i class="bi bi-wallet2"></i> Advance Available</span>
+                        {% endif %}
+                     </td>
+                    <td data-label="Phone">{{ customer.phone or '-' }}</td>
+                    <td data-label="Total">Rs {{ "%.2f"|format(customer.total_purchases) }}</td>
+                    <td data-label="Paid" class="text-success">Rs {{ "%.2f"|format(customer.total_paid_cash + customer.total_advance_used) }}</td>
+                    <td data-label="Due" class="text-danger fw-bold">Rs {{ "%.2f"|format(customer.pending_due) }}</td>
+                    <td data-label="Advance Bal.">
+                        {% if customer.advance_balance and customer.advance_balance > 0 %}
+                            <span class="fw-bold text-info">Rs {{ "%.2f"|format(customer.advance_balance) }}</span>
+                        {% else %}
+                            <span class="text-muted">Rs 0</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Action">
+                        <div class="action-buttons" style="display: flex; gap: 8px;">
+                            <button type="button"
+                                    class="btn-ui btn-success-ui open-payment-modal"
+                                    style="padding: 8px 12px; font-size: 0.75rem;"
+                                    data-customer-id="{{ customer.id }}"
+                                    data-customer-name="{{ customer.name }}"
+                                    data-customer-due="{{ customer.pending_due }}"
+                                    data-customer-advance="{{ customer.advance_balance if customer.advance_balance else 0 }}">
+                                <i class="bi bi-cash-stack"></i> Pay
+                            </button>
+                            <button type="button"
+                                    class="btn-ui btn-primary-ui open-advance-modal"
+                                    style="padding: 8px 12px; font-size: 0.75rem;"
+                                    data-customer-id="{{ customer.id }}"
+                                    data-customer-name="{{ customer.name }}"
+                                    data-customer-balance="{{ customer.advance_balance if customer.advance_balance else 0 }}">
+                                <i class="bi bi-wallet2"></i> Manage
+                            </button>
+                        </div>
+                    </td>
+                 </tr>
+            {% else %}
+                 <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <i class="bi bi-check-circle-fill" style="font-size:2.5rem;color:#22c55e;"></i>
+                        <p class="text-muted mt-2 mb-0">No pending dues found</p>
+                    </td>
+                 </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-cash-stack"></i> Record Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" id="paymentForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Customer</label>
+                        <input type="text" id="paymentCustomerName" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Total Due Amount</label>
+                        <input type="text" id="paymentDueAmount" class="form-control" readonly style="background: #fef2f2; font-weight: 600; color: #dc2626;">
+                    </div>
+                    
+                    <div id="advanceInfoDiv" class="advance-info-box" style="display: none;">
+                        <span><i class="bi bi-wallet2"></i> Available Advance Balance:</span>
+                        <span id="availableAdvance" class="advance-amount" style="color: #0369a1;">Rs 0</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Payment Method</label>
+                        <select name="payment_mode" id="paymentMode" class="form-select" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Khalti">Khalti</option>
+                            <option value="eSewa">eSewa</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="advanceCheckboxDiv" style="display: none;">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="useAdvanceCheckbox" style="width: 50px; height: 25px;">
+                            <label class="form-check-label fw-bold" for="useAdvanceCheckbox">
+                                Use Advance Balance
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="advanceAmountDiv" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label">Amount from Advance:</label>
+                            <input type="number" name="advance_amount" id="advanceAmount" class="form-control" step="0.01" min="0" value="0">
+                            <small class="text-muted" id="advanceMaxHelp"></small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Cash Payment Amount</label>
+                        <input type="number" name="amount" id="cashAmount" class="form-control" step="0.01" placeholder="Enter cash amount" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea name="notes" id="paymentNotes" class="form-control" rows="2" placeholder="Add any notes..."></textarea>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="sendEmailCheckbox" name="send_email" value="on" >
+                            <label class="form-check-label ms-2" for="sendEmailCheckbox">
+                                <i class="bi bi-envelope"></i> Send Payment Receipt Email
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Record Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ADVANCE MANAGEMENT MODAL -->
+<div class="modal fade" id="advanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-wallet2"></i> Manage Advance Balance
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Customer</label>
+                    <input type="text" id="advanceCustomerName" class="form-control" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Current Advance Balance</label>
+                    <input type="text" id="advanceCustomerBalance" class="form-control" readonly style="background: #f0fdf4; font-weight: 600;">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Operation</label>
+                    <select id="advanceOperationType" class="form-select">
+                        <option value="add">Add Advance (Deposit)</option>
+                        <option value="deduct">Deduct Advance (Withdraw)</option>
+                    </select>
+                </div>
+                <div id="advanceDeductWarning" class="warning-box" style="display: none;">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Warning:</strong> Deducting advance will reduce customer's balance.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" id="advanceAmountLabel">Amount to Add *</label>
+                    <input type="number" id="advanceAmountInput" class="form-control" step="0.01" min="0.01" placeholder="Enter amount" required>
+                    <small id="advanceAmountHelp" class="text-muted"></small>
+                </div>
+                <div class="mb-3" id="advancePaymentModeGroup">
+                    <label class="form-label">Payment Mode</label>
+                    <select id="advancePaymentMode" class="form-select">
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Khalti">Khalti</option>
+                        <option value="eSewa">eSewa</option>
+                    </select>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label">Notes (Optional)</label>
+                    <textarea id="advanceNotes" class="form-control" rows="2" placeholder="Reason for this transaction..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="submitAdvanceBtn">
+                    <i class="bi bi-plus-circle"></i> Add Advance
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== PAYMENT MODAL LOGIC ==========
+    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    const paymentButtons = document.querySelectorAll('.open-payment-modal');
+    const paymentForm = document.getElementById('paymentForm');
+    
+    let selectedCustomerId = null;
+    let selectedCustomerDue = 0;
+    let selectedCustomerAdvance = 0;
+    
+    paymentButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            selectedCustomerId = this.dataset.customerId;
+            selectedCustomerDue = parseFloat(this.dataset.customerDue) || 0;
+            selectedCustomerAdvance = parseFloat(this.dataset.customerAdvance) || 0;
+            
+            document.getElementById('paymentCustomerName').value = this.dataset.customerName;
+            document.getElementById('paymentDueAmount').value = 'Rs ' + selectedCustomerDue.toFixed(2);
+            document.getElementById('cashAmount').value = selectedCustomerDue.toFixed(2);
+            document.getElementById('paymentNotes').value = '';
+            document.getElementById('paymentMode').value = 'Cash';
+            document.getElementById('sendEmailCheckbox').checked = false;
+            
+            const advanceInfoDiv = document.getElementById('advanceInfoDiv');
+            const advanceCheckboxDiv = document.getElementById('advanceCheckboxDiv');
+            const useAdvanceCheckbox = document.getElementById('useAdvanceCheckbox');
+            const advanceAmountDiv = document.getElementById('advanceAmountDiv');
+            const advanceAmountInput = document.getElementById('advanceAmount');
+            const cashAmountInput = document.getElementById('cashAmount');
+            const availableAdvanceSpan = document.getElementById('availableAdvance');
+            
+            if (selectedCustomerAdvance > 0) {
+                advanceInfoDiv.style.display = 'flex';
+                availableAdvanceSpan.innerHTML = 'Rs ' + selectedCustomerAdvance.toFixed(2);
+                advanceCheckboxDiv.style.display = 'block';
+                useAdvanceCheckbox.checked = false;
+                advanceAmountDiv.style.display = 'none';
+                advanceAmountInput.value = 0;
+                cashAmountInput.value = selectedCustomerDue.toFixed(2);
+                document.getElementById('advanceMaxHelp').innerHTML = `Maximum: Rs ${selectedCustomerAdvance.toFixed(2)}`;
+            } else {
+                advanceInfoDiv.style.display = 'none';
+                advanceCheckboxDiv.style.display = 'none';
+                advanceAmountDiv.style.display = 'none';
+            }
+            
+            paymentModal.show();
+        });
+    });
+    
+    // Handle advance checkbox in payment modal
+    const useAdvanceCheckbox = document.getElementById('useAdvanceCheckbox');
+    const advanceAmountDiv = document.getElementById('advanceAmountDiv');
+    const advanceAmountInput = document.getElementById('advanceAmount');
+    const cashAmountInput = document.getElementById('cashAmount');
+    
+    if (useAdvanceCheckbox) {
+        useAdvanceCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                advanceAmountDiv.style.display = 'block';
+                let maxAdvance = Math.min(selectedCustomerAdvance, selectedCustomerDue);
+                advanceAmountInput.max = maxAdvance;
+                advanceAmountInput.value = maxAdvance;
+                cashAmountInput.value = (selectedCustomerDue - maxAdvance).toFixed(2);
+                if (cashAmountInput.value < 0) cashAmountInput.value = 0;
+            } else {
+                advanceAmountDiv.style.display = 'none';
+                advanceAmountInput.value = 0;
+                cashAmountInput.value = selectedCustomerDue.toFixed(2);
+            }
+        });
+    }
+    
+    if (advanceAmountInput) {
+        advanceAmountInput.addEventListener('input', function() {
+            let advance = parseFloat(this.value) || 0;
+            let remaining = selectedCustomerDue - advance;
+            cashAmountInput.value = remaining > 0 ? remaining.toFixed(2) : 0;
+        });
+    }
+    
+    // Handle payment form submission
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const advanceAmount = parseFloat(document.getElementById('advanceAmount').value) || 0;
+            const cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
+            
+            if (advanceAmount === 0 && cashAmount === 0) {
+                alert('Please enter a payment amount');
+                return;
+            }
+            
+            const formData = new URLSearchParams();
+            formData.append('advance_amount', advanceAmount);
+            formData.append('amount', cashAmount);
+            formData.append('payment_mode', document.getElementById('paymentMode').value);
+            formData.append('notes', document.getElementById('paymentNotes').value);
+            formData.append('send_email', document.getElementById('sendEmailCheckbox').checked ? 'on' : 'off');
+            
+            const submitBtn = paymentForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+            
+            fetch("{{ url_for('admin.record_payment_direct', customer_id=0) }}".replace('0', selectedCustomerId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            }).then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.reload();
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Record Payment';
+            });
+        });
+    }
+    
+    // ========== ADVANCE MANAGEMENT MODAL LOGIC ==========
+    const advanceModal = new bootstrap.Modal(document.getElementById('advanceModal'));
+    const advanceButtons = document.querySelectorAll('.open-advance-modal');
+    
+    let selectedAdvanceCustomerId = null;
+    let selectedAdvanceCustomerBalance = 0;
+    
+    const advanceCustomerNameInput = document.getElementById('advanceCustomerName');
+    const advanceCustomerBalanceInput = document.getElementById('advanceCustomerBalance');
+    const advanceAmountInputField = document.getElementById('advanceAmountInput');
+    const advanceOperationSelect = document.getElementById('advanceOperationType');
+    const advanceDeductWarning = document.getElementById('advanceDeductWarning');
+    const advancePaymentModeGroup = document.getElementById('advancePaymentModeGroup');
+    const advanceAmountLabel = document.getElementById('advanceAmountLabel');
+    const advanceAmountHelp = document.getElementById('advanceAmountHelp');
+    const submitAdvanceBtn = document.getElementById('submitAdvanceBtn');
+    const advanceNotes = document.getElementById('advanceNotes');
+    const advancePaymentMode = document.getElementById('advancePaymentMode');
+    
+    function updateAdvanceModalUI() {
+        const operation = advanceOperationSelect.value;
+        if (operation === 'deduct') {
+            advanceDeductWarning.style.display = 'block';
+            advancePaymentModeGroup.style.display = 'none';
+            advanceAmountLabel.innerHTML = 'Amount to Deduct *';
+            advanceAmountHelp.innerHTML = `Maximum deduction: Rs ${selectedAdvanceCustomerBalance.toFixed(2)}`;
+            advanceAmountInputField.max = selectedAdvanceCustomerBalance;
+            advanceAmountInputField.placeholder = `Max: Rs ${selectedAdvanceCustomerBalance.toFixed(2)}`;
+            submitAdvanceBtn.innerHTML = '<i class="bi bi-dash-circle"></i> Deduct Advance';
+            submitAdvanceBtn.classList.remove('btn-success');
+            submitAdvanceBtn.classList.add('btn-danger');
+        } else {
+            advanceDeductWarning.style.display = 'none';
+            advancePaymentModeGroup.style.display = 'block';
+            advanceAmountLabel.innerHTML = 'Amount to Add *';
+            advanceAmountHelp.innerHTML = '';
+            advanceAmountInputField.max = '';
+            advanceAmountInputField.placeholder = 'Enter amount';
+            submitAdvanceBtn.innerHTML = '<i class="bi bi-plus-circle"></i> Add Advance';
+            submitAdvanceBtn.classList.remove('btn-danger');
+            submitAdvanceBtn.classList.add('btn-success');
+        }
+    }
+    
+    advanceButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            selectedAdvanceCustomerId = this.dataset.customerId;
+            selectedAdvanceCustomerBalance = parseFloat(this.dataset.customerBalance) || 0;
+            
+            advanceCustomerNameInput.value = this.dataset.customerName;
+            advanceCustomerBalanceInput.value = 'Rs ' + selectedAdvanceCustomerBalance.toFixed(2);
+            advanceAmountInputField.value = '';
+            advanceNotes.value = '';
+            advanceOperationSelect.value = 'add';
+            updateAdvanceModalUI();
+            
+            advanceModal.show();
+        });
+    });
+    
+    advanceOperationSelect.addEventListener('change', updateAdvanceModalUI);
+    
+    submitAdvanceBtn.addEventListener('click', function() {
+        const operation = advanceOperationSelect.value;
+        let amount = parseFloat(advanceAmountInputField.value) || 0;
+        const notes = advanceNotes.value;
+        const paymentMode = advancePaymentMode.value;
+        
+        if (amount <= 0) {
+            alert('Please enter a valid amount');
+            return;
+        }
+        
+        if (operation === 'deduct' && amount > selectedAdvanceCustomerBalance) {
+            alert(`Cannot deduct more than available balance (Rs ${selectedAdvanceCustomerBalance.toFixed(2)})`);
+            return;
+        }
+        
+        submitAdvanceBtn.disabled = true;
+        submitAdvanceBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+        
+        let url = '';
+        const formData = new URLSearchParams();
+        formData.append('amount', amount);
+        formData.append('notes', notes);
+        
+        if (operation === 'add') {
+            url = "{{ url_for('admin.add_customer_advance', customer_id=0) }}".replace('0', selectedAdvanceCustomerId);
+            formData.append('payment_mode', paymentMode);
+        } else {
+            url = "{{ url_for('admin.deduct_advance_balance', customer_id=0) }}".replace('0', selectedAdvanceCustomerId);
+        }
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData
+        }).then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                window.location.reload();
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+            submitAdvanceBtn.disabled = false;
+            updateAdvanceModalUI();
+        });
+    });
+    
+    // Clear form when modals are hidden
+    document.getElementById('advanceModal').addEventListener('hidden.bs.modal', function() {
+        advanceAmountInputField.value = '';
+        advanceNotes.value = '';
+        advanceOperationSelect.value = 'add';
+        updateAdvanceModalUI();
+        submitAdvanceBtn.disabled = false;
+    });
+    
+    document.getElementById('paymentModal').addEventListener('hidden.bs.modal', function() {
+        if (useAdvanceCheckbox) useAdvanceCheckbox.checked = false;
+        if (advanceAmountDiv) advanceAmountDiv.style.display = 'none';
+        if (advanceAmountInput) advanceAmountInput.value = 0;
+    });
+});
+</script>
+
+{% endblock %}

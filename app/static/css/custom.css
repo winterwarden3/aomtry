@@ -1,0 +1,152 @@
+/* Custom Styles for Adarsh Oil Mill */
+
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 2px solid #f8f9fa;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 6px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+}
+
+/* Tables */
+.table {
+    font-size: 0.95rem;
+}
+
+.table thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Forms */
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+}
+
+/* Stats Cards */
+.card.bg-primary,
+.card.bg-danger,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Login Page */
+.card.shadow {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .navbar, .btn, footer {
+        display: none !important;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+    }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Custom badges */
+.badge {
+    padding: 0.4em 0.8em;
+    font-weight: 500;
+}
+
+/* Chart containers */
+canvas {
+    max-width: 100%;
+}

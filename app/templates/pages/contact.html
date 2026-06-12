@@ -1,0 +1,660 @@
+{% extends "base_public.html" %}
+
+{% block title %}Contact Us - Adarsh Oil Mill{% endblock %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family:'Poppins',sans-serif;
+}
+
+/* HERO */
+.contact-hero{
+    background:linear-gradient(135deg,#0C5B3F 0%,#138A52 100%);
+    min-height:55vh;
+    display:flex;
+    align-items:center;
+    position:relative;
+    overflow:hidden;
+}
+
+.contact-hero::before{
+    content:'';
+    position:absolute;
+    width:500px;
+    height:500px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.05);
+    top:-200px;
+    right:-100px;
+}
+
+.contact-hero::after{
+    content:'';
+    position:absolute;
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.05);
+    bottom:-120px;
+    left:-80px;
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+}
+
+.hero-title{
+    font-size:4rem;
+    font-weight:800;
+    color:white;
+}
+
+.hero-subtitle{
+    color:white;
+    opacity:0.9;
+    font-size:1.2rem;
+}
+
+/* SECTION */
+.section{
+    padding:100px 0;
+}
+
+/* GLASS CARD */
+.glass-card{
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(15px);
+    border-radius:30px;
+    padding:45px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.06);
+    transition:all 0.4s ease;
+    height:100%;
+}
+
+.glass-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 25px 60px rgba(0,0,0,0.1);
+}
+
+/* CONTACT INFO */
+.info-box{
+    display:flex;
+    gap:20px;
+    margin-bottom:35px;
+    transition:all 0.3s ease;
+}
+
+.info-box:hover{
+    transform:translateX(8px);
+}
+
+.info-icon{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 10px 25px rgba(12,91,63,0.2);
+}
+
+.info-icon i{
+    color:white;
+    font-size:28px;
+}
+
+.info-content h5{
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.info-content p{
+    color:var(--secondary-text);
+    margin:0;
+}
+
+/* FORM */
+.form-title{
+    font-size:2rem;
+    font-weight:700;
+    color:var(--primary);
+}
+
+.form-control{
+    border:none;
+    background:var(--secondary-bg);
+    padding:15px 18px;
+    border-radius:16px;
+    transition:all 0.3s ease;
+}
+
+.form-control:focus{
+    box-shadow:0 0 0 4px rgba(12,91,63,0.1);
+    border:none;
+    background:white;
+    transform:translateY(-2px);
+}
+
+textarea.form-control{
+    resize:none;
+}
+
+/* BUTTON */
+.submit-btn{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:white;
+    font-weight:600;
+    transition:all 0.3s ease;
+    cursor:pointer;
+}
+
+.submit-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(12,91,63,0.2);
+}
+
+.submit-btn:disabled{
+    opacity:0.7;
+    cursor:not-allowed;
+    transform:none;
+}
+
+/* Button loading animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.submit-btn .bi-hourglass-split {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* Toast animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.toast-success {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #10b981;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.toast-success i {
+    font-size: 1.2rem;
+}
+
+/* SOCIAL */
+.social-icons a{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:white;
+    margin-right:10px;
+    transition:all 0.3s ease;
+    text-decoration:none;
+}
+
+.social-icons a:hover{
+    transform:translateY(-5px) scale(1.05);
+    box-shadow:0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* MAP */
+.map-card{
+    background:white;
+    border-radius:32px;
+    overflow:hidden;
+    box-shadow:0 15px 40px rgba(0,0,0,0.06);
+    transition:all 0.4s ease;
+}
+
+.map-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 25px 60px rgba(0,0,0,0.1);
+}
+
+.map-card iframe{
+    transition:transform 0.5s ease;
+}
+
+.map-card:hover iframe{
+    transform:scale(1.02);
+}
+
+/* SECTION TITLE */
+.section-title{
+    text-align:center;
+    margin-bottom:60px;
+}
+
+.section-title h2{
+    font-size:2.7rem;
+    font-weight:700;
+    color:var(--primary);
+}
+
+.section-title p{
+    color:var(--secondary-text);
+}
+
+/* ANIMATION */
+.fade-up{
+    animation:fadeUp 1s ease;
+}
+
+.float{
+    animation:float 4s ease-in-out infinite;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(40px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes float{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-15px);
+    }
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .hero-title{
+        font-size:2.7rem;
+    }
+
+    .section{
+        padding:70px 0;
+    }
+
+    .contact-hero{
+        min-height:45vh;
+        text-align:center;
+    }
+
+    .glass-card{
+        padding:35px 25px;
+    }
+
+    .section-title h2{
+        font-size:2rem;
+    }
+}
+
+</style>
+
+<!-- HERO -->
+<section class="contact-hero">
+
+    <div class="container hero-content text-center fade-up">
+
+        <h1 class="hero-title">
+            Contact Us
+        </h1>
+
+        <p class="hero-subtitle mt-3">
+            We'd Love To Hear From You
+        </p>
+
+    </div>
+
+</section>
+
+<!-- CONTACT SECTION -->
+<section class="section">
+
+    <div class="container">
+
+        <div class="row g-5">
+
+            <!-- CONTACT INFO -->
+            <div class="col-lg-5 fade-up">
+
+                <div class="glass-card">
+
+                    <h2 class="form-title mb-5">
+                        Get In Touch
+                    </h2>
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+
+                        <div class="info-content">
+                            <h5>Address</h5>
+                            <p>Mainapokhar, Bardiya, Nepal</p>
+                        </div>
+
+                    </div>
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            <i class="bi bi-telephone-fill"></i>
+                        </div>
+
+                        <div class="info-content">
+                            <h5>Phone / WhatsApp</h5>
+                            <p>+977-9848023150</p>
+                        </div>
+
+                    </div>
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            <i class="bi bi-envelope-fill"></i>
+                        </div>
+
+                        <div class="info-content">
+                            <h5>Email</h5>
+                            <p>adarshoilbusiness@gmail.com</p>
+                        </div>
+
+                    </div>
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            <i class="bi bi-clock-fill"></i>
+                        </div>
+
+                        <div class="info-content">
+                            <h5>Business Hours</h5>
+                            <p>Mon - Sat : 8:00 AM - 6:00 PM</p>
+                            <p>Sunday : Closed</p>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-5">
+
+                        <h5 class="fw-bold mb-3">
+                            Follow Us
+                        </h5>
+
+                        <div class="social-icons">
+
+                            <a href="https://facebook.com"
+                               target="_blank">
+
+                                <i class="bi bi-facebook"></i>
+
+                            </a>
+
+                            <a href="https://wa.me/9779848023150"
+                               target="_blank">
+
+                                <i class="bi bi-whatsapp"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FORM -->
+            <div class="col-lg-7 fade-up">
+
+                <div class="glass-card">
+
+                    <h2 class="form-title mb-5">
+                        Send Us A Message
+                    </h2>
+
+                    <form method="POST"
+                          action="{{ url_for('public.contact') }}">
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Full Name *
+                                </label>
+
+                                <input type="text"
+                                       name="name"
+                                       class="form-control"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Email *
+                                </label>
+
+                                <input type="email"
+                                       name="email"
+                                       class="form-control"
+                                       required>
+
+                            </div>
+
+                            <div class="col-12">
+
+                                <label class="form-label fw-semibold">
+                                    Phone Number
+                                </label>
+
+                                <input type="tel"
+                                       name="phone"
+                                       class="form-control">
+
+                            </div>
+
+                            <div class="col-12">
+
+                                <label class="form-label fw-semibold">
+                                    Message *
+                                </label>
+
+                                <textarea name="message"
+                                          rows="6"
+                                          class="form-control"
+                                          required></textarea>
+
+                            </div>
+
+                            <div class="col-12 mt-3">
+
+                                <button type="submit"
+                                        class="submit-btn"
+                                        id="submitBtn">
+
+                                    Send Message
+                                    <i class="bi bi-send-fill"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                    <div class="text-center mt-4">
+
+                        <small style="color:var(--secondary-text);">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            Your information is safe with us
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- MAP -->
+<section class="section"
+         style="background:var(--secondary-bg);">
+
+    <div class="container">
+
+        <div class="section-title fade-up">
+
+            <div class="float">
+
+                <i class="bi bi-map-fill"
+                   style="
+                        font-size:60px;
+                        color:var(--primary);
+                   ">
+                </i>
+
+            </div>
+
+            <h2 class="mt-3">
+                Find Us Here
+            </h2>
+
+            <p>
+                Visit our mill at Mainapokhar, Bardiya
+            </p>
+
+        </div>
+
+        <div class="map-card fade-up">
+
+            <iframe
+                src="https://maps.google.com/maps?q=28.1836746,81.4797783&z=17&output=embed"
+                width="100%"
+                height="450"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Contact form submission with animation
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.querySelector('form[action*="contact"]');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (contactForm && submitBtn) {
+        contactForm.addEventListener('submit', function(e) {
+            // Show loading state
+            const originalIcon = '<i class="bi bi-send-fill"></i>';
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
+            submitBtn.disabled = true;
+        });
+    }
+    
+    // Check URL for success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('sent') === 'success') {
+        // Reset button if needed
+        if (submitBtn) {
+            submitBtn.innerHTML = 'Send Message <i class="bi bi-send-fill"></i>';
+            submitBtn.disabled = false;
+        }
+        
+        // Show success toast
+        const toast = document.createElement('div');
+        toast.className = 'toast-success';
+        toast.innerHTML = `
+            <i class="bi bi-check-circle-fill"></i>
+            <span>Message sent successfully! We'll contact you soon.</span>
+        `;
+        document.body.appendChild(toast);
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+        
+        // Remove sent param from URL without reloading
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+});
+</script>
+{% endblock %}

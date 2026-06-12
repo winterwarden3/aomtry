@@ -1,0 +1,590 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Expense Management - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+/* ============================================
+   CONSISTENT UI WITH SALES & CUSTOMERS PAGE
+   ============================================ */
+
+:root {
+    --primary: #0C5B3F;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Header - Matching Sales Page */
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 4px;
+}
+
+.page-header p {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+/* Cards - Matching Sales Page */
+.stat-card, .card-ui {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.stat-card {
+    padding: 20px;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-ui {
+    padding: 0;
+    overflow: hidden;
+}
+
+.stat-card h6 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--gray-800);
+}
+
+.stat-footer {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin-top: 6px;
+}
+
+.icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Buttons - Matching Sales Page */
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+}
+
+.btn-primary-ui {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary-ui:hover {
+    background: var(--accent);
+    transform: translateY(-1px);
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+}
+
+.btn-outline-ui:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-danger-ui {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger-ui:hover {
+    background: #dc2626;
+}
+
+/* Search/Filter - Matching Sales Page */
+.search-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+/* Table - Matching Sales Page */
+.expenses-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.expenses-table th {
+    text-align: left;
+    padding: 14px 12px;
+    background: var(--gray-50);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    border-bottom: 1px solid var(--gray-200);
+    font-family: inherit;
+}
+
+.expenses-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.85rem;
+    vertical-align: middle;
+    font-family: inherit;
+}
+
+.expenses-table tr:last-child td {
+    border-bottom: none;
+}
+
+.expenses-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+/* Expense ID - Matching Invoice Number */
+.expense-id {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Category Badge */
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+/* Amount - Matching Sales Page */
+.amount {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.amount-high {
+    color: var(--danger);
+}
+
+.amount-normal {
+    color: var(--warning);
+}
+
+/* Action Buttons - Matching Sales Page */
+.action-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Status Badge - Matching Sales Page */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.status-high {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.status-normal {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+/* Pagination - Matching Sales Page */
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 20px;
+    padding: 16px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.page-link {
+    padding: 6px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.page-link:hover,
+.page-link.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Empty State - Matching Sales Page */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    color: var(--gray-300);
+    margin-bottom: 16px;
+}
+
+.empty-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+}
+
+.empty-desc {
+    font-size: 0.85rem;
+    color: var(--gray-400);
+}
+
+/* Mobile Responsive - Matching Sales Page */
+@media (max-width: 1024px) {
+    .expenses-table th:nth-child(4),
+    .expenses-table td:nth-child(4) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .expenses-table thead {
+        display: none;
+    }
+    
+    .expenses-table tbody tr {
+        display: block;
+        margin-bottom: 16px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        background: white;
+    }
+    
+    .expenses-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .expenses-table td:last-child {
+        border-bottom: none;
+    }
+    
+    .expenses-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--gray-500);
+        min-width: 100px;
+    }
+    
+    .action-group {
+        justify-content: flex-end;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+    }
+    
+    .icon-box {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-wrapper {
+        flex-direction: column;
+    }
+    
+    .action-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-ui {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="container-fluid px-md-3 py-3">
+
+    <!-- Header - Matching Sales Page -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="fw-bold mb-1" style="font-size: 1.5rem;">
+                <i class="bi bi-receipt"></i> Expenses
+            </h1>
+            <p class="text-muted mb-0" style="font-size: 0.8rem;">Track and manage business expenses</p>
+        </div>
+        <a href="{{ url_for('admin.add_expense') }}" class="btn-ui btn-primary-ui">
+            <i class="bi bi-plus-lg"></i> Add Expense
+        </a>
+    </div>
+
+    <!-- Stats Cards - Matching Sales Page -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Total Expenses</h6>
+                        <div class="stat-value">{{ total_expenses }}</div>
+                        <div class="stat-footer">{{ expenses.total }} transactions</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Categories</h6>
+                        <div class="stat-value">{{ categories|length }}</div>
+                        <div class="stat-footer">Expense types</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
+                        <i class="bi bi-tags"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Avg per Transaction</h6>
+                        <div class="stat-value">Rs {{ avg_per_transaction }}</div>
+                        <div class="stat-footer">Average expense</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
+                        <i class="bi bi-calculator"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Highest Expense</h6>
+                        <div class="stat-value">Rs {{ highest_expense }}</div>
+                        <div class="stat-footer">Single highest</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search/Filter - Matching Sales Page -->
+    <div class="card-ui mb-4" style="padding: 16px;">
+        <form method="GET" action="{{ url_for('admin.expenses_list') }}">
+            <div class="search-wrapper">
+                <select class="search-input" name="category" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-ui btn-primary-ui" style="padding: 10px 20px;">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Expenses Table - Matching Sales Page -->
+    <div class="card-ui">
+        <div style="overflow-x: auto;">
+            <table class="expenses-table">
+                <thead>
+                    <tr>
+                        <th>Expense ID</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses.items %}
+                    <tr>
+                        <td data-label="Expense ID">
+                            <span class="expense-id"><i class="bi bi-receipt"></i> EXP-{{ expense.get('id') }}</span>
+                        </td>
+                        <td data-label="Date">
+                            {{ expense.get('date', '')[:10] if expense.get('date') else '' }}
+                        </td>
+                        <td data-label="Category">
+                            <span class="category-badge"><i class="bi bi-tag"></i> {{ expense.get('category', 'Uncategorized') }}</span>
+                        </td>
+                        <td data-label="Description">
+                            {{ expense.get('description', '-') }}
+                        </td>
+                        <td data-label="Amount" class="amount {% if expense.get('amount', 0) > 10000 %}amount-high{% else %}amount-normal{% endif %}">
+                            Rs {{ "%.2f"|format(expense.get('amount', 0)) }}
+                        </td>
+                        <td data-label="Status">
+                            {% if expense.get('amount', 0) > 10000 %}
+                                <span class="status-badge status-high">High Value</span>
+                            {% else %}
+                                <span class="status-badge status-normal">Normal</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Actions">
+                            <div class="action-group">
+                                <a href="{{ url_for('admin.edit_expense', expense_id=expense.get('id')) }}" class="btn-ui btn-outline-ui">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                                <form method="POST" action="{{ url_for('admin.delete_expense', expense_id=expense.get('id')) }}" 
+                                      onsubmit="return confirm('Delete this expense?');" style="display: inline;">
+                                    <button type="submit" class="btn-ui btn-danger-ui">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="bi bi-receipt"></i></div>
+                                <div class="empty-title">No expenses found</div>
+                                <div class="empty-desc">Add your first expense to get started</div>
+                                <a href="{{ url_for('admin.add_expense') }}" class="btn-ui btn-primary-ui mt-3">
+                                    <i class="bi bi-plus-lg"></i> Add Expense
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination - Matching Sales Page -->
+        {% if expenses.pages > 1 %}
+        <div class="pagination">
+            {% if expenses.has_prev %}
+                <a class="page-link" href="{{ url_for('admin.expenses_list', page=expenses.prev_num, category=selected_category) }}">←</a>
+            {% endif %}
+            {% for page_num in expenses.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+                {% if page_num %}
+                    <a class="page-link {% if page_num == expenses.page %}active{% endif %}" href="{{ url_for('admin.expenses_list', page=page_num, category=selected_category) }}">{{ page_num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if expenses.has_next %}
+                <a class="page-link" href="{{ url_for('admin.expenses_list', page=expenses.next_num, category=selected_category) }}">→</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,866 @@
+{% extends "base_public.html" %}
+
+{% block title %}Home - Adarsh Oil Mill{% endblock %}
+
+{% block content %}
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* HERO */
+.hero-section {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(135deg,
+        #FAFAF7 0%,
+        #F4F4F2 100%);
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: rgba(19,138,82,0.08);
+    border-radius: 50%;
+    top: -200px;
+    right: -100px;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: rgba(12,91,63,0.06);
+    border-radius: 50%;
+    bottom: -120px;
+    left: -100px;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--primary);
+}
+
+.hero-text {
+    color: var(--secondary-text);
+    font-size: 1.15rem;
+    margin: 25px 0;
+    line-height: 1.8;
+}
+
+.hero-image-box {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(15px);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    transform: rotate(-2deg);
+    transition: all 0.4s ease;
+}
+
+.hero-image-box:hover {
+    transform: rotate(0deg) translateY(-10px);
+}
+
+.hero-icon {
+    font-size: 220px;
+    color: var(--primary);
+    text-align: center;
+    display: block;
+    animation: float 4s ease-in-out infinite;
+}
+
+/* BUTTONS */
+.btn-modern {
+    padding: 14px 32px;
+    border-radius: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary-modern {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 10px 30px rgba(12,91,63,0.25);
+}
+
+.btn-primary-modern:hover {
+    background: var(--accent);
+    transform: translateY(-3px);
+    color: white;
+}
+
+.btn-outline-modern {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline-modern:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* SECTION */
+.section {
+    padding: 90px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 70px;
+}
+
+.section-title h2 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.section-title p {
+    color: var(--secondary-text);
+    font-size: 1.1rem;
+}
+
+/* GLASS CARDS */
+.glass-card {
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 35px;
+    transition: all 0.4s ease;
+    height: 100%;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.05);
+}
+
+.glass-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+.glass-card i {
+    font-size: 55px;
+    color: var(--primary);
+}
+
+.glass-card h4 {
+    margin-top: 20px;
+    font-weight: 700;
+}
+
+/* Product image styling */
+.product-image {
+    width: 105%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+/* STATS */
+.stats-section {
+    background: var(--primary);
+    color: white;
+    padding: 70px 0;
+}
+
+.stats-box h2 {
+    font-size: 3rem;
+    font-weight: 800;
+}
+
+.stats-box p {
+    opacity: 0.9;
+}
+
+/* CTA */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    padding: 90px 0;
+    text-align: center;
+}
+
+.cta-section h2 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.cta-section p {
+    margin: 20px 0 35px;
+    font-size: 1.15rem;
+}
+
+/* ANIMATIONS */
+@keyframes float {
+    0%,100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+    .hero-title {
+        font-size: 2.7rem;
+    }
+
+    .hero-icon {
+        font-size: 150px;
+    }
+
+    .section-title h2 {
+        font-size: 2rem;
+    }
+
+    .cta-section h2 {
+        font-size: 2rem;
+    }
+
+    .hero-section {
+        text-align: center;
+        padding: 80px 0;
+    }
+}
+
+/* Responsive product grid */
+@media (min-width: 768px) and (max-width: 991px) {
+    .col-md-4 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 767px) {
+    .col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 480px) {
+    .col-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Make cards same height */
+.h-100 {
+    height: 100%;
+}
+
+#products-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+/* ========== TESTIMONIAL CAROUSEL ========== */
+.testimonial-carousel {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    min-height: 380px;
+}
+
+.testimonial-slide {
+    display: none;
+    animation: fadeEffect 0.5s ease-in-out;
+}
+
+.testimonial-slide.active {
+    display: block;
+}
+
+@keyframes fadeEffect {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.testimonial-card {
+    background: var(--secondary-bg);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(12,91,63,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border-color: var(--primary);
+}
+
+.testimonial-icon {
+    font-size: 48px;
+    color: var(--primary);
+    opacity: 0.5;
+    margin-bottom: 20px;
+}
+
+.testimonial-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 25px;
+}
+
+.testimonial-author h5 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.testimonial-author p {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.testimonial-stars {
+    color: #FFB800;
+    font-size: 1rem;
+}
+
+.testimonial-stars i {
+    margin: 0 2px;
+}
+
+/* Carousel Controls */
+.carousel-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.carousel-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-btn:hover {
+    background: var(--accent);
+    transform: scale(1.05);
+}
+
+.carousel-dots {
+    display: flex;
+    gap: 10px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    width: 25px;
+    border-radius: 10px;
+    background: var(--primary);
+}
+
+.dot:hover {
+    background: var(--accent);
+}
+
+@media (max-width: 768px) {
+    .testimonial-card {
+        padding: 25px;
+    }
+    
+    .testimonial-text {
+        font-size: 0.95rem;
+    }
+    
+    .testimonial-icon {
+        font-size: 36px;
+    }
+    
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+}
+
+
+</style>
+
+<!-- HERO -->
+<section class="hero-section">
+    <div class="container hero-content">
+        <div class="row align-items-center">
+
+            <div class="col-lg-6 mb-5 mb-lg-0">
+
+                <h1 class="hero-title">
+                    Pure Quality <br>
+                    Trusted Since 2062
+                </h1>
+
+                <p class="hero-text">
+                    Adarsh Oil Mill delivers pure mustard oil,
+                    premium grains, and natural products
+                    trusted by families across Nepal.
+                </p>
+
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('public.products') }}"
+                       class="btn-modern btn-primary-modern">
+                        Explore Products
+                    </a>
+
+                    <a href="{{ url_for('public.contact') }}"
+                       class="btn-modern btn-outline-modern">
+                        Contact Us
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+                <div class="hero-image-box">
+                    <i class="bi bi-droplet-fill hero-icon"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section">
+    <div class="container">
+
+        <div class="section-title">
+            <h2>Why Choose Us</h2>
+            <p>Quality products with decades of trust and excellence</p>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="glass-card text-center">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h4>100% Pure</h4>
+                    <p>No chemicals or additives. Only natural products.</p>
+                </div>
+            </div>
+
+
+            <div class="col-md-4">
+                <div class="glass-card text-center">
+                    <i class="bi bi-flower1"></i>
+                    <h4>Natural Ingredients</h4>
+                    <p>Sourced from local farms with traditional methods.</p>
+                </div>
+            </div>
+
+
+            <div class="col-md-4">
+                <div class="glass-card text-center">
+                    <i class="bi bi-award-fill"></i>
+                    <h4>20+ Years Trust</h4>
+                    <p>Serving thousands of happy customers since 2062 BS.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+<!-- STATS -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row text-center g-4">
+
+            <div class="col-md-3">
+                <div class="stats-box">
+                    <h2>20+</h2>
+                    <p>Years Experience</p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stats-box">
+                    <h2>5000+</h2>
+                    <p>Happy Customers</p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stats-box">
+                    <h2>100%</h2>
+                    <p>Pure Products</p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stats-box">
+                    <h2>100%</h2>
+                    <p>Satisfaction</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- PRODUCTS - DYNAMIC FROM DATABASE -->
+<section class="section" style="background: var(--secondary-bg);">
+
+    <div class="container">
+
+        <div class="section-title">
+            <h2>Our Products</h2>
+            <p>Premium quality products made with care</p>
+        </div>
+
+        <div class="row g-4" id="products-container">
+            {% if products and products|length > 0 %}
+                {% for product in products %}
+                <div class="col-md-4 col-sm-6 col-12 mb-4">
+                    <div class="glass-card text-center h-100">
+                        {% if product.image_url %}
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <i class="bi bi-basket-fill"></i>
+                        {% endif %}
+                        <h4>{{ product.name }}</h4>
+                        <p>{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                        {% if product.price %}
+                            <p class="fw-bold text-success" style="font-size: 1.25rem; margin-top: 15px;">
+                                Rs.{{ "%.2f"|format(product.price) }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <div class="glass-card">
+                        <i class="bi bi-box-seam" style="font-size: 64px; color: var(--primary);"></i>
+                        <h4 class="mt-3">No Products Yet</h4>
+                        <p class="mt-2">Check back soon for our premium quality products!</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if products and products|length > 0 %}
+        <div class="text-center mt-5">
+            <a href="{{ url_for('public.products') }}"
+               class="btn-modern btn-primary-modern">
+                View All Products
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+
+<!-- TESTIMONIALS SECTION - AUTO ROTATING -->
+<section class="section" style="background: white;">
+    <div class="container">
+        <div class="section-title">
+            <h2>What Our Customers Say</h2>
+            <p>Trusted by families across Nepal for generations</p>
+        </div>
+        
+        <div class="testimonial-carousel">
+            <!-- Testimonial 1 - Pankaj Pandey about Oil -->
+            <div class="testimonial-slide active" data-slide="0">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"The mustard oil from Adarsh Oil Mill is absolutely pure and has that authentic taste. I've been using it for years and never been disappointed."</p>
+                    <div class="testimonial-author">
+                        <h5>Pankaj Pandey</h5>
+                        <p>Pokhara, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Testimonial 2 - Nirajan Lamsal about Turmeric -->
+            <div class="testimonial-slide" data-slide="1">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"The turmeric powder is so fresh and aromatic. It gives perfect color and flavor to my dishes. Adarsh Oil Mill delivers premium quality spices to Pokhara."</p>
+                    <div class="testimonial-author">
+                        <h5>Nirajan Lamsal</h5>
+                        <p>Pokhara, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <
+            <div class="testimonial-slide" data-slide="2">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"The rice grains are perfectly polished and cook beautifully. Every grain separates perfectly. Adarsh Oil Mill is best known for quality rice."</p>
+                    <div class="testimonial-author">
+                        <h5>Sulav Baral</h5>
+                        <p>Kathmandu, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="testimonial-slide" data-slide="3">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"The wheat flour is so fine and makes soft, fluffy rotis. No lumps, perfect texture every time. Highly recommended for all households in Kathmandu."</p>
+                    <div class="testimonial-author">
+                        <h5>Kshitij Paudel</h5>
+                        <p>Kathmandu, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+
+           
+            <div class="testimonial-slide" data-slide="4">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"The mustard oil has that traditional taste my grandmother used to make. Pure, natural, and healthy. Worth every rupee! Delivered fresh to Baglung."</p>
+                    <div class="testimonial-author">
+                        <h5>Pragati Paudel</h5>
+                        <p>Baglung, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="testimonial-slide" data-slide="5">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"Excellent service and friendly staff! They always provide the best quality products with a smile. Adarsh Oil Mill is truly the best in Mainapokhar."</p>
+                    <div class="testimonial-author">
+                        <h5>Sarita Sharma</h5>
+                        <p>Mainapokhar, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="testimonial-slide" data-slide="6">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"Without doubt the best oil mill in Mainapokhar! Their products are top quality and prices are reasonable. I've been a loyal customer for over 15 years."</p>
+                    <div class="testimonial-author">
+                        <h5>Sita Bhandari</h5>
+                        <p>Ranipur, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div class="testimonial-slide" data-slide="7">
+                <div class="testimonial-card">
+                    <i class="bi bi-chat-quote-fill testimonial-icon"></i>
+                    <p class="testimonial-text">"I'm very impressed with their hygiene and cleanliness standards. The mill is spotless and products are packaged with care. Very trustworthy business in Mainapokhar."</p>
+                    <div class="testimonial-author">
+                        <h5>Muna Paudel</h5>
+                        <p>Mainapokhar, Nepal</p>
+                    </div>
+                    <div class="testimonial-stars">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Carousel Controls -->
+        <div class="carousel-controls">
+            <button class="carousel-btn prev-btn" onclick="changeSlide(-1)">❮</button>
+            <div class="carousel-dots">
+                <span class="dot active" data-dot="0" onclick="goToSlide(0)"></span>
+                <span class="dot" data-dot="1" onclick="goToSlide(1)"></span>
+                <span class="dot" data-dot="2" onclick="goToSlide(2)"></span>
+                <span class="dot" data-dot="3" onclick="goToSlide(3)"></span>
+                <span class="dot" data-dot="4" onclick="goToSlide(4)"></span>
+                <span class="dot" data-dot="5" onclick="goToSlide(5)"></span>
+                <span class="dot" data-dot="6" onclick="goToSlide(6)"></span>
+                <span class="dot" data-dot="7" onclick="goToSlide(7)"></span>
+            </div>
+            <button class="carousel-btn next-btn" onclick="changeSlide(1)">❯</button>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- CTA -->
+<section class="cta-section">
+
+    <div class="container">
+
+        <h2>Need Bulk Orders?</h2>
+
+        <p>
+            Contact us today for wholesale pricing and business inquiries.
+        </p>
+
+        <a href="{{ url_for('public.contact') }}"
+           class="btn-modern"
+           style="background:white; color: var(--primary);">
+            Get In Touch
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<script>
+    // Testimonial Carousel Auto-Rotate
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.testimonial-slide');
+    const dots = document.querySelectorAll('.dot');
+    const totalSlides = slides.length;
+    let autoRotateInterval;
+
+    function showSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+        currentSlide = index;
+    }
+
+    function changeSlide(direction) {
+        let newIndex = currentSlide + direction;
+        if (newIndex < 0) newIndex = totalSlides - 1;
+        if (newIndex >= totalSlides) newIndex = 0;
+        showSlide(newIndex);
+        resetAutoRotate();
+    }
+
+    function goToSlide(index) {
+        showSlide(index);
+        resetAutoRotate();
+    }
+
+    function startAutoRotate() {
+        autoRotateInterval = setInterval(() => {
+            let nextIndex = (currentSlide + 1) % totalSlides;
+            showSlide(nextIndex);
+        }, 5000);
+    }
+
+    function resetAutoRotate() {
+        clearInterval(autoRotateInterval);
+        startAutoRotate();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (slides.length > 0) {
+            startAutoRotate();
+        }
+    });
+</script>
+
+{% endblock %}

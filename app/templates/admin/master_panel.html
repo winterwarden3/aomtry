@@ -1,0 +1,1335 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Batch Sales - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+    --primary: #0C5B3F;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.container-fluid {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 6px;
+}
+
+.page-header p {
+    font-size: 0.95rem;
+    color: var(--gray-500);
+}
+
+.form-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.form-section {
+    padding: 28px;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    margin-bottom: 24px;
+}
+
+.section-title h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+}
+
+.section-title p {
+    font-size: 0.85rem;
+    color: var(--gray-400);
+    margin-top: 4px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+}
+
+.form-label .required {
+    color: var(--danger);
+}
+
+.form-control, .form-select {
+    padding: 12px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: white;
+    width: 100%;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+.form-control[readonly] {
+    background: var(--gray-50);
+    color: var(--gray-600);
+}
+
+.advance-alert {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.advance-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.advance-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+.advance-amount {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--info);
+}
+
+.advance-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.advance-checkbox input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.items-table-wrapper {
+    overflow-x: auto;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table th {
+    text-align: left;
+    padding: 14px 12px;
+    background: var(--gray-50);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.items-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+}
+
+.items-table td:last-child {
+    text-align: center;
+    vertical-align: middle;
+    width: 60px;
+}
+
+.items-table input, 
+.items-table select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    height: 42px;
+    box-sizing: border-box;
+}
+
+.items-table input:focus, 
+.items-table select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.remove-item:hover {
+    color: var(--danger);
+    background: var(--gray-100);
+}
+
+.add-item-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: none;
+    border: 1px dashed var(--gray-300);
+    border-radius: var(--radius-md);
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.add-item-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #f0fdf4;
+}
+
+.exchange-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.exchange-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+}
+
+.exchange-checkbox input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.rate-fluctuating {
+    border-right: 3px solid #f59e0b !important;
+    background: #fffbeb !important;
+}
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+}
+
+.payment-item label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.payment-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.payment-value.due { color: var(--danger); }
+.payment-value.advance { color: var(--info); }
+.payment-value.paid { color: var(--success); }
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #059669;
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    z-index: 9999;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    max-height: 220px;
+    overflow-y: auto;
+    width: 100%;
+    margin-top: 4px;
+    box-shadow: var(--shadow-md);
+}
+
+.suggestion-item {
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+    background: var(--gray-50);
+}
+
+.position-relative {
+    position: relative !important;
+}
+
+.toolbar-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-icon {
+    background: none;
+    border: 1px solid var(--gray-200);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-icon:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--gray-50);
+}
+
+.btn-primary-icon {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.btn-primary-icon:hover {
+    background: var(--accent);
+    color: white;
+}
+
+.customer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.customer-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.btn-remove-customer {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+}
+
+.btn-remove-customer:hover {
+    background: #fee2e2;
+}
+
+.save-bar {
+    position: fixed;
+    bottom: 0;
+    left: 280px;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--gray-200);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: center;
+    z-index: 900;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.page-bottom-spacer {
+    height: 80px;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .payment-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .items-table thead {
+        display: none;
+    }
+    .items-table tbody tr {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: 16px;
+    }
+    .items-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border: none;
+    }
+    .items-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        min-width: 100px;
+    }
+    .advance-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .form-section {
+        padding: 20px;
+    }
+    .save-bar {
+        left: 0;
+    }
+}
+</style>
+
+<div class="container-fluid px-md-3 py-3">
+
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1><i class="bi bi-layers"></i> Batch Sales</h1>
+                <p>Add multiple customers with multiple items in one go</p>
+            </div>
+            <a href="{{ url_for('admin.sales_list') }}" class="btn-icon">
+                <i class="bi bi-arrow-left"></i> Back to Sales
+            </a>
+        </div>
+    </div>
+
+    <div class="toolbar-card">
+        <button type="button" class="btn-icon" onclick="exportSales()">
+            <i class="bi bi-file-earmark-excel"></i> Export
+        </button>
+        <button type="button" class="btn-icon" onclick="downloadTemplate()">
+            <i class="bi bi-download"></i> Template
+        </button>
+        <label class="btn-icon">
+            <i class="bi bi-upload"></i> Import to Form
+            <input type="file" id="importExcelPreview" accept=".xlsx,.xls" style="display:none" onchange="importSales(this, true)">
+        </label>
+        <label class="btn-icon btn-primary-icon">
+            <i class="bi bi-lightning"></i> Import & Save
+            <input type="file" id="importExcelSave" accept=".xlsx,.xls" style="display:none" onchange="importSales(this, false)">
+        </label>
+    </div>
+
+    <div id="customersContainer"></div>
+
+    <div class="text-center mb-3">
+        <button type="button" class="btn-icon" id="addCustomerBtn" style="border-color: var(--accent); color: var(--accent);">
+            <i class="bi bi-plus-lg"></i> Add Another Customer
+        </button>
+    </div>
+
+    <div class="page-bottom-spacer"></div>
+</div>
+
+<div class="save-bar">
+    <button type="button" class="submit-btn" id="saveAllBtn" style="width: auto; padding: 12px 32px;">
+        <i class="bi bi-check2-circle"></i> Save All Sales
+    </button>
+</div>
+
+<script>
+// Product list for suggestions
+const PRODUCTS = [
+    "Mustard Oil Extraction", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
+    "Turmeric Powder", "Others"
+];
+
+// PRODUCT DEFAULTS
+const PRODUCT_DEFAULTS = {
+    "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
+    "Wheat Grinding": { rate: 4, unit: "Kg" },
+    "Paddy Grinding": { rate: 4, unit: "Kg" },
+    "Turmeric Grinding": { rate: 40, unit: "Kg" },
+    "Spice Grinding": { rate: 40, unit: "Kg" },
+    "Rice Bran": { rate: 45, unit: "Kg", fluctuates: true },
+    "Mustard Cake": { rate: 45, unit: "Kg", fluctuates: true },
+    "Wheat Flour": { rate: 80, unit: "Kg", fluctuates: true },
+    "Rice": { rate: 90, unit: "Kg", fluctuates: true },
+    "Mustard Seed": { rate: 120, unit: "Kg" },
+    "Wheat": { rate: 50, unit: "Kg", fluctuates: true },
+    "Mustard Oil": { rate: 400, unit: "Liter", fluctuates: true },
+    "Paddy": { rate: 40, unit: "Kg", fluctuates: true },
+    "Spices": { rate: 100, unit: "Kg" },
+    "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
+    "Others": { rate: 0, unit: "Kg" }
+};
+
+function isMustardExtraction(name) {
+    return (name || '').toLowerCase().includes('mustard oil extraction');
+}
+
+function isOthersProduct(name) {
+    const n = (name || '').toLowerCase().trim();
+    return n === 'others' || n === 'mustard cake, others' || n.endsWith(', others');
+}
+
+let customerUidCounter = 0;
+let itemUidCounter = 0;
+let customers = [];
+let isSaving = false;
+
+function nextCustomerId() { return ++customerUidCounter; }
+function nextItemId() { return ++itemUidCounter; }
+
+function findCustomer(customerUid) {
+    return customers.find(c => c.uid === customerUid);
+}
+
+function findItem(customer, itemUid) {
+    return customer.items.find(i => i.uid === itemUid);
+}
+
+function createEmptyItem() {
+    return {
+        uid: nextItemId(),
+        product_name: '',
+        quantity: 1,
+        unit: 'Kg',
+        rate: 0,
+        subtotal: 0
+    };
+}
+
+function createEmptyCustomer() {
+    return {
+        uid: nextCustomerId(),
+        customerId: null,
+        customerName: '',
+        email: '',
+        items: [createEmptyItem()],
+        advanceBalance: 0,
+        useAdvance: false,
+        advanceUsed: 0,
+        cashPaid: 0,
+        totalAmount: 0,
+        totalPaid: 0,
+        dueAmount: 0,
+        advanceCredit: 0,
+        maxAdvance: 0,
+        paymentStatus: 'pending',
+        exchangeMustardCake: false,
+        exchangeRiceBran: false
+    };
+}
+
+function getMaxAdvance(customer) {
+    const total = customer.totalAmount || 0;
+    const cash = customer.cashPaid || 0;
+    const balance = customer.advanceBalance || 0;
+    return Math.max(0, Math.min(balance, total - cash));
+}
+
+function calculateTotals(customer) {
+    let total = 0;
+    for (const item of customer.items) {
+        let rate = parseFloat(item.rate) || 0;
+        
+        if (customer.exchangeMustardCake && isMustardExtraction(item.product_name)) {
+            rate = 0;
+        }
+        if (customer.exchangeRiceBran && isOthersProduct(item.product_name)) {
+            rate = 0;
+        }
+        
+        const subtotal = (parseFloat(item.quantity) || 0) * rate;
+        item.subtotal = subtotal;
+        total += subtotal;
+    }
+    customer.totalAmount = total;
+
+    const advanceUsed = parseFloat(customer.advanceUsed) || 0;
+    const cashPaid = parseFloat(customer.cashPaid) || 0;
+    const totalPaid = advanceUsed + cashPaid;
+    customer.totalPaid = totalPaid;
+    customer.maxAdvance = getMaxAdvance(customer);
+
+    if (advanceUsed > customer.maxAdvance) {
+        customer.advanceUsed = customer.maxAdvance;
+    }
+
+    const effectivePaid = (parseFloat(customer.advanceUsed) || 0) + cashPaid;
+
+    if (effectivePaid > total) {
+        customer.dueAmount = 0;
+        customer.advanceCredit = effectivePaid - total;
+        customer.paymentStatus = 'advance';
+    } else if (total > 0 && effectivePaid >= total) {
+        customer.dueAmount = 0;
+        customer.advanceCredit = 0;
+        customer.paymentStatus = 'paid';
+    } else if (effectivePaid > 0) {
+        customer.dueAmount = total - effectivePaid;
+        customer.advanceCredit = 0;
+        customer.paymentStatus = 'partial';
+    } else {
+        customer.dueAmount = total;
+        customer.advanceCredit = 0;
+        customer.paymentStatus = total > 0 ? 'credit' : 'pending';
+    }
+}
+
+function paymentStatusLabel(customer) {
+    if (customer.paymentStatus === 'advance') {
+        return { cls: 'advance', text: `Advance: Rs ${customer.advanceCredit.toFixed(2)}` };
+    }
+    if (customer.paymentStatus === 'paid') {
+        return { cls: 'paid', text: 'Fully Paid' };
+    }
+    if (customer.dueAmount > 0) {
+        return { cls: 'due', text: `Due: Rs ${customer.dueAmount.toFixed(2)}` };
+    }
+    return { cls: '', text: 'Rs 0.00' };
+}
+
+function addCustomer() {
+    const customer = createEmptyCustomer();
+    customers.push(customer);
+    render();
+}
+
+function addItem(customerUid) {
+    const customer = findCustomer(customerUid);
+    if (!customer) return;
+    customer.items.push(createEmptyItem());
+    calculateTotals(customer);
+    render();
+}
+
+function removeItem(customerUid, itemUid) {
+    const customer = findCustomer(customerUid);
+    if (!customer) return;
+    if (customer.items.length === 1) {
+        customer.items[0] = createEmptyItem();
+        notify('Cannot remove last item. Clear values instead.', 'warning');
+    } else {
+        customer.items = customer.items.filter(i => i.uid !== itemUid);
+    }
+    calculateTotals(customer);
+    render();
+}
+
+function removeCustomer(customerUid) {
+    customers = customers.filter(c => c.uid !== customerUid);
+    if (customers.length === 0) addCustomer();
+    else render();
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
+}
+
+function formatNumber(num) {
+    if (num === undefined || num === null) return '0.00';
+    return num.toFixed(2);
+}
+
+// PRODUCT SUGGESTION HANDLER - FIXED VERSION
+function handleProductInput(e) {
+    let input = e.target;
+    let row = input.closest("tr");
+    let box = row.querySelector(".product-suggestions");
+    let query = input.value.toLowerCase().trim();
+    
+    if (!query) {
+        box.style.display = "none";
+        box.innerHTML = "";
+        return;
+    }
+    
+    let matches = PRODUCTS.filter(p => p.toLowerCase().includes(query));
+    
+    if (matches.length > 0) {
+        box.innerHTML = "";
+        matches.forEach(p => {
+            let div = document.createElement("div");
+            div.className = "suggestion-item";
+            div.textContent = p;
+            div.onclick = function() {
+                input.value = p;
+                box.style.display = "none";
+                box.innerHTML = "";
+                
+                const customerUid = parseInt(input.getAttribute("data-customer-uid"));
+                const itemUid = parseInt(input.getAttribute("data-item-uid"));
+                const customer = findCustomer(customerUid);
+                const item = findItem(customer, itemUid);
+                const defaults = PRODUCT_DEFAULTS[p];
+                
+                if (item) {
+                    item.product_name = p;
+                    if (defaults) {
+                        if (item.rate === 0) item.rate = defaults.rate;
+                        item.unit = defaults.unit;
+                        const unitSelect = row.querySelector('.unit-select');
+                        if (unitSelect) unitSelect.value = defaults.unit;
+                    }
+                    calculateTotals(customer);
+                    render();
+                }
+            };
+            box.appendChild(div);
+        });
+        box.style.display = "block";
+    } else {
+        box.style.display = "none";
+        box.innerHTML = "";
+    }
+}
+
+function attachProductListeners() {
+    document.querySelectorAll('.product-input').forEach(input => {
+        input.removeEventListener('input', handleProductInput);
+        input.addEventListener('input', handleProductInput);
+    });
+}
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.classList.contains('product-input')) {
+        document.querySelectorAll('.product-suggestions').forEach(box => {
+            box.style.display = 'none';
+        });
+    }
+});
+
+function handleCustomerInput(e) {
+    let input = e.target;
+    let card = input.closest('.form-card');
+    let box = card.querySelector(".customer-suggestions");
+    let query = input.value.toLowerCase().trim();
+    let customerUid = parseInt(input.getAttribute("data-customer-uid"));
+    
+    if (!query || query.length < 2) {
+        box.style.display = "none";
+        return;
+    }
+    
+    fetch(`/admin/master-panel/api/customer/search?name=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            box.innerHTML = "";
+            
+            if (data.suggestions && data.suggestions.length) {
+                box.style.display = "block";
+                data.suggestions.forEach(s => {
+                    let div = document.createElement("div");
+                    div.className = "suggestion-item";
+                    div.textContent = s.name;
+                    div.onclick = () => {
+                        fetch(`/admin/master-panel/api/customer/${s.id}/advance`)
+                            .then(res => res.json())
+                            .then(advanceData => {
+                                const customer = findCustomer(customerUid);
+                                if (customer) {
+                                    customer.customerId = s.id;
+                                    customer.customerName = s.name;
+                                    customer.advanceBalance = advanceData.advance_balance || 0;
+                                    calculateTotals(customer);
+                                    render();
+                                }
+                            });
+                        input.value = s.name;
+                        box.style.display = "none";
+                    };
+                    box.appendChild(div);
+                });
+            }
+            
+            if (data.can_create && query) {
+                let div = document.createElement("div");
+                div.className = "suggestion-item";
+                div.style.borderTop = "1px solid var(--gray-200)";
+                div.style.color = "var(--primary)";
+                div.innerHTML = `<i class="bi bi-plus-circle"></i> Create "${escapeHtml(query)}"`;
+                div.onclick = () => {
+                    fetch('/admin/master-panel/api/customer/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: query })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            const customer = findCustomer(customerUid);
+                            if (customer) {
+                                customer.customerId = data.customer.id;
+                                customer.customerName = data.customer.name;
+                                customer.advanceBalance = 0;
+                                calculateTotals(customer);
+                                render();
+                            }
+                            input.value = data.customer.name;
+                            notify('Customer created successfully!', 'success');
+                        } else {
+                            notify('Failed to create customer', 'danger');
+                        }
+                    });
+                    box.style.display = "none";
+                };
+                box.appendChild(div);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function attachCustomerListeners() {
+    document.querySelectorAll('.customer-name-input').forEach(input => {
+        input.removeEventListener('input', handleCustomerInput);
+        input.addEventListener('input', handleCustomerInput);
+    });
+}
+
+function render() {
+    const container = document.getElementById('customersContainer');
+    if (!container) return;
+    
+    customers.forEach(c => calculateTotals(c));
+    
+    container.innerHTML = customers.map((customer, index) => {
+        const status = paymentStatusLabel(customer);
+        const hasMustardOil = customer.items.some(item => isMustardExtraction(item.product_name));
+        const hasOthers = customer.items.some(item => isOthersProduct(item.product_name));
+        const showExchange = hasMustardOil || hasOthers;
+        
+        return `
+        <div class="form-card" data-customer-uid="${customer.uid}">
+            <div class="form-section">
+                <div class="customer-header">
+                    <div class="customer-title">
+                        <i class="bi bi-person-badge"></i> Customer ${index + 1}
+                    </div>
+                    <button type="button" class="btn-remove-customer" onclick="removeCustomer(${customer.uid})">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group position-relative">
+                        <label class="form-label">Customer Name <span class="required">*</span></label>
+                        <input type="text" class="form-control customer-name-input" data-customer-uid="${customer.uid}" value="${escapeHtml(customer.customerName)}" placeholder="Search or enter customer name..." autocomplete="off">
+                        <div class="suggestions-dropdown customer-suggestions" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control customer-email-input" data-customer-uid="${customer.uid}" value="${escapeHtml(customer.email)}" placeholder="for invoice">
+                    </div>
+                </div>
+                
+                ${customer.advanceBalance > 0 ? `
+                <div class="advance-alert">
+                    <div class="advance-info">
+                        <div>
+                            <span class="advance-label">Advance Balance Available</span>
+                            <div class="advance-amount">Rs ${customer.advanceBalance.toFixed(2)}</div>
+                        </div>
+                        <label class="advance-checkbox">
+                            <input type="checkbox" class="use-advance-checkbox" data-customer-uid="${customer.uid}" ${customer.useAdvance ? 'checked' : ''} onchange="toggleAdvance(${customer.uid}, this.checked)">
+                            <span>Use advance balance</span>
+                        </label>
+                    </div>
+                    <div id="advanceAmountSection_${customer.uid}" style="display: ${customer.useAdvance ? 'block' : 'none'}; margin-top: 12px;">
+                        <label class="form-label">Amount to use (Rs)</label>
+                        <input type="number" class="form-control advance-used-input" data-customer-uid="${customer.uid}" step="0.01" min="0" value="${customer.advanceUsed}" onchange="updateAdvance(${customer.uid}, this.value)">
+                        <small class="text-muted">Max available: Rs ${customer.maxAdvance.toFixed(2)}</small>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="form-section">
+                <div class="section-title">
+                    <h3>Order Items</h3>
+                    <p>Add products to this invoice</p>
+                </div>
+                
+                <div class="items-table-wrapper">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%">Product</th>
+                                <th style="width: 12%">Quantity</th>
+                                <th style="width: 12%">Unit</th>
+                                <th style="width: 15%">Rate (Rs)</th>
+                                <th style="width: 15%">Subtotal</th>
+                                <th style="width: 5%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${customer.items.map(item => {
+                                const defaults = PRODUCT_DEFAULTS[item.product_name];
+                                const isFluctuating = defaults && defaults.fluctuates;
+                                return `
+                            <tr>
+                                <td data-label="Product" class="position-relative">
+                                    <input type="text" class="form-control product-input" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" value="${escapeHtml(item.product_name)}" placeholder="Type product name..." autocomplete="off">
+                                    <div class="suggestions-dropdown product-suggestions" style="display: none;"></div>
+                                 </td>
+                                <td data-label="Quantity">
+                                    <input type="number" class="form-control qty-input" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" step="any" value="${item.quantity}" onchange="updateItem(${customer.uid}, ${item.uid}, 'qty', this.value)">
+                                 </td>
+                                <td data-label="Unit">
+                                    <select class="form-control unit-select" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" onchange="updateItem(${customer.uid}, ${item.uid}, 'unit', this.value)">
+                                        <option value="Kg" ${item.unit === 'Kg' ? 'selected' : ''}>Kg</option>
+                                        <option value="Liter" ${item.unit === 'Liter' ? 'selected' : ''}>Liter</option>
+                                        <option value="Piece" ${item.unit === 'Piece' ? 'selected' : ''}>Piece</option>
+                                        <option value="Quintal" ${item.unit === 'Quintal' ? 'selected' : ''}>Quintal</option>
+                                    </select>
+                                 </td>
+                                <td data-label="Rate">
+                                    <input type="number" class="form-control rate ${isFluctuating ? 'rate-fluctuating' : ''}" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" step="any" value="${item.rate}" ${isFluctuating ? 'data-fluctuating="true"' : ''} onchange="updateItem(${customer.uid}, ${item.uid}, 'rate', this.value)">
+                                 </td>
+                                <td data-label="Subtotal">
+                                    <input type="text" class="form-control subtotal-display" readonly style="background: var(--gray-50);" value="Rs ${item.subtotal.toFixed(2)}">
+                                 </td>
+                                <td data-label="Action">
+                                    <button type="button" class="remove-item" onclick="removeItem(${customer.uid}, ${item.uid})">✕</button>
+                                 </td>
+                            </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <button type="button" class="add-item-btn" onclick="addItem(${customer.uid})">
+                    <i class="bi bi-plus"></i> Add another item
+                </button>
+                
+                <div class="exchange-options" style="display: ${showExchange ? 'flex' : 'none'};">
+                    <label class="exchange-checkbox">
+                        <input type="checkbox" class="exchange-mustard-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeMustardCake ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'mustard', this.checked)">
+                        <span>Customer left <strong>Mustard Cake</strong> → Mustard Oil Extraction FREE</span>
+                    </label>
+                    <label class="exchange-checkbox">
+                        <input type="checkbox" class="exchange-rice-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeRiceBran ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'rice', this.checked)">
+                        <span>Customer left <strong>Rice Bran</strong> → Others service FREE</span>
+                    </label>
+                </div>
+                
+                <div class="payment-grid">
+                    <div class="payment-item">
+                        <label>Total Amount</label>
+                        <div class="payment-value">Rs ${customer.totalAmount.toFixed(2)}</div>
+                    </div>
+                    <div class="payment-item">
+                        <label>Cash Payment</label>
+                        <input type="number" class="form-control cash-paid-input" data-customer-uid="${customer.uid}" step="1" value="${customer.cashPaid}" onchange="updateCashPaid(${customer.uid}, this.value)">
+                    </div>
+                    <div class="payment-item">
+                        <label>Due / Advance</label>
+                        <div class="payment-value ${status.cls}">${status.text}</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Payment Mode</label>
+                    <select class="form-select payment-mode-select" data-customer-uid="${customer.uid}>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Khalti">Khalti</option>
+                        <option value="eSewa">eSewa</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
+    
+    attachProductListeners();
+    attachCustomerListeners();
+}
+
+// Global functions for inline event handlers
+function toggleAdvance(customerUid, checked) {
+    const customer = findCustomer(customerUid);
+    if (customer) {
+        customer.useAdvance = checked;
+        if (checked) {
+            customer.advanceUsed = customer.maxAdvance;
+        } else {
+            customer.advanceUsed = 0;
+        }
+        calculateTotals(customer);
+        render();
+    }
+}
+
+function updateAdvance(customerUid, value) {
+    const customer = findCustomer(customerUid);
+    if (customer) {
+        customer.advanceUsed = parseFloat(value) || 0;
+        if (customer.advanceUsed > customer.maxAdvance) {
+            customer.advanceUsed = customer.maxAdvance;
+        }
+        calculateTotals(customer);
+        render();
+    }
+}
+
+function updateItem(customerUid, itemUid, field, value) {
+    const customer = findCustomer(customerUid);
+    const item = findItem(customer, itemUid);
+    if (item) {
+        if (field === 'qty') item.quantity = parseFloat(value) || 0;
+        if (field === 'rate') item.rate = parseFloat(value) || 0;
+        if (field === 'unit') item.unit = value;
+        calculateTotals(customer);
+        render();
+    }
+}
+
+function updateCashPaid(customerUid, value) {
+    const customer = findCustomer(customerUid);
+    if (customer) {
+        customer.cashPaid = parseFloat(value) || 0;
+        calculateTotals(customer);
+        render();
+    }
+}
+
+function toggleExchange(customerUid, type, checked) {
+    const customer = findCustomer(customerUid);
+    if (customer) {
+        if (type === 'mustard') customer.exchangeMustardCake = checked;
+        if (type === 'rice') customer.exchangeRiceBran = checked;
+        calculateTotals(customer);
+        render();
+    }
+}
+
+function validateBeforeSave() {
+    const salesData = [];
+    const validationErrors = [];
+    
+    for (const customer of customers) {
+        const name = (customer.customerName || '').trim();
+        const validItems = customer.items.filter(item => {
+            if (!item.product_name || !item.product_name.trim()) return false;
+            if ((parseFloat(item.quantity) || 0) <= 0) return false;
+            return true;
+        });
+        
+        if (!name || !validItems.length) continue;
+        
+        calculateTotals(customer);
+        
+        if (customer.advanceUsed > 0 && !customer.customerId) {
+            validationErrors.push(`${name}: Cannot use advance without selecting a registered customer`);
+            continue;
+        }
+        if (customer.advanceUsed > (customer.advanceBalance || 0)) {
+            validationErrors.push(`${name}: Insufficient advance balance. Available: Rs ${(customer.advanceBalance || 0).toFixed(2)}`);
+            continue;
+        }
+        if (customer.advanceUsed > customer.totalAmount) {
+            validationErrors.push(`${name}: Advance cannot exceed total amount (Rs ${customer.totalAmount.toFixed(2)})`);
+            continue;
+        }
+        
+        salesData.push({
+            customer_id: customer.customerId,
+            customer_name: name,
+            email: customer.email,
+            items: validItems.map(item => ({
+                product_name: item.product_name.trim(),
+                quantity: parseFloat(item.quantity) || 0,
+                unit: item.unit || 'Kg',
+                rate: parseFloat(item.rate) || 0,
+                subtotal: parseFloat(item.subtotal) || 0
+            })),
+            advance_used: parseFloat(customer.advanceUsed) || 0,
+            cash_paid: parseFloat(customer.cashPaid) || 0,
+            exchange_mustard_cake: !!customer.exchangeMustardCake,
+            exchange_rice_bran: !!customer.exchangeRiceBran
+        });
+    }
+    
+    return { salesData, validationErrors };
+}
+
+async function saveAllSales() {
+    if (isSaving) return;
+    
+    const { salesData, validationErrors } = validateBeforeSave();
+    
+    if (validationErrors.length) {
+        notify(validationErrors.join('\n'), 'danger');
+        return;
+    }
+    
+    if (!salesData.length) {
+        notify('No valid sales data to save. Please add customer name and at least one product with quantity.', 'warning');
+        return;
+    }
+    
+    const saveBtn = document.getElementById('saveAllBtn');
+    isSaving = true;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+    
+    try {
+        const response = await fetch('/admin/master-panel/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ customers: salesData })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            notify(result.message, 'success');
+            customers = [];
+            addCustomer();
+        } else {
+            const errorMsg = result.errors ? result.errors.join('\n') : (result.message || 'Unknown error');
+            notify(errorMsg, 'danger');
+        }
+    } catch (error) {
+        notify('Error saving sales: ' + error.message, 'danger');
+    } finally {
+        isSaving = false;
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="bi bi-check2-circle"></i> Save All Sales';
+    }
+}
+
+function exportSales() { 
+    window.location.href = '/admin/export-sales-excel'; 
+}
+
+function downloadTemplate() { 
+    window.location.href = '/admin/download-sales-template'; 
+}
+
+async function importSales(fileInput, previewOnly) {
+    if (!fileInput.files || !fileInput.files[0]) return;
+    
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    if (previewOnly) formData.append('preview', 'true');
+    
+    notify(previewOnly ? 'Loading Excel...' : 'Importing sales...', 'info');
+    
+    try {
+        const response = await fetch('/admin/import-sales-excel', { method: 'POST', body: formData });
+        const result = await response.json();
+        
+        if (result.success) {
+            if (result.preview && result.customers) {
+                loadCustomersFromImport(result.customers);
+                notify(result.message, 'success');
+            } else {
+                notify(result.message, 'success');
+                customers = [];
+                addCustomer();
+            }
+        } else {
+            notify(result.error || 'Import failed', 'danger');
+        }
+    } catch (error) {
+        notify('Error importing file', 'danger');
+    }
+    
+    fileInput.value = '';
+}
+
+function loadCustomersFromImport(importedCustomers) {
+    customers = importedCustomers.map(entry => {
+        const customer = {
+            uid: nextCustomerId(),
+            customerId: entry.customer_id,
+            customerName: entry.customer_name || '',
+            email: entry.email || '',
+            items: (entry.items || []).map(item => ({
+                uid: nextItemId(),
+                product_name: item.product_name || '',
+                quantity: parseFloat(item.quantity) || 0,
+                unit: item.unit || 'Kg',
+                rate: parseFloat(item.rate) || 0,
+                subtotal: parseFloat(item.subtotal) || 0
+            })),
+            advanceBalance: parseFloat(entry.advance_balance) || 0,
+            useAdvance: (parseFloat(entry.advance_used) || 0) > 0,
+            advanceUsed: parseFloat(entry.advance_used) || 0,
+            cashPaid: parseFloat(entry.cash_paid) || 0,
+            totalAmount: 0,
+            totalPaid: 0,
+            dueAmount: 0,
+            advanceCredit: 0,
+            maxAdvance: 0,
+            paymentStatus: 'pending',
+            exchangeMustardCake: !!entry.exchange_mustard_cake,
+            exchangeRiceBran: !!entry.exchange_rice_bran
+        };
+        if (!customer.items.length) customer.items = [createEmptyItem()];
+        calculateTotals(customer);
+        return customer;
+    });
+    
+    if (!customers.length) addCustomer();
+    else render();
+}
+
+function notify(message, type = 'success') {
+    if (typeof window.showToast === 'function') {
+        window.showToast(message, type);
+    } else {
+        alert(message);
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    addCustomer();
+});
+
+document.getElementById('addCustomerBtn').addEventListener('click', addCustomer);
+document.getElementById('saveAllBtn').addEventListener('click', saveAllSales);
+</script>
+
+{% endblock %}

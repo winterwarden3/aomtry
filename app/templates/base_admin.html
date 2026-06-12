@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel - {{ business_name }}{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0C5B3F;
+            --accent: #138A52;
+            --secondary-bg: #F8F8F6;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--secondary-bg);
+            overflow-x: hidden;
+        }
+
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary) 0%, #0a4a33 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .sidebar-header small {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: white;
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-left-color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-menu i {
+            font-size: 1.2rem;
+            width: 24px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .admin-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .toggle-sidebar {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220,38,38,0.3);
+            color: white;
+        }
+
+        .main-content {
+            padding: 24px 30px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Toast Styles */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            min-width: 280px;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-left: 4px solid;
+            animation: slideInRight 0.3s ease forwards;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-glass.success {
+            border-left-color: #22c55e;
+        }
+        .toast-glass.success i {
+            color: #22c55e;
+        }
+
+        .toast-glass.danger {
+            border-left-color: #ef4444;
+        }
+        .toast-glass.danger i {
+            color: #ef4444;
+        }
+
+        .toast-glass.warning {
+            border-left-color: #f59e0b;
+        }
+        .toast-glass.warning i {
+            color: #f59e0b;
+        }
+
+        .toast-glass.info {
+            border-left-color: #0C5B3F;
+        }
+        .toast-glass.info i {
+            color: #0C5B3F;
+        }
+
+        .toast-glass i {
+            font-size: 1.2rem;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                left: -280px;
+            }
+            
+            .admin-sidebar.active {
+                left: 0;
+            }
+            
+            .admin-content {
+                margin-left: 0;
+            }
+            
+            .toggle-sidebar {
+                display: block;
+            }
+
+            #toast-container {
+                top: 10px;
+                right: 10px;
+            }
+
+            .toast-glass {
+                min-width: 250px;
+                padding: 12px 15px;
+            }
+        }
+
+        .admin-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<!-- Loading Animation for Vercel -->
+<div id="appLoader" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0C5B3F 0%, #138A52 100%);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+">
+    <div style="text-align: center;">
+        <!-- Oil Drop -->
+        <div style="
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: dropFloat 1.5s ease-in-out infinite;
+            position: relative;
+        ">
+            <div style="
+                position: absolute;
+                width: 25px;
+                height: 25px;
+                background: #fef3c7;
+                border-radius: 50%;
+                top: 18px;
+                left: 30px;
+                animation: dropShine 2s ease-in-out infinite;
+            "></div>
+        </div>
+        
+        <!-- Spinner -->
+        <div style="
+            width: 45px;
+            height: 45px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top: 3px solid #fbbf24;
+            border-radius: 50%;
+            animation: spinRing 0.8s linear infinite;
+            margin: 15px auto;
+        "></div>
+        
+        <!-- Text -->
+        <p style="color: white; font-weight: 600; margin-top: 10px;">Adarsh Oil Mill</p>
+        <p style="color: rgba(255,255,255,0.8); font-size: 12px;" id="loadingMsg">Loading Admin Panel...</p>
+    </div>
+</div>
+
+<style>
+    @keyframes dropFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    @keyframes dropShine {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
+    }
+    @keyframes spinRing {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    // Rotating messages
+    const messages = ["🛢️ Loading...", "📊 Fetching data...", "⚙️ Almost ready..."];
+    let i = 0;
+    setInterval(() => {
+        const el = document.getElementById('loadingMsg');
+        if (el) { i = (i + 1) % messages.length; el.innerHTML = messages[i]; }
+    }, 1500);
+    
+    // Hide loader when page loads
+    window.addEventListener('load', function() {
+        const loader = document.getElementById('appLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+    });
+    
+    // Fallback hide after 4 seconds
+    setTimeout(() => {
+        const loader = document.getElementById('appLoader');
+        if (loader && loader.parentNode) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+    }, 4000);
+</script>
+
+<div class="admin-wrapper">
+    
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar" id="sidebar">
+        
+        <div class="sidebar-header">
+            <h3>
+                <i class="bi bi-building"></i> {{ business_name }}
+            </h3>
+            <small>Admin Panel</small>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url_for('admin.sales_list') }}" class="{% if request.endpoint == 'admin.sales_list' %}active{% endif %}">
+                    <i class="bi bi-cart-check"></i>
+                    <span>Sales</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('admin.master_panel') }}" class="{% if request.endpoint and 'master_panel' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-layers"></i>
+                    <span>Batch Sales</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url_for('admin.customers_list') }}" class="{% if request.endpoint == 'admin.customers_list' %}active{% endif %}">
+                    <i class="bi bi-people"></i>
+                    <span>Customers</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url_for('admin.expenses_list') }}" class="{% if request.endpoint == 'admin.expenses_list' %}active{% endif %}">
+                    <i class="bi bi-receipt"></i>
+                    <span>Expenses</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('admin.customer_dues') }}" class="{% if request.endpoint == 'admin.customer_dues' %}active{% endif %}">
+                    <i class="bi bi-currency-rupee"></i>
+                    <span>Customer Dues</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('admin_products.product_list') }}" class="{% if request.endpoint == 'admin_products.product_list' %}active{% endif %}">
+                    <i class="bi bi-box"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url_for('admin.profit_analysis') }}" class="{% if request.endpoint == 'admin.profit_analysis' %}active{% endif %}">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Profit Analysis</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url_for('admin.reports') }}" class="{% if request.endpoint == 'admin.reports' %}active{% endif %}">
+                    <i class="bi bi-file-text"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('admin.contact_messages') }}" class="{% if request.endpoint == 'admin.contact_messages' %}active{% endif %}">
+                    <i class="bi bi-envelope"></i>
+                    <span>Contact Messages</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{{ url_for('auth.change_password') }}" class="{% if request.endpoint == 'auth.change_password' %}active{% endif %}">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>Change Password</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <small>
+                <i class="bi bi-clock"></i> 
+                Logged in as Admin
+            </small>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="admin-content">
+        
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <button class="toggle-sidebar" id="toggleSidebarBtn">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <div class="user-info">
+                <span class="user-name">
+                    <i class="bi bi-person-circle"></i> Admin
+                </span>
+                
+                <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-content">
+            <!-- TOAST CONTAINER -->
+            <div id="toast-container"></div>
+
+            {% block content %}{% endblock %}
+        </div>
+        
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Toggle sidebar on mobile
+    document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.toggle('active');
+    });
+
+    document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleSidebarBtn');
+        
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        }
+    });
+
+    // Toast notification function
+    function showToast(message, category) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-glass ${category}`;
+        
+        let icon = 'bi-info-circle';
+        let title = 'Notice';
+        
+        if (category === 'success') {
+            icon = 'bi-check-circle-fill';
+            title = 'Success!';
+        } else if (category === 'danger') {
+            icon = 'bi-exclamation-triangle-fill';
+            title = 'Error!';
+        } else if (category === 'warning') {
+            icon = 'bi-exclamation-circle-fill';
+            title = 'Warning!';
+        } else {
+            icon = 'bi-info-circle-fill';
+            title = 'Info';
+        }
+        
+        toast.innerHTML = `
+            <i class="bi ${icon}"></i>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast && toast.parentNode) {
+                toast.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => {
+                    if (toast.parentNode) toast.remove();
+                }, 300);
+            }
+        }, 5000);
+    }
+
+    // Show flash messages as toasts
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            document.addEventListener('DOMContentLoaded', function() {
+                {% for category, message in messages %}
+                    showToast("{{ message|safe }}", "{{ category }}");
+                {% endfor %}
+            });
+        {% endif %}
+    {% endwith %}
+</script>
+
+<style>
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+</style>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ sale.get('invoice_number') }}</title>
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+            button {
+                display: none;
+            }
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            padding: 40px;
+            color: #1f2937;
+            background: white;
+        }
+        
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #16a34a;
+        }
+        
+        .business-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: #166534;
+        }
+        
+        .invoice-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #16a34a;
+            margin-top: 15px;
+        }
+        
+        .invoice-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .customer-info {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        
+        th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .summary {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        
+        .total {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #e2e8f0;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        
+        .advance-row {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 11px;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+        
+        .download-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .download-btn:hover {
+            background: #15803d;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        
+        <!-- HEADER -->
+        <div class="header">
+            <div class="business-name">{{ business_name }}</div>
+            <div>Mainapokhar, Bardiya, Nepal</div>
+            <div>Phone: 9848023150 | Email: adarshoilbusiness@gmail.com</div>
+            <div class="invoice-title">PAYMENT RECEIPT</div>
+        </div>
+        
+        <!-- INVOICE INFO -->
+        <div class="invoice-info">
+            <div>
+                <strong>Invoice Number</strong><br>
+                #{{ sale.get('invoice_number', '') }}
+            </div>
+            <div>
+                <strong>Invoice Date</strong><br>
+                {{ sale.get('date', '')[:10] if sale.get('date') else '' }}
+            </div>
+            <div>
+                <strong>Status</strong><br>
+                <span style="color: 
+                    {% if sale.get('payment_status') == 'paid' %}#16a34a
+                    {% elif sale.get('payment_status') == 'partial' %}#d97706
+                    {% elif sale.get('payment_status') == 'advance' %}#3b82f6
+                    {% else %}#dc2626{% endif %};">
+                    {{ sale.get('payment_status', '').upper() }}
+                </span>
+            </div>
+        </div>
+        
+        <!-- CUSTOMER INFO -->
+        <div class="customer-info">
+            <strong>Bill To:</strong><br> 
+            {{ current_user.name }}<br>
+            {% if current_user.phone %}Phone: {{ current_user.phone }}{% endif %}
+        </div>
+        
+        <!-- ITEMS TABLE -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Unit</th>
+                    <th>Rate (Rs.)</th>
+                    <th class="text-right">Total (Rs.)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sale.get('items',[]) %}
+                <tr>
+                    <td>{{ item.get('product_name', '') }}</td>
+                    <td>{{ item.get('quantity', 0) }}</td>
+                    <td>{{ item.get('unit', '') }}</td>
+                    <td>Rs. {{ item.get('rate', 0)|round(2) }}</td>
+                    <td class="text-right">Rs. {{ item.get('subtotal', 0)|round(2) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <small class="text-muted"><i class="bi bi-info-circle">note*: zero qty + zero paid = byproduct exchange (mustard Cake/bran).</i> </small>
+        <!-- SUMMARY -->
+        <div class="summary">
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <span>Rs. {{ sale.get('total_amount', 0)|round(2) }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Cash Paid:</span>
+                <span>Rs. {{ sale.get('paid_amount', 0)|round(2) }}</span>
+            </div>
+            {% if sale.get('advance_used', 0) > 0 %}
+            <div class="summary-row advance-row">
+                <span>Advance Used:</span>
+                <span>Rs. {{ sale.get('advance_used', 0)|round(2) }}</span>
+            </div>
+            {% endif %}
+            <div class="summary-row total">
+                <span>Total Paid:</span>
+                <span>Rs. {{ (sale.get('paid_amount', 0) + sale.get('advance_used', 0))|round(2) }}</span>
+            </div>
+            
+            {% set due = sale.get('due_amount', 0) %}
+            {% set advance = sale.get('advance_amount', 0) %}
+            
+            {% if due > 0 %}
+            <div class="summary-row" style="color: #dc2626; font-weight: 700; margin-top: 10px;">
+                <span>Due Balance:</span>
+                <span>Rs. {{ due|round(2) }}</span>
+            </div>
+            {% elif advance > 0 %}
+            <div class="summary-row" style="color: #3b82f6; font-weight: 700; margin-top: 10px;">
+                <span>Advance Balance (Credit):</span>
+                <span>Rs. {{ advance|round(2) }}</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- PAYMENT DETAILS -->
+        <div style="margin-top: 20px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+            <strong>Payment Details</strong><br>
+            Cash Payment: Rs. {{ sale.get('paid_amount', 0)|round(2) }}<br>
+            {% if sale.get('advance_used', 0) > 0 %}
+            Advance Used: Rs. {{ sale.get('advance_used', 0)|round(2) }}<br>
+            Remaining Advance Balance: Rs. {{ advance_balance|round(2) }}
+            {% endif %}
+        </div>
+
+        <!-- Download Button (visible only on screen, hidden when printed) -->
+        <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+            <button class="download-btn" onclick="window.print()">
+                📄 Save as PDF
+            </button>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            Thank you for your business!<br>
+            This is a computer generated invoice. Valid without signature.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}Adarsh Oil Mill{% endblock %}
+    </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        /* ROOT COLORS */
+        :root{
+
+            --primary:#0C5B3F;
+            --accent:#138A52;
+
+            --dark-bg:#1F2A24;
+
+            --main-bg:#FAFAF7;
+            --secondary-bg:#F4F4F2;
+
+            --heading:#1F1A17;
+            --secondary-text:#7C685B;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+
+            font-family:'Poppins',sans-serif;
+
+            background:
+            linear-gradient(to bottom,#FAFAF7,#F4F4F2);
+
+            color:var(--heading);
+
+            overflow-x:hidden;
+        }
+
+        .container{
+            max-width:1200px;
+        }
+
+        /* NAVBAR */
+
+        .navbar{
+
+            background:rgba(255,255,255,0.75)!important;
+
+            backdrop-filter:blur(14px);
+
+            box-shadow:0 10px 30px rgba(0,0,0,0.05);
+
+            padding:18px 0;
+
+            transition:all 0.3s ease;
+        }
+
+        .navbar-brand{
+
+            font-size:1.6rem;
+
+            font-weight:800;
+
+            color:var(--primary)!important;
+        }
+
+        .navbar-brand i{
+            color:var(--accent);
+        }
+
+        .nav-link{
+
+            font-weight:600;
+
+            color:var(--heading)!important;
+
+            position:relative;
+
+            margin:0 10px;
+
+            transition:all 0.3s ease;
+        }
+
+        .nav-link::after{
+
+            content:'';
+
+            position:absolute;
+
+            width:0%;
+
+            height:2px;
+
+            background:var(--primary);
+
+            left:0;
+
+            bottom:-5px;
+
+            transition:0.3s ease;
+        }
+
+        .nav-link:hover::after{
+            width:100%;
+        }
+
+        .nav-link:hover{
+            color:var(--primary)!important;
+        }
+
+        /* CUSTOMER LOGIN BUTTON */
+        .btn-customer-login{
+            background:transparent;
+            color:var(--primary);
+            border:2px solid var(--primary);
+            border-radius:14px;
+            padding:8px 20px;
+            font-weight:600;
+            transition:all 0.3s ease;
+            margin-right:10px;
+        }
+
+        .btn-customer-login:hover{
+            background:var(--primary);
+            color:white;
+            transform:translateY(-3px);
+        }
+
+        /* ADMIN LOGIN BUTTON */
+        .btn-admin-login{
+            background:linear-gradient(135deg,var(--primary),var(--accent));
+            color:white;
+            border:none;
+            border-radius:14px;
+            padding:8px 24px;
+            font-weight:600;
+            transition:all 0.3s ease;
+            box-shadow:0 8px 20px rgba(12,91,63,0.15);
+        }
+
+        .btn-admin-login:hover{
+            transform:translateY(-3px);
+            color:white;
+            box-shadow:0 12px 30px rgba(12,91,63,0.25);
+        }
+
+        /* BUTTONS */
+
+        .btn-primary{
+
+            background:
+            linear-gradient(135deg,var(--primary),var(--accent));
+
+            border:none;
+
+            border-radius:14px;
+
+            padding:12px 30px;
+
+            font-weight:600;
+
+            transition:all 0.3s ease;
+        }
+
+        .btn-primary:hover{
+
+            transform:translateY(-3px);
+
+            box-shadow:0 10px 25px rgba(12,91,63,0.2);
+        }
+
+        .btn-outline-primary{
+
+            border:2px solid var(--primary);
+
+            color:var(--primary);
+
+            border-radius:14px;
+
+            padding:10px 25px;
+
+            font-weight:600;
+
+            transition:all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover{
+
+            background:var(--primary);
+
+            color:white;
+
+            transform:translateY(-2px);
+        }
+
+        /* CARDS */
+
+        .card{
+
+            border:none;
+
+            border-radius:24px;
+
+            overflow:hidden;
+
+            transition:all 0.4s ease;
+
+            box-shadow:0 10px 30px rgba(0,0,0,0.04);
+        }
+
+        .card:hover{
+
+            transform:translateY(-10px);
+
+            box-shadow:0 20px 50px rgba(0,0,0,0.08);
+        }
+
+        /* SECTION TITLE */
+
+        .section-title{
+
+            text-align:center;
+
+            margin-bottom:50px;
+        }
+
+        .section-title h2{
+
+            color:var(--primary);
+
+            font-weight:700;
+
+            font-size:2.5rem;
+
+            margin-bottom:12px;
+        }
+
+        .section-title p{
+
+            color:var(--secondary-text);
+
+            font-size:1rem;
+        }
+
+        /* SECTIONS - NO GAPS */
+        .section {
+            padding: 60px 0;
+            margin: 0;
+        }
+
+        .hero-section {
+            padding: 80px 0;
+            margin: 0;
+        }
+
+        .stats-section {
+            padding: 50px 0;
+            margin: 0;
+        }
+
+        .cta-section {
+            padding: 50px 0;
+            margin: 0;
+        }
+
+        /* FOOTER - COMPACT VERSION */
+
+        footer{
+
+            background:
+            linear-gradient(135deg,#1F2A24,#2E3D35);
+
+            color:#d7d7d7;
+
+            padding: 40px 0 20px;
+
+            position:relative;
+
+            overflow:hidden;
+
+            margin-top: 0;
+        }
+
+        footer::before{
+
+            content:'';
+
+            position:absolute;
+
+            width:250px;
+
+            height:250px;
+
+            background:rgba(255,255,255,0.03);
+
+            border-radius:50%;
+
+            top:-100px;
+
+            right:-80px;
+        }
+
+        footer h5{
+
+            color:white;
+
+            font-weight:600;
+
+            margin-bottom:15px;
+
+            font-size:1.1rem;
+        }
+
+        footer p,
+        footer a{
+
+            color:#cfcfcf;
+
+            text-decoration:none;
+
+            transition:all 0.3s ease;
+
+            font-size:0.85rem;
+        }
+
+        footer a:hover{
+
+            color:white;
+
+            padding-left:5px;
+        }
+
+        .social-icons a{
+
+            width:35px;
+            height:35px;
+            border-radius:50%;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            background:rgba(255,255,255,0.08);
+            margin-right:8px;
+            transition:all 0.3s ease;
+            font-size:0.9rem;
+        }
+
+        .social-icons a:hover{
+
+            background:
+            linear-gradient(135deg,var(--primary),var(--accent));
+
+            transform:translateY(-3px);
+
+            color:white;
+        }
+
+        /* ANIMATIONS */
+
+        .fade-up{
+            animation:fadeUp 1s ease;
+        }
+
+        .float{
+            animation:float 4s ease-in-out infinite;
+        }
+
+        @keyframes fadeUp{
+
+            from{
+                opacity:0;
+                transform:translateY(40px);
+            }
+
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+        @keyframes float{
+
+            0%,100%{
+                transform:translateY(0);
+            }
+
+            50%{
+                transform:translateY(-15px);
+            }
+        }
+
+        /* MOBILE */
+
+        @media(max-width:768px){
+
+            .navbar-brand{
+                font-size:1.2rem;
+            }
+
+            .section-title h2{
+                font-size:1.8rem;
+            }
+
+            .hero-section {
+                padding: 50px 0;
+            }
+
+            .section {
+                padding: 40px 0;
+            }
+
+            footer{
+                text-align:center;
+                padding: 30px 0 15px;
+            }
+
+            .social-icons{
+                justify-content:center;
+            }
+            
+            .btn-customer-login,
+            .btn-admin-login {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+                text-align: center;
+            }
+        }
+
+    </style>
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+
+<!-- Loading Animation for Vercel -->
+<div id="appLoader" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0C5B3F 0%, #138A52 100%);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+">
+    <div style="text-align: center;">
+        <!-- Oil Drop -->
+        <div style="
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: dropFloat 1.5s ease-in-out infinite;
+            position: relative;
+        ">
+            <div style="
+                position: absolute;
+                width: 25px;
+                height: 25px;
+                background: #fef3c7;
+                border-radius: 50%;
+                top: 18px;
+                left: 30px;
+                animation: dropShine 2s ease-in-out infinite;
+            "></div>
+        </div>
+        
+        <!-- Spinner -->
+        <div style="
+            width: 45px;
+            height: 45px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-top: 3px solid #fbbf24;
+            border-radius: 50%;
+            animation: spinRing 0.8s linear infinite;
+            margin: 15px auto;
+        "></div>
+        
+        <!-- Text -->
+        <p style="color: white; font-weight: 600; margin-top: 10px;">Adarsh Oil Mill</p>
+        <p style="color: rgba(255,255,255,0.8); font-size: 12px;" id="loadingMsg">Loading...</p>
+    </div>
+</div>
+
+<style>
+    @keyframes dropFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    @keyframes dropShine {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
+    }
+    @keyframes spinRing {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    // Rotating messages
+    const messages = ["🛢️ Loading...", "🌟 Almost there...", "✨ Getting ready..."];
+    let i = 0;
+    setInterval(() => {
+        const el = document.getElementById('loadingMsg');
+        if (el) { i = (i + 1) % messages.length; el.innerHTML = messages[i]; }
+    }, 1500);
+    
+    // Hide loader when page loads
+    window.addEventListener('load', function() {
+        const loader = document.getElementById('appLoader');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+    });
+    
+    // Fallback hide after 4 seconds
+    setTimeout(() => {
+        const loader = document.getElementById('appLoader');
+        if (loader && loader.parentNode) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+    }, 4000);
+</script>
+
+
+
+
+<!-- NAVBAR -->
+
+<nav class="navbar navbar-expand-lg sticky-top">
+
+    <div class="container">
+
+        <a class="navbar-brand"
+           href="{{ url_for('public.home') }}">
+
+            <i class="bi bi-droplet-fill"></i>
+
+            Adarsh Oil Mill
+
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#nav">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse"
+             id="nav">
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{{ url_for('public.home') }}">
+
+                        Home
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{{ url_for('public.about') }}">
+
+                        About
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{{ url_for('public.products') }}">
+
+                        Products
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       href="{{ url_for('public.contact') }}">
+
+                        Contact
+
+                    </a>
+
+                </li>
+
+                <!-- ADMIN LOGIN BUTTON -->
+                <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
+                    <a class="btn btn-admin-login"
+                       href="{{ url_for('auth.login', type='') }}">
+                        <i class="bi bi-shield-lock"></i>
+                        Login
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- TOAST FLASH MESSAGES -->
+<div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<style>
+.toast-glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    min-width: 280px;
+    max-width: 350px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-left: 4px solid;
+    animation: slideInRight 0.3s ease forwards;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Poppins', sans-serif;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast-glass.success {
+    border-left-color: #22c55e;
+}
+.toast-glass.success i {
+    color: #22c55e;
+}
+
+.toast-glass.danger {
+    border-left-color: #ef4444;
+}
+.toast-glass.danger i {
+    color: #ef4444;
+}
+
+.toast-glass.warning {
+    border-left-color: #f59e0b;
+}
+.toast-glass.warning i {
+    color: #f59e0b;
+}
+
+.toast-glass.info {
+    border-left-color: #0C5B3F;
+}
+.toast-glass.info i {
+    color: #0C5B3F;
+}
+
+.toast-glass i {
+    font-size: 1.2rem;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: #555;
+}
+</style>
+
+<script>
+function showToast(message, category) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-glass ${category}`;
+    
+    let icon = 'bi-info-circle';
+    let title = 'Notice';
+    
+    if (category === 'success') {
+        icon = 'bi-check-circle-fill';
+        title = 'Success!';
+    } else if (category === 'danger') {
+        icon = 'bi-exclamation-triangle-fill';
+        title = 'Error!';
+    } else if (category === 'warning') {
+        icon = 'bi-exclamation-circle-fill';
+        title = 'Warning!';
+    } else {
+        icon = 'bi-info-circle-fill';
+        title = 'Info';
+    }
+    
+    toast.innerHTML = `
+        <i class="bi ${icon}"></i>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast && toast.parentNode) {
+            toast.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 300);
+        }
+    }, 5000);
+}
+
+// Wait for DOM to load before showing toasts
+document.addEventListener('DOMContentLoaded', function() {
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                showToast("{{ message|safe }}", "{{ category }}");
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+});
+</script>
+
+<!-- MAIN -->
+
+<main>
+
+    {% block content %}{% endblock %}
+
+</main>
+
+<!-- FOOTER - COMPACT VERSION -->
+
+<footer>
+
+    <div class="container">
+
+        <div class="row g-4">
+
+            <!-- BRAND -->
+
+            <div class="col-lg-4">
+
+                <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
+
+                    <i class="bi bi-droplet-fill"></i>
+
+                    Adarsh Oil Mill
+
+                </h5>
+
+                <p style="font-size: 0.85rem; line-height: 1.5;">
+
+                    Delivering purity, quality,
+                    and trust since 2062 BS.
+
+                    Natural products crafted
+                    with tradition and care.
+
+                </p>
+
+                <div class="social-icons mt-3">
+
+                    <a href="https://www.facebook.com/adarshoillmill"
+                       target="_blank"
+                       style="width: 35px; height: 35px; font-size: 0.9rem;">
+
+                        <i class="bi bi-facebook"></i>
+
+                    </a>
+
+                    <a href="https://wa.me/9779848023150"
+                       target="_blank"
+                       style="width: 35px; height: 35px; font-size: 0.9rem;">
+
+                        <i class="bi bi-whatsapp"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- LINKS -->
+
+            <div class="col-lg-4">
+
+                <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
+                    Quick Links
+                </h5>
+
+                <ul class="list-unstyled" style="font-size: 0.85rem;">
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('public.home') }}">
+                            Home
+                        </a>
+
+                    </li>
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('public.about') }}">
+                            About Us
+                        </a>
+
+                    </li>
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('public.products') }}">
+                            Products
+                        </a>
+
+                    </li>
+
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('public.contact') }}">
+                            Contact
+                        </a>
+                    </li>
+                    <li class="mb-2">
+
+                        <a href="{{ url_for('auth.login', type='') }}">
+                            Login
+                        </a>
+                    </li>
+
+
+                </ul>
+
+            </div>
+
+            <!-- CONTACT -->
+
+            <div class="col-lg-4">
+
+                <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
+                    Contact Info
+                </h5>
+
+                <!-- Location - Opens Google Maps -->
+                <p style="font-size: 0.85rem; margin-bottom: 8px;">
+                    <a href="https://www.google.com/maps/place/Adarsh+Oil+Mill/@28.1835509,81.4796051,19.25z/data=!4m6!3m5!1s0x39988850f734f1b1:0x1bf6799c805fe87!8m2!3d28.1836746!4d81.4797783!16s%2Fg%2F11f11fm2qw?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D    " 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style="color: #cfcfcf; text-decoration: none;">
+                        <i class="bi bi-geo-alt-fill"></i> Mainapokhar, Bardiya, Nepal
+                    </a>
+                </p>
+
+                <!-- Phone - Opens Phone App -->
+                <p style="font-size: 0.85rem; margin-bottom: 8px;">
+                    <a href="tel:+9779848023150" 
+                    style="color: #cfcfcf; text-decoration: none;">
+                        <i class="bi bi-telephone-fill"></i>
+                        +977-9848023150
+                    </a>
+                </p>
+
+                <!-- Email - Opens Email App -->
+                <p style="font-size: 0.85rem; margin-bottom: 8px;">
+                    <a href="mailto:adarshoilbusiness@gmail.com" 
+                    style="color: #cfcfcf; text-decoration: none;">
+                        <i class="bi bi-envelope-fill"></i>
+                        adarshoilbusiness@gmail.com
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+        <hr class="my-4"
+            style="border-color:rgba(255,255,255,0.08);">
+
+        <div class="text-center">
+
+            <small style="font-size: 0.75rem;">
+
+                © 2026 Adarsh Oil Mill.
+                All Rights Reserved.
+
+            </small>
+
+            <br>
+            <small style="font-size: 0.7rem;">
+                Developed by Kushal
+            </small>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<!-- Bootstrap JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

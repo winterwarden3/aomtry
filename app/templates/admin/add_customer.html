@@ -1,0 +1,272 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Add Customer - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+    --primary: #0C5B3F;
+    --accent: #138A52;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    --border: #e5e7eb;
+    --transition: 0.25s ease;
+}
+
+.card-ui {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 24px;
+}
+
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 11px 18px;
+}
+
+.btn-ui:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary-ui {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    width: 100%;
+}
+
+.btn-primary-ui:hover {
+    color: white;
+    box-shadow: 0 6px 18px rgba(19,138,82,0.25);
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline-ui:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.form-control-ui {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    font-size: .9rem;
+    transition: all var(--transition);
+    background: white;
+}
+
+.form-control-ui:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+textarea.form-control-ui {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-label-ui {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--primary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.input-icon {
+    position: relative;
+}
+
+.input-icon i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    z-index: 1;
+    font-size: 1rem;
+}
+
+.input-icon .form-control-ui {
+    padding-left: 40px;
+}
+
+.input-icon textarea+i {
+    top: 20px;
+    transform: none;
+}
+
+.input-icon textarea.form-control-ui {
+    padding-left: 40px;
+}
+
+@media (max-width: 768px) {
+    .card-ui {
+        padding: 16px;
+    }
+    
+    .btn-ui {
+        padding: 10px 16px;
+    }
+}
+</style>
+
+<div class="container-fluid px-md-3 py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="fw-bold mb-1" style="font-size: 1.8rem;">
+                <i class="bi bi-person-plus"></i>
+                Add New Customer
+            </h1>
+            <p class="text-muted mb-0">Register a new customer into your system</p>
+        </div>
+        <a href="{{ url_for('admin.customers_list') }}" class="btn-ui btn-outline-ui">
+            <i class="bi bi-arrow-left"></i>
+            Back to Customers
+        </a>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4 shadow-sm mb-3">
+                    <i class="bi bi-info-circle"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- FORM CARD -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card-ui">
+                <form method="POST">
+
+                    <!-- NAME -->
+                    <div class="mb-3">
+                        <label class="form-label-ui">
+                            <i class="bi bi-person"></i> Full Name <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-icon">
+                            <i class="bi bi-person"></i>
+                            <input type="text"
+                                   name="name"
+                                   class="form-control-ui"
+                                   placeholder="Enter full name"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- USERNAME -->
+                    <div class="mb-3">
+                        <label class="form-label-ui">
+                            <i class="bi bi-person-badge"></i> Username <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-icon">
+                            <i class="bi bi-at"></i>
+                            <input type="text"
+                                   name="username"
+                                   class="form-control-ui"
+                                   placeholder="Unique username"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="mb-3">
+                        <label class="form-label-ui">
+                            <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <div class="input-icon">
+                            <i class="bi bi-envelope"></i>
+                            <input type="email"
+                                   name="email"
+                                   class="form-control-ui"
+                                   placeholder="customer@example.com">
+                        </div>
+                    </div>
+
+                    <!-- PHONE -->
+                    <div class="mb-3">
+                        <label class="form-label-ui">
+                            <i class="bi bi-telephone"></i> Phone
+                        </label>
+                        <div class="input-icon">
+                            <i class="bi bi-telephone"></i>
+                            <input type="text"
+                                   name="phone"
+                                   class="form-control-ui"
+                                   placeholder="Phone number">
+                        </div>
+                    </div>
+
+                    <!-- ADDRESS -->
+                    <div class="mb-4">
+                        <label class="form-label-ui">
+                            <i class="bi bi-geo-alt"></i> Address
+                        </label>
+                        <div class="input-icon">
+                            <i class="bi bi-geo-alt"></i>
+                            <textarea name="address"
+                                      class="form-control-ui"
+                                      rows="3"
+                                      placeholder="Customer address (optional)"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- BUTTON -->
+                    <button type="submit" class="btn-ui btn-primary-ui">
+                        <i class="bi bi-check-circle"></i>
+                        Save Customer
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const nameInput = document.querySelector('input[name="name"]');
+    const usernameInput = document.querySelector('input[name="username"]');
+
+    if (nameInput && usernameInput) {
+        nameInput.addEventListener("input", function () {
+            let username = this.value
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, "_")
+                .replace(/[^a-z0-9_]/g, "");
+            usernameInput.value = username;
+        });
+    }
+});
+</script>
+
+{% endblock %}

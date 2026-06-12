@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Invoice | {{ business_name }}</title>
+  <!-- Use system fonts for a clean, classic look -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.45;
+      color: #000;
+      padding: 32px 24px;
+    }
+
+    /* Main container */
+    .invoice-container {
+      max-width: 840px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 10px;
+      border: 1px solid #000;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    /* Header */
+    .invoice-header {
+      background: #000;
+      padding: 48px 48px 40px 48px;
+      color: #fff;
+    }
+
+    .logo-area .logo {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .invoice-badge {
+      background: #fff;
+      padding: 8px 20px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.8px;
+      border: 0.5px solid #fff;
+      color: #fff;
+    }
+
+    .title-section h1 {
+      color: #fff;
+      font-weight: 700;
+      font-size: 34px;
+      letter-spacing: -0.3px;
+      margin-top: 8px;
+    }
+
+    .title-section .invoice-ref {
+      font-size: 15px;
+      font-weight: 500;
+      margin-top: 10px;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    /* Body spacing */
+    .invoice-body {
+      padding: 44px 48px 48px;
+    }
+
+    /* Greeting */
+    .greeting-modern {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 20px;
+    }
+
+    .greeting-modern h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    /* Info panels */
+    .info-panels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      background: #f9f9f9;
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 40px;
+      border: 1px solid #ccc;
+    }
+
+    .info-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: #555;
+    }
+
+    .info-value {
+      font-size: 18px;
+      font-weight: 700;
+      word-break: break-word;
+      color: #000;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      border: 1px solid #000;
+      background: #fff;
+      color: #000;
+    }
+
+    /* Note & alert cards */
+    .corporate-note {
+      background: #fff;
+      border-left: 4px solid #000;
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #000;
+    }
+
+    .alert-modern {
+      border-radius: 16px;
+      padding: 18px 24px;
+      margin-bottom: 32px;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      border: 1px solid #ccc;
+      background: #f0f0f0;
+    }
+
+    /* Table styles */
+    .invoice-table-wrapper {
+      /* Removed overflow-x: auto to prevent unnecessary scrolling on small screens */
+      margin-bottom: 40px;
+      border-radius: 18px;
+      border: 1px solid #ccc;
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .invoice-table thead tr {
+      background: #f9f9f9;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .invoice-table th {
+      text-align: left;
+      padding: 18px 16px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .invoice-table td {
+      padding: 18px 16px;
+      border-bottom: 1px solid #eee;
+      color: #222;
+      font-weight: 500;
+    }
+
+    .product-name {
+      font-weight: 700;
+      color: #000;
+    }
+
+    /* Totals box */
+    .totals-card {
+      background: #f9f9f9;
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      border: 1px solid #ccc;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      flex-wrap: wrap;
+    }
+
+    .totals-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .totals-amount {
+      font-weight: 700;
+      font-size: 16px;
+      color: #000;
+    }
+
+    /* CTA button */
+    .cta-section {
+      text-align: center;
+      margin: 40px 0 36px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 36px;
+      border-radius: 44px;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .btn-primary:hover {
+      background: #222;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Footer */
+    .footer {
+      background: #fff;
+      padding: 36px 48px 32px;
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .thankyou-line {
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    /* Responsive adjustments */
+    @media(max-width: 680px) {
+      body {
+        padding: 16px 12px;
+      }
+      .invoice-header {
+        padding: 32px 24px;
+      }
+      .invoice-body {
+        padding: 28px 24px;
+      }
+      .info-panels {
+        flex-direction: column;
+        gap: 18px;
+        padding: 22px;
+      }
+      .footer {
+        padding: 28px 24px;
+      }
+      .logo-area .logo {
+        font-size: 24px;
+      }
+      .title-section h1 {
+        font-size: 28px;
+      }
+    }
+
+    @media(max-width: 480px) {
+      .btn-primary {
+        width: 100%;
+        padding: 14px 20px;
+      }
+      .invoice-table th, .invoice-table td {
+        padding: 12px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="invoice-container">
+
+  <!-- Header -->
+  <div class="invoice-header">
+    <div class="logo-area">
+      <div class="logo">{{ business_name }}</div>
+    </div>
+    <div class="title-section">
+      <h1>Receipt</h1>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="invoice-body">
+    <!-- greeting -->
+    <div class="greeting-modern">
+      <h2>Dear {{ sale.get('customer_name', 'Partner') }},</h2>
+      <p>Here’s the detailed summary of your transaction.</p>
+    </div>
+
+    <!-- info panels -->
+    <div class="info-panels">
+      <div class="info-panel-item">
+        <div class="info-label">INVOICE NUMBER</div>
+        <div class="info-value"> {{ sale.get('invoice_number', '—') }}</div>
+      </div>
+      <div class="info-panel-item">
+        <div class="info-label">ISSUE DATE</div>
+        <div class="info-value"> {{ sale.get('date')[:10] if sale.get('date') else '—' }}</div>
+      </div>
+      <div class="info-panel-item">
+        <div class="info-label">PAYMENT STATUS</div>
+        <div class="info-value">
+          {% set status = sale.get('payment_status', '') %}
+          {% if status == 'paid' %}
+            <span class="badge"> ✓ Fully Paid</span>
+          {% elif status == 'partial' %}
+            <span class="badge"> ⚠ Partially Paid</span>
+          {% elif status == 'advance' %}
+            <span class="badge"> ↻ Advance Payment</span>
+          {% else %}
+            <span class="badge"> ⏳ Pending</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- notes -->
+    {% if sale.get('notes') %}
+    <div class="corporate-note">
+      📌 {{ sale.get('notes') }}
+    </div>
+    {% endif %}
+
+    <!-- items table -->
+    {% if sale.get('items') and sale.get('items')|length > 0 %}
+    <div class="invoice-table-wrapper">
+      <table class="invoice-table">
+        <thead>
+          <tr>
+            <th>Products/Services</th>
+            <th style="text-align:center;">Qty</th>
+            <th style="text-align:right;">Unit Price (Rs)</th>
+            <th style="text-align:right;">Total (Rs)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in sale.get('items', []) %}
+          <tr>
+            <td>
+              <div class="product-name">{{ item.get('product_name', 'Product') }}</div>
+              {% if item.get('unit') %}
+              <div class="product-unit">  Unit: {{ item.get('unit') }}</div>
+              {% endif %}
+            </td>
+            <td style="text-align:center;">{{ item.get('quantity', 0) }}</td>
+            <td style="text-align:right;">{{ "%.2f"|format(item.get('rate', 0)) }}</td>
+            <td style="text-align:right;">{{ "%.2f"|format(item.get('subtotal', 0)) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    <!-- totals -->
+    {% set total = sale.get('total_amount', 0) %}
+    {% set paid = sale.get('paid_amount', 0) %}
+    {% set advance_used = sale.get('advance_used', 0) %}
+    {% set due = sale.get('due_amount', 0) %}
+    {% set advance_credit = sale.get('advance_amount', 0) %}
+
+    <div class="totals-card">
+      <div class="totals-row">
+        <span class="totals-label">Subtotal</span>
+        <span class="totals-amount">  Rs {{ "%.2f"|format(total) }}</span>
+      </div>
+      {% if paid > 0 %}
+      <div class="totals-row">
+        <span class="totals-label">Payment</span>
+        <span class="totals-amount">  Rs {{ "%.2f"|format(paid) }}</span>
+      </div>
+      {% endif %}
+      {% if advance_used > 0 %}
+      <div class="totals-row">
+        <span class="totals-label">Advance Applied</span>
+        <span class="totals-amount">  Rs {{ "%.2f"|format(advance_used) }}</span>
+      </div>
+      {% endif %}
+      {% if due > 0 %}
+      <div class="totals-row">
+        <span class="totals-label">Outstanding Balance</span>
+        <span class="totals-amount">  Rs {{ "%.2f"|format(due) }}</span>
+      </div>
+      {% endif %}
+      {% if advance_credit > 0 %}
+      <div class="totals-row">
+        <span class="totals-label">Remaining Advance Credit</span>
+        <span class="totals-amount">   Rs {{ "%.2f"|format(advance_credit) }}</span>
+      </div>
+      {% endif %}
+      <div class="totals-row" style="border-top:1px solid #ccc; margin-top:12px; padding-top:12px;">
+        <span class="totals-label">Total Amount Settled </span>
+        <span class="totals-amount">   Rs {{ "%.2f"|format(paid + advance_used) }}</span>
+      </div>
+    </div>
+
+    <!-- note -->
+    <div class="corporate-note" style="background:#fff;">
+      <span>Note: Zero quantity + zero paid = byproduct exchange (mustard cake / bran). Applicable adjustments recorded.</span>
+    </div>
+
+    <!-- alerts -->
+    {% if due > 0 %}
+    <div class="alert-modern alert-warning">
+      <strong>Pending payment of Rs {{ "%.2f"|format(due) }}</strong><br>Please settle the due amount.
+    </div>
+    {% elif due == 0 and (paid > 0 or advance_used > 0) %}
+    <div class="alert-modern alert-success">
+      <strong>Fully settled, Thank you for your payment.</strong> 
+    </div>
+    {% elif advance_credit > 0 %}
+    <div class="alert-modern alert-info">
+      <strong>Advance credit: Rs {{ "%.2f"|format(advance_credit) }}</strong><br>Use for future purchases.
+    </div>
+    {% endif %}
+
+    <!-- button & footer -->
+    <div class="cta-section">
+      <a href="https://www.adarshoilmill.com.np/auth/login?type=customer" class="btn-primary">Access Customer Portal →</a>
+    </div>
+    <div class="footer">
+      <div class="thankyou-line">Thank you for trusting us!</div>
+      <p>{{ business_name }} | Mainapokhar, Bardiya, Nepal</p>
+      <p>+977-9848023150 | adarshoilbusiness@gmail.com</p>
+      <p style="font-size:11px; margin-top:16px;">This is a system-generated receipt, no signature required.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
