@@ -1007,7 +1007,7 @@ function render() {
                                 const isFluctuating = defaults && defaults.fluctuates;
                                 return `
                             <tr>
-                                <td data-label="Product" class="position-relative">
+                                <td data-label="Product" class="position-absolute">
                                     <input type="text" class="form-control product-input" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" value="${escapeHtml(item.product_name)}" placeholder="Type product name..." autocomplete="off">
                                     <div class="suggestions-dropdown product-suggestions" style="display: none;"></div>
                                  </td>
@@ -1041,14 +1041,14 @@ function render() {
                     <i class="bi bi-plus"></i> Add another item
                 </button>
                 
-                <div class="exchange-options" style="display: ${showExchange ? 'flex' : 'none'};">
-                    <label class="exchange-checkbox">
+                <div class="exchange-options" style="display: flex; margin-top: 20px;">
+                    <label class="exchange-checkbox" style="display: ${hasMustardOil ? 'flex' : 'none'};">
                         <input type="checkbox" class="exchange-mustard-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeMustardCake ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'mustard', this.checked)">
-                        <span>Customer left <strong>Mustard Cake</strong> → Mustard Oil Extraction FREE</span>
+                        <span>Customer left <strong>Mustard Cake</strong></span>
                     </label>
-                    <label class="exchange-checkbox">
+                    <label class="exchange-checkbox" style="display: ${hasOthers ? 'flex' : 'none'};">
                         <input type="checkbox" class="exchange-rice-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeRiceBran ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'rice', this.checked)">
-                        <span>Customer left <strong>Rice Bran</strong> → Others service FREE</span>
+                        <span>Customer left <strong>Rice Bran</strong></span>
                     </label>
                 </div>
                 
