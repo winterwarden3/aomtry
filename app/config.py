@@ -34,7 +34,18 @@ class Config:
     # ============================================
     BUSINESS_NAME = "Adarsh Oil Mill"
     CURRENCY = "Rs."
-    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'adarshoilbusiness@gmail.com')
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@adarshoilmill.com.np')
+    
+    # ============================================
+    # OTP & RATE LIMITING CONSTANTS
+    # ============================================
+    MAX_OTP_REQUESTS = int(os.environ.get('MAX_OTP_REQUESTS', 3))
+    OTP_WINDOW_HOURS = int(os.environ.get('OTP_WINDOW_HOURS', 1))
+    OTP_EXPIRY_MINUTES = int(os.environ.get('OTP_EXPIRY_MINUTES', 5))
+    
+    # Login attempt constants
+    MAX_LOGIN_ATTEMPTS = int(os.environ.get('MAX_LOGIN_ATTEMPTS', 5))
+    LOCKOUT_MINUTES = int(os.environ.get('LOCKOUT_MINUTES', 15))
     
     # ============================================
     # FLASK SETTINGS

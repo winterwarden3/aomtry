@@ -9,7 +9,7 @@ from app.utils import (
     generate_invoice_number, get_customer_summary, format_currency,
     get_weekly_sales_data, get_monthly_sales_data, get_payment_channel_data, get_nepal_time,
     build_byproduct_note, parse_exchange_from_note, apply_byproduct_exchange_to_line_items,
-    is_mustard_extraction_product, is_others_product
+    is_mustard_extraction_product, is_others_product, Pagination 
 )
 from datetime import datetime, timedelta
 from app.brevo_service import send_invoice_email
@@ -113,11 +113,24 @@ def dashboard():
             print(f"Error formatting time: {e}")
             return str(date_val)[:10] if date_val else "Unknown"
     
+    
     # Recent Sales
     recent_sales = Sale.get_recent(5)
+
+    # Batch fetch all customers at once
+    customer_ids = [sale.get('customer_id') for sale in recent_sales if sale.get('customer_id')]
+    customers = {}
+    if customer_ids:
+        # Fetch all customers in one query
+        response = supabase.table("users").select("id, name").in_("id", customer_ids).execute()
+        customers = {c['id']: c for c in response.data}
+
     for sale in recent_sales:
-        customer = User.get_by_id(sale.get('customer_id')) if sale.get('customer_id') else None
-        customer_name = customer.get('name') if customer else "Walk-in Customer"
+        customer_id = sale.get('customer_id')
+        if customer_id and customer_id in customers:
+            customer_name = customers[customer_id].get('name')
+        else:
+            customer_name = "Walk-in Customer"
         
         recent_activities.append({
             'icon': 'bi bi-cart-check',
@@ -200,34 +213,6 @@ def sales_list():
     pending_sales_count = status_counts['pending']
     advance_sales_count = status_counts['advance']
     
-    # Create pagination class
-    class Pagination:
-        def __init__(self, items, page, per_page, total):
-            self.items = items
-            self.page = page
-            self.per_page = per_page
-            self.total = total
-            self.pages = max(1, -(-total // per_page))
-        
-        def iter_pages(self, left_edge=1, left_current=2, right_current=2, right_edge=1):
-            return range(1, self.pages + 1)
-        
-        @property
-        def has_prev(self):
-            return self.page > 1
-        
-        @property
-        def has_next(self):
-            return self.page < self.pages
-        
-        @property
-        def prev_num(self):
-            return max(1, self.page - 1)
-        
-        @property
-        def next_num(self):
-            return min(self.pages, self.page + 1)
-    
     sales = Pagination(sales_data, page, 10, total)
     
     return render_template(
@@ -239,10 +224,6 @@ def sales_list():
         advance_sales_count=advance_sales_count,
         business_name=Config.BUSINESS_NAME
     )
-
-
-
-
 
 
 
@@ -723,34 +704,6 @@ def customers_list():
     active_customers_count = list_stats['active_customers_count']
     inactive_customers_count = list_stats['inactive_customers_count']
     
-    # Pagination class
-    class Pagination:
-        def __init__(self, items, page, per_page, total):
-            self.items = items
-            self.page = page
-            self.per_page = per_page
-            self.total = total
-            self.pages = max(1, -(-total // per_page))
-        
-        def iter_pages(self, left_edge=1, left_current=2, right_current=2, right_edge=1):
-            return range(1, self.pages + 1)
-        
-        @property
-        def has_prev(self):
-            return self.page > 1
-        
-        @property
-        def has_next(self):
-            return self.page < self.pages
-        
-        @property
-        def prev_num(self):
-            return max(1, self.page - 1)
-        
-        @property
-        def next_num(self):
-            return min(self.pages, self.page + 1)
-    
     customers = Pagination(customers_data, page, 10, total)
     
     return render_template(
@@ -761,7 +714,7 @@ def customers_list():
         inactive_customers_count=inactive_customers_count,
         total_advance_balance=total_advance_balance,
         total_customers_with_advance=total_customers_with_advance
-    )
+    )   
 
 @bp.route('/customers/add', methods=['GET', 'POST'])
 @login_required
@@ -924,33 +877,6 @@ def expenses_list():
     # Highest expense
     highest_expense = max((e.get('amount', 0) for e in all_expenses), default=0)
     
-    class Pagination:
-        def __init__(self, items, page, per_page, total):
-            self.items = items
-            self.page = page
-            self.per_page = per_page
-            self.total = total
-            self.pages = max(1, -(-total // per_page))
-        
-        def iter_pages(self, left_edge=1, left_current=2, right_current=2, right_edge=1):
-            return range(1, self.pages + 1)
-        
-        @property
-        def has_prev(self):
-            return self.page > 1
-        
-        @property
-        def has_next(self):
-            return self.page < self.pages
-        
-        @property
-        def prev_num(self):
-            return max(1, self.page - 1)
-        
-        @property
-        def next_num(self):
-            return min(self.pages, self.page + 1)
-    
     expenses = Pagination(expenses_data, page, 10, total)
     categories = Expense.get_categories()
     
@@ -964,7 +890,6 @@ def expenses_list():
         highest_expense=f"{highest_expense:,.2f}",
         business_name=Config.BUSINESS_NAME
     )
-
 @bp.route('/expenses/add', methods=['GET', 'POST'])
 @login_required
 @admin_required

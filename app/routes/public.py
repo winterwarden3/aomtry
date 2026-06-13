@@ -76,7 +76,7 @@ def contact():
             print(f"❌ Error saving contact message: {e}")
         
         # SEND EMAIL NOTIFICATION (your existing code)
-        business_email = os.getenv('BREVO_TO_EMAIL', 'adarshoilbusiness@gmail.com')
+        business_email = os.getenv('BREVO_TO_EMAIL', 'contact@adarshoilmill.com.np')
         subject = f"New Contact Message from {name}"
         html_body = f"""
         <h2>New Contact Form Submission</h2>

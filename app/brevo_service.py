@@ -33,10 +33,9 @@ def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
         return False
     
     try:
-        # Determine sender email based on recipient
-        # Admin emails go to adarshoilbusiness@gmail.com - use reset sender
+        
         # Customer emails go to customer - use invoice sender
-        if to_email == 'adarshoilbusiness@gmail.com' or 'admin' in to_email.lower():
+        if to_email == 'contact@adarshoilmill.com.np' or 'admin' in to_email.lower():
             sender_email = BREVO_SENDER_EMAIL_RESET
             sender_name = f"{BREVO_SENDER_NAME} - Password Reset"
         else:

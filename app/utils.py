@@ -366,3 +366,37 @@ def apply_byproduct_exchange_to_line_items(items, exchange_mustard_cake=False, e
         row['subtotal'] = round(qty * rate, 2)
         updated.append(row)
     return updated
+
+# ============================================
+# PAGINATION CLASS (Reusable)
+# ============================================
+
+class Pagination:
+    """Reusable pagination class for all list views"""
+    
+    def __init__(self, items, page, per_page, total):
+        self.items = items
+        self.page = page
+        self.per_page = per_page
+        self.total = total
+        self.pages = max(1, -(-total // per_page))  # Ceiling division
+    
+    def iter_pages(self, left_edge=1, left_current=2, right_current=2, right_edge=1):
+        """Generate page numbers for pagination display"""
+        return range(1, self.pages + 1)
+    
+    @property
+    def has_prev(self):
+        return self.page > 1
+    
+    @property
+    def has_next(self):
+        return self.page < self.pages
+    
+    @property
+    def prev_num(self):
+        return max(1, self.page - 1)
+    
+    @property
+    def next_num(self):
+        return min(self.pages, self.page + 1)
