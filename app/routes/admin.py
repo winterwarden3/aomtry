@@ -19,7 +19,6 @@ from app.config import Config
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
-
 @bp.route('/dashboard')
 @login_required
 @admin_required
@@ -73,45 +72,62 @@ def dashboard():
     # RECENT ACTIVITIES
     recent_activities = []
     
-    # Format time ago function - FIXED for Nepal timezone
-    def format_time_ago(date_val):
+    # ============================================================
+    # FIXED: format_time_ago with source parameter
+    # ============================================================
+    def format_time_ago(date_val, source='auto'):
+        """Format time ago with support for both UTC and Nepal time dates"""
         if not date_val:
             return "Unknown"
         try:
             import pytz
+            from datetime import datetime
+            
+            nepal_tz = pytz.timezone('Asia/Kathmandu')
+            now_nepal = datetime.now(nepal_tz)
             
             # Parse the date value
             if isinstance(date_val, str):
                 # Handle different date formats
                 if 'T' in date_val:
                     date_val = date_val.replace('T', ' ').replace('Z', '').split('.')[0]
-                
-                # Parse as UTC (Supabase stores timestamps in UTC)
                 naive_date = datetime.strptime(date_val[:19], '%Y-%m-%d %H:%M:%S')
-                
-                # Make it timezone-aware as UTC
-                utc_tz = pytz.timezone('UTC')
-                date_utc = utc_tz.localize(naive_date)
-                
-                # Convert to Nepal time
-                nepal_tz = pytz.timezone('Asia/Kathmandu')
-                date = date_utc.astimezone(nepal_tz)
             else:
                 # If it's already a datetime object
-                date = date_val
-                if date.tzinfo is None:
-                    # Assume UTC if no timezone
-                    utc_tz = pytz.timezone('UTC')
-                    date = utc_tz.localize(date)
-                # Convert to Nepal time
-                nepal_tz = pytz.timezone('Asia/Kathmandu')
-                date = date.astimezone(nepal_tz)
+                naive_date = date_val
             
-            # Calculate difference using Nepal times
-            diff = now - date
+            # Determine timezone based on source
+            if source == 'sale':
+                # Sale dates are already in Nepal time
+                if naive_date.tzinfo is None:
+                    date_nepal = nepal_tz.localize(naive_date)
+                else:
+                    date_nepal = naive_date.astimezone(nepal_tz)
+            elif source == 'expense':
+                # Expense dates from Supabase are in UTC
+                if naive_date.tzinfo is None:
+                    utc_tz = pytz.timezone('UTC')
+                    date_utc = utc_tz.localize(naive_date)
+                    date_nepal = date_utc.astimezone(nepal_tz)
+                else:
+                    date_nepal = naive_date.astimezone(nepal_tz)
+            else:
+                # Default: treat as UTC (for customers and anything else from Supabase)
+                if naive_date.tzinfo is None:
+                    utc_tz = pytz.timezone('UTC')
+                    date_utc = utc_tz.localize(naive_date)
+                    date_nepal = date_utc.astimezone(nepal_tz)
+                else:
+                    date_nepal = naive_date.astimezone(nepal_tz)
+            
+            # Calculate difference
+            diff = now_nepal - date_nepal
             seconds = diff.total_seconds()
             
-            if seconds < 60:
+            # Format the output
+            if seconds < 0:
+                return "Just now"
+            elif seconds < 60:
                 return "Just now"
             elif seconds < 3600:
                 mins = int(seconds // 60)
@@ -123,12 +139,15 @@ def dashboard():
                 days = int(seconds // 86400)
                 return f"{days} day{'s' if days > 1 else ''} ago"
             else:
-                return date.strftime('%b %d, %Y')
+                return date_nepal.strftime('%b %d, %Y')
+                
         except Exception as e:
             print(f"Error formatting time: {e}")
             return str(date_val)[:10] if date_val else "Unknown"
     
-    # Recent Sales
+    # ============================================================
+    # Recent Sales - PASS source='sale' because sale dates are in Nepal time
+    # ============================================================
     recent_sales = Sale.get_recent(5)
 
     # Batch fetch all customers at once
@@ -152,11 +171,13 @@ def dashboard():
             'icon_color': '#16a34a',
             'title': 'New Sale',
             'description': f"Invoice #{sale.get('invoice_number')} - Rs.{sale.get('total_amount', 0):,.2f} from {customer_name}",
-            'time_ago': format_time_ago(sale.get('date')),
+            'time_ago': format_time_ago(sale.get('date'), source='sale'),  # ← FIXED: pass source='sale'
             'timestamp': sale.get('date')
         })
     
-    # Recent Expenses
+    # ============================================================
+    # Recent Expenses - PASS source='expense' (UTC from Supabase)
+    # ============================================================
     recent_expenses = Expense.get_recent(5)
     for expense in recent_expenses:
         recent_activities.append({
@@ -165,11 +186,13 @@ def dashboard():
             'icon_color': '#dc2626',
             'title': 'New Expense',
             'description': f"{expense.get('category')} - Rs.{expense.get('amount', 0):,.2f}",
-            'time_ago': format_time_ago(expense.get('date')),
+            'time_ago': format_time_ago(expense.get('date'), source='expense'),  # ← FIXED: pass source='expense'
             'timestamp': expense.get('date')
         })
     
-    # Recent Customers
+    # ============================================================
+    # Recent Customers - NO source needed (defaults to UTC)
+    # ============================================================
     recent_customers = User.get_all_customers()[:5]
     for customer in recent_customers:
         recent_activities.append({
@@ -178,10 +201,11 @@ def dashboard():
             'icon_color': '#3b82f6',
             'title': 'New Customer',
             'description': f"{customer.get('name')} added to system",
-            'time_ago': format_time_ago(customer.get('created_at')),
+            'time_ago': format_time_ago(customer.get('created_at')),  # ← Works correctly (UTC)
             'timestamp': customer.get('created_at')
         })
     
+    # Sort activities by timestamp (newest first)
     recent_activities.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
     recent_activities = recent_activities[:10]
     
@@ -204,7 +228,6 @@ def dashboard():
         current_month_abbr=current_month_abbr,
         current_year=current_year
     )
-
 
 
 
