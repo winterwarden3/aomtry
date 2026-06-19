@@ -6,25 +6,192 @@
 
 <style>
 :root {
+    --primary: #0C5B3F;
+    --primary-light: #138A52;
+    --primary-dark: #09452F;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
     --radius-lg: 16px;
     --radius-md: 12px;
     --radius-sm: 8px;
-
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
     --shadow-md: 0 8px 20px rgba(0,0,0,0.10);
-
-    --success: #16a34a;
-    --danger: #dc2626;
-    --warning: #f59e0b;
-
     --border: #e5e7eb;
     --muted: #64748b;
-
     --transition: 0.25s ease;
 }
 
-/* ===== Cards ===== */
+/* Modal Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 450px;
+    width: 90%;
+    padding: 28px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-success-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-error-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-error-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-info-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-info-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--gray-800);
+}
+
+.modal-message {
+    color: var(--gray-600);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.modal-button-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-button-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.modal-button-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-button-secondary:hover {
+    background: var(--gray-300);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== Cards ===== */
 .card-ui {
     background: white;
     border: 1px solid rgba(0,0,0,0.04);
@@ -35,7 +202,6 @@
 }
 
 /* ===== Typography ===== */
-
 .section-title {
     margin: 30px 0 20px;
 }
@@ -61,7 +227,6 @@
 }
 
 /* ===== Buttons ===== */
-
 .btn-ui {
     border: none;
     border-radius: var(--radius-md);
@@ -75,20 +240,26 @@
     cursor: pointer;
 }
 
-.btn-ui:hover {
+.btn-ui:hover:not(:disabled) {
     transform: translateY(-2px);
 }
 
 .btn-primary-ui {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: white;
     padding: 11px 18px;
     width: 100%;
 }
 
-.btn-primary-ui:hover {
+.btn-primary-ui:hover:not(:disabled) {
     color: white;
     box-shadow: 0 6px 18px rgba(19,138,82,0.25);
+}
+
+.btn-primary-ui:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-outline-ui {
@@ -110,7 +281,6 @@
 }
 
 /* ===== Forms ===== */
-
 .form-control-ui {
     width: 100%;
     padding: 11px 14px;
@@ -123,7 +293,7 @@
 
 .form-control-ui:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--primary-light);
     box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
@@ -145,14 +315,11 @@ textarea.form-control-ui {
 }
 
 /* ===== Utilities ===== */
-
 .text-danger { color: var(--danger) !important; }
 .text-muted { color: var(--muted) !important; }
 
 /* ===== Mobile ===== */
-
 @media (max-width: 768px) {
-
     .container-fluid {
         padding: 0 12px !important;
     }
@@ -167,123 +334,209 @@ textarea.form-control-ui {
 }
 
 @media (max-width: 576px) {
-
     .card-ui {
         padding: 14px;
     }
 }
 </style>
 
-<div class="container-fluid px-md-3">
+<div class="container-fluid px-md-3 py-4">
 
-<!-- HEADER -->
-
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-
-    <div>
-        <h1 class="fw-bold mb-1" style="font-size: 1.8rem;">
-            <i class="bi bi-cash-stack"></i>
-            Add New Expense
-        </h1>
-
-        <p class="text-muted mb-0">
-            Record business expense details
-        </p>
-    </div>
-
-    <a href="{{ url_for('admin.expenses_list') }}"
-       class="btn-ui btn-outline-ui">
-
-        <i class="bi bi-arrow-left"></i>
-        Back to Expenses
-    </a>
-
-</div>
-
-<!-- FORM -->
-
-<div class="row justify-content-center">
-
-    <div class="col-md-8 col-lg-6">
-
-        <div class="card-ui">
-
-            <form method="POST">
-
-                <!-- CATEGORY -->
-                <div class="mb-3">
-                    <label class="form-label-ui">
-                        <i class="bi bi-tag"></i> Category <span class="text-danger">*</span>
-                    </label>
-
-                    <select class="form-control-ui"
-                            name="category"
-                            required>
-
-                        <option value="">Select Category</option>
-                        <option value="Electricity">Electricity</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Raw Material Purchase">Raw Material Purchase</option>
-                        <option value="Other">Other</option>
-
-                    </select>
-                </div>
-
-                <!-- AMOUNT -->
-                <div class="mb-3">
-                    <label class="form-label-ui">
-                        <i class="bi bi-currency-rupee"></i> Amount <span class="text-danger">*</span>
-                    </label>
-
-                    <input type="number"
-                           name="amount"
-                           class="form-control-ui"
-                           step="0.01"
-                           min="0"
-                           placeholder="Enter amount"
-                           required>
-                </div>
-
-                <!-- DESCRIPTION -->
-                <div class="mb-3">
-                    <label class="form-label-ui">
-                        <i class="bi bi-pencil"></i> Description
-                    </label>
-
-                    <input type="text"
-                           name="description"
-                           class="form-control-ui"
-                           placeholder="What was this expense for?">
-                </div>
-
-                <!-- NOTES -->
-                <div class="mb-4">
-                    <label class="form-label-ui">
-                        <i class="bi bi-journal-text"></i> Notes
-                    </label>
-
-                    <textarea class="form-control-ui"
-                              name="notes"
-                              rows="3"
-                              placeholder="Optional additional details..."></textarea>
-                </div>
-
-                <!-- SUBMIT -->
-                <button type="submit"
-                        class="btn-ui btn-primary-ui">
-
-                    <i class="bi bi-check-circle"></i>
-                    Save Expense
-                </button>
-
-            </form>
-
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h1 class="fw-bold mb-1" style="font-size: 1.8rem;">
+                <i class="bi bi-cash-stack"></i>
+                Add New Expense
+            </h1>
+            <p class="text-muted mb-0">
+                Record business expense details
+            </p>
         </div>
+        <a href="{{ url_for('admin.expenses_list') }}" class="btn-ui btn-outline-ui" id="cancelBtn">
+            <i class="bi bi-arrow-left"></i>
+            Back to Expenses
+        </a>
+    </div>
 
+    <!-- FORM -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card-ui">
+                <form id="addExpenseForm">
+
+                    <!-- CATEGORY -->
+                    <div class="mb-3">
+                        <label class="form-label-ui">
+                            <i class="bi bi-tag"></i> Category <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-control-ui" name="category" id="expenseCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Electricity">Electricity</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Raw Material Purchase">Raw Material Purchase</option>
+                            <option value="Salary">Salary</option>
+                            <option value="Rent">Rent</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- AMOUNT -->
+                    <div class="mb-3">
+                        <label class="form-label-ui">
+                            <i class="bi bi-currency-rupee"></i> Amount <span class="text-danger">*</span>
+                        </label>
+                        <input type="number"
+                               name="amount"
+                               id="expenseAmount"
+                               class="form-control-ui"
+                               step="0.01"
+                               min="0"
+                               placeholder="Enter amount"
+                               required>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="mb-3">
+                        <label class="form-label-ui">
+                            <i class="bi bi-pencil"></i> Description
+                        </label>
+                        <input type="text"
+                               name="description"
+                               id="expenseDescription"
+                               class="form-control-ui"
+                               placeholder="What was this expense for?">
+                    </div>
+
+                    <!-- NOTES -->
+                    <div class="mb-4">
+                        <label class="form-label-ui">
+                            <i class="bi bi-journal-text"></i> Notes
+                        </label>
+                        <textarea class="form-control-ui"
+                                  name="notes"
+                                  id="expenseNotes"
+                                  rows="3"
+                                  placeholder="Optional additional details..."></textarea>
+                    </div>
+
+                    <!-- SUBMIT -->
+                    <button type="submit" class="btn-ui btn-primary-ui" id="submitBtn">
+                        <i class="bi bi-check-circle"></i>
+                        Save Expense
+                    </button>
+
+                </form>
+            </div>
+        </div>
     </div>
 
 </div>
 
-</div>
+<script>
+// Close modal function
+function closeModal(modalId = null) {
+    if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+    } else {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => modal.remove());
+    }
+}
+
+// Show success/error modal
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('modalCloseBtn').onclick = function() {
+        closeModal('resultModal');
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    };
+}
+
+// AJAX Form Submission
+let isSubmitting = false;
+
+document.getElementById('addExpenseForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (isSubmitting) return false;
+    
+    // Validate required fields
+    const category = document.getElementById('expenseCategory').value;
+    const amount = parseFloat(document.getElementById('expenseAmount').value);
+    
+    if (!category) {
+        showModal('Validation Error', 'Please select a category', 'error');
+        return false;
+    }
+    
+    if (isNaN(amount) || amount <= 0) {
+        showModal('Validation Error', 'Please enter a valid amount greater than 0', 'error');
+        return false;
+    }
+    
+    // Collect form data
+    const formData = new FormData();
+    formData.append('category', category);
+    formData.append('amount', amount);
+    formData.append('description', document.getElementById('expenseDescription').value);
+    formData.append('notes', document.getElementById('expenseNotes').value);
+    
+    // Mark as submitting
+    isSubmitting = true;
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving Expense...';
+    
+    try {
+        const response = await fetch('{{ url_for("admin.add_expense") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showModal('Success!', data.message || 'Expense added successfully!', 'success', data.redirect || '{{ url_for("admin.expenses_list") }}');
+        } else {
+            showModal('Error', data.error || 'Failed to add expense', 'error');
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Save Expense';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Save Expense';
+    }
+});
+</script>
 
 {% endblock %}

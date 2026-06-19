@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify
 from flask_login import login_required, current_user
-from app.models_supabase import Sale, User
+from app.models_supabase import Sale, User, Payment
 from app.utils import get_customer_summary
 
 bp = Blueprint('customer', __name__, url_prefix='/customer')
@@ -9,29 +9,45 @@ bp = Blueprint('customer', __name__, url_prefix='/customer')
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    """Customer dashboard - view purchases, payments, and advance balance"""
-    if current_user.role != 'customer':
-        return redirect(url_for('admin.dashboard'))
-    
     customer_id = current_user.id
-    summary = get_customer_summary(customer_id)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
     
-    total_purchases = summary.get('total_purchases', 0)
-    total_payments = summary.get('total_payments', 0)
-    pending_due = summary.get('pending_dues', 0)
+    # Get customer data
+    customer = User.get_by_id(customer_id)
+    total_purchases = User.get_total_spending(customer_id)
+    total_payments = Payment.get_total_paid_by_customer(customer_id)
+    pending_due = User.get_total_due(customer_id)
     advance_balance = User.get_advance_balance(customer_id)
     
-    customer_sales, _ = Sale.get_by_customer(customer_id, page=1, per_page=50, with_items=True)
+    # Get paginated sales
+    sales, total_sales = Sale.get_by_customer(customer_id, page=page, per_page=per_page, with_items=True)
+    total_pages = (total_sales + per_page - 1) // per_page if total_sales > 0 else 1
     
-    return render_template(
-        'customer/dashboard.html',
-        summary=summary,
-        total_purchases=total_purchases,
-        total_payments=total_payments,
-        pending_due=pending_due,
-        advance_balance=advance_balance,
-        recent_sales=customer_sales
-    )
+    if is_ajax:
+        # Return JSON for AJAX requests
+        html = render_template('customer/_invoice_cards.html', recent_sales=sales)
+        return jsonify({
+            'success': True,
+            'html': html,
+            'total_purchases': total_purchases,
+            'total_payments': total_payments,
+            'pending_due': pending_due,
+            'advance_balance': advance_balance,
+            'sales_count': total_sales,
+            'has_more': page < total_pages,
+            'total_pages': total_pages
+        })
+    
+    return render_template('customer/dashboard.html', 
+                         total_purchases=total_purchases,
+                         total_payments=total_payments,
+                         pending_due=pending_due,
+                         advance_balance=advance_balance,
+                         recent_sales=sales,
+                         total_sales_count=total_sales,
+                         total_pages=total_pages)
 
 
 @bp.route('/invoices')
@@ -121,8 +137,6 @@ def profile():
 @login_required
 def api_advance_balance():
     """Get current advance balance as JSON"""
-    from flask import jsonify
-    
     if current_user.role != 'customer':
         return jsonify({'error': 'Unauthorized'}), 403
     
@@ -137,8 +151,6 @@ def api_advance_balance():
 @login_required
 def api_recent_invoices():
     """Get recent invoices as JSON"""
-    from flask import jsonify
-    
     if current_user.role != 'customer':
         return jsonify({'error': 'Unauthorized'}), 403
     

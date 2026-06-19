@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 import pandas as pd
 import pytz
+import uuid
 from app.supabase_client import supabase
 from app.models_supabase import User, Sale, Expense, Product, Payment
 from app.utils import (
@@ -9,7 +10,7 @@ from app.utils import (
     generate_invoice_number, get_customer_summary, format_currency,
     get_weekly_sales_data, get_monthly_sales_data, get_payment_channel_data, get_nepal_time,
     build_byproduct_note, parse_exchange_from_note, apply_byproduct_exchange_to_line_items,
-    is_mustard_extraction_product, is_others_product, Pagination 
+    is_mustard_extraction_product, is_others_product, Pagination,format_time_ago
 )
 from datetime import datetime, timedelta
 from app.brevo_service import send_invoice_email
@@ -72,28 +73,42 @@ def dashboard():
     # RECENT ACTIVITIES
     recent_activities = []
     
-    # Format time ago function
+    # Format time ago function - FIXED for Nepal timezone
     def format_time_ago(date_val):
         if not date_val:
             return "Unknown"
         try:
+            import pytz
+            
+            # Parse the date value
             if isinstance(date_val, str):
                 # Handle different date formats
                 if 'T' in date_val:
                     date_val = date_val.replace('T', ' ').replace('Z', '').split('.')[0]
-                date = datetime.strptime(date_val[:19], '%Y-%m-%d %H:%M:%S')
+                
+                # Parse as UTC (Supabase stores timestamps in UTC)
+                naive_date = datetime.strptime(date_val[:19], '%Y-%m-%d %H:%M:%S')
+                
+                # Make it timezone-aware as UTC
+                utc_tz = pytz.timezone('UTC')
+                date_utc = utc_tz.localize(naive_date)
+                
+                # Convert to Nepal time
+                nepal_tz = pytz.timezone('Asia/Kathmandu')
+                date = date_utc.astimezone(nepal_tz)
             else:
+                # If it's already a datetime object
                 date = date_val
+                if date.tzinfo is None:
+                    # Assume UTC if no timezone
+                    utc_tz = pytz.timezone('UTC')
+                    date = utc_tz.localize(date)
+                # Convert to Nepal time
+                nepal_tz = pytz.timezone('Asia/Kathmandu')
+                date = date.astimezone(nepal_tz)
             
-            # Make sure date is timezone-naive for comparison
-            if date.tzinfo:
-                date = date.replace(tzinfo=None)
-            if now.tzinfo:
-                now_naive = now.replace(tzinfo=None)
-            else:
-                now_naive = now
-            
-            diff = now_naive - date
+            # Calculate difference using Nepal times
+            diff = now - date
             seconds = diff.total_seconds()
             
             if seconds < 60:
@@ -104,15 +119,14 @@ def dashboard():
             elif seconds < 86400:
                 hours = int(seconds // 3600)
                 return f"{hours} hour{'s' if hours > 1 else ''} ago"
-            elif seconds < 2592000:
+            elif seconds < 2592000:  # 30 days
                 days = int(seconds // 86400)
                 return f"{days} day{'s' if days > 1 else ''} ago"
             else:
-                return date.strftime('%Y-%m-%d')
+                return date.strftime('%b %d, %Y')
         except Exception as e:
             print(f"Error formatting time: {e}")
             return str(date_val)[:10] if date_val else "Unknown"
-    
     
     # Recent Sales
     recent_sales = Sale.get_recent(5)
@@ -196,9 +210,6 @@ def dashboard():
 
 
 
-
-
-
 @bp.route('/sales')
 @login_required
 @admin_required
@@ -259,9 +270,14 @@ def add_sale():
     
     # POST request - process form
     if request.method == 'POST':
+        # Check if AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
         # ========== PREVENT DUPLICATE SUBMISSION ==========
         submitted_token = request.form.get('form_token')
         if not submitted_token or submitted_token != session.get('sale_form_token'):
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Form already submitted or expired. Please refresh the page.'}), 400
             flash('Form already submitted or expired. Please try again.', 'danger')
             return redirect(url_for('admin.add_sale'))
         
@@ -330,11 +346,17 @@ def add_sale():
             if advance_used > 0 and customer_id_final:
                 available_balance = User.get_advance_balance(customer_id_final)
                 if advance_used > available_balance:
-                    flash(f'Insufficient advance balance. Available: Rs.{available_balance:,.2f}', 'danger')
+                    error_msg = f'Insufficient advance balance. Available: Rs.{available_balance:,.2f}'
+                    if is_ajax:
+                        return jsonify({'success': False, 'error': error_msg}), 400
+                    flash(error_msg, 'danger')
                     return redirect(url_for('admin.add_sale'))
                 
                 if advance_used > total_amount:
-                    flash(f'Advance amount cannot exceed total amount (Rs.{total_amount:,.2f})', 'danger')
+                    error_msg = f'Advance amount cannot exceed total amount (Rs.{total_amount:,.2f})'
+                    if is_ajax:
+                        return jsonify({'success': False, 'error': error_msg}), 400
+                    flash(error_msg, 'danger')
                     return redirect(url_for('admin.add_sale'))
             
             # Prepare sale data
@@ -361,14 +383,20 @@ def add_sale():
                     })
             
             if not sale_items:
-                flash('Please add at least one product', 'danger')
+                error_msg = 'Please add at least one product'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg}), 400
+                flash(error_msg, 'danger')
                 return redirect(url_for('admin.add_sale'))
             
             # Create sale
             sale = Sale.create(sale_data, sale_items, advance_used)
             
             if not sale:
-                flash('Failed to create sale', 'danger')
+                error_msg = 'Failed to create sale'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg}), 500
+                flash(error_msg, 'danger')
                 return redirect(url_for('admin.add_sale'))
             
             send_invoice = request.form.get('send_invoice') == 'on'
@@ -393,6 +421,19 @@ def add_sale():
                     )
                     
                     send_invoice_email(customer.get('email'), subject, html_content)
+            
+            # AJAX response
+            if is_ajax:
+                return jsonify({
+                    'success': True,
+                    'message': f'Sale #{sale.get("invoice_number")} created successfully!',
+                    'invoice_number': sale.get('invoice_number'),
+                    'redirect': url_for('admin.sales_list')
+                })
+            
+            # Non-AJAX response (fallback)
+            if customer_id_final and send_invoice:
+                if customer and customer.get('email'):
                     flash('Sale created successfully! Invoice will be sent shortly.', 'success')
                 else:
                     flash('Sale created successfully! (No email - customer has no email)', 'success')
@@ -403,12 +444,13 @@ def add_sale():
             
         except Exception as e:
             print(f"Error creating sale: {e}")
-            flash(f'Error: {str(e)}', 'danger')
+            error_msg = str(e)
+            if is_ajax:
+                return jsonify({'success': False, 'error': error_msg}), 500
+            flash(f'Error: {error_msg}', 'danger')
             return redirect(url_for('admin.add_sale'))
     
     return render_template('admin/add_sale.html', customer_advance_balance=customer_advance_balance, selected_customer_id=selected_customer_id)
-
-
 
 
 
@@ -421,23 +463,35 @@ def add_sale():
 @login_required
 @admin_required
 def deduct_advance_balance(customer_id):
-    """Manually deduct advance balance from customer"""
+    """Manually deduct advance balance from customer - AJAX ready"""
     from app.models_supabase import User
+    
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     customer = User.get_by_id(customer_id)
     if not customer:
-        return jsonify({'success': False, 'error': 'Customer not found'})
+        if is_ajax:
+            return jsonify({'success': False, 'error': 'Customer not found'}), 404
+        flash('Customer not found', 'danger')
+        return redirect(url_for('admin.customers_list'))
     
     try:
         amount = float(request.form.get('amount', 0))
         notes = request.form.get('notes', '')
         
         if amount <= 0:
-            return jsonify({'success': False, 'error': 'Amount must be greater than 0'})
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Amount must be greater than 0'}), 400
+            flash('Amount must be greater than 0', 'danger')
+            return redirect(url_for('admin.customers_list'))
         
         available_balance = User.get_advance_balance(customer_id)
         if amount > available_balance:
-            return jsonify({'success': False, 'error': f'Insufficient balance. Available: Rs.{available_balance:,.2f}'})
+            if is_ajax:
+                return jsonify({'success': False, 'error': f'Insufficient balance. Available: Rs.{available_balance:,.2f}'}), 400
+            flash(f'Insufficient balance. Available: Rs.{available_balance:,.2f}', 'danger')
+            return redirect(url_for('admin.customers_list'))
         
         # Deduct advance
         result = User.update_advance_balance(customer_id, amount, "deduct")
@@ -453,12 +507,25 @@ def deduct_advance_balance(customer_id):
             }
             supabase.table("advance_transactions").insert(transaction_data).execute()
             
+            if is_ajax:
+                return jsonify({
+                    'success': True,
+                    'message': f'Rs.{amount:,.2f} deducted from {customer["name"]}\'s advance balance!',
+                    'new_balance': User.get_advance_balance(customer_id)
+                })
             flash(f'Rs.{amount:,.2f} deducted from {customer["name"]}\'s advance balance!', 'success')
             return redirect(url_for('admin.customers_list'))
         else:
-            return jsonify({'success': False, 'error': 'Failed to deduct advance'})
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Failed to deduct advance'}), 500
+            flash('Failed to deduct advance', 'danger')
+            return redirect(url_for('admin.customers_list'))
+            
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        if is_ajax:
+            return jsonify({'success': False, 'error': str(e)}), 500
+        flash(f'Error: {str(e)}', 'danger')
+        return redirect(url_for('admin.customers_list'))
 
 
 
@@ -479,29 +546,65 @@ def edit_sale(sale_id):
     sale = Sale.get_by_id(sale_id)
     
     if not sale:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'error': 'Sale not found'}), 404
         flash('Sale not found', 'danger')
         return redirect(url_for('admin.sales_list'))
     
     customer_id = sale.get('customer_id')
     
+    # GET request - show form
+    if request.method == 'GET':
+        sale = Sale.get_by_id_with_items(sale_id) or sale
+        exchange_mustard_cake, exchange_rice_bran = parse_exchange_from_note(sale.get('notes', ''))
+        current_balance = User.get_advance_balance(customer_id) if customer_id else 0
+        return render_template(
+            'admin/edit_sale.html',
+            sale=sale,
+            customer_advance_balance=current_balance,
+            exchange_mustard_cake=exchange_mustard_cake,
+            exchange_rice_bran=exchange_rice_bran
+        )
+    
+    # POST request - process form
     if request.method == 'POST':
+        # Check if AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
         try:
             exchange_mustard_cake = request.form.get('exchange_mustard_cake') == 'on'
             exchange_rice_bran = request.form.get('exchange_rice_bran') == 'on'
             sale_note = build_byproduct_note(exchange_mustard_cake, exchange_rice_bran)
 
+            # Get existing items
             items = Sale.get_items(sale_id)
+            
+            # Process existing items and check for new items
             item_updates = []
             new_total = 0
+            
+            # Process existing items (with numeric IDs)
             for item in items:
+                item_id = item['id']
                 product = item.get('product_name', '')
                 qty = float(item.get('quantity', 0) or 0)
                 rate = float(item.get('rate', 0) or 0)
-                form_rate = request.form.get(f'item_rate_{item["id"]}')
-
+                
+                # Get form values for this item
+                form_rate = request.form.get(f'item_rate_{item_id}')
+                form_qty = request.form.get(f'item_qty_{item_id}')
+                form_unit = request.form.get(f'item_unit_{item_id}')
+                
+                # Update qty if provided
+                if form_qty is not None:
+                    qty = float(form_qty or 0)
+                
+                # Apply exchange logic
                 if exchange_mustard_cake and is_mustard_extraction_product(product):
                     rate = 0
                 elif not exchange_mustard_cake and is_mustard_extraction_product(product) and form_rate is not None:
+                    rate = float(form_rate or 0)
+                elif form_rate is not None:
                     rate = float(form_rate or 0)
 
                 if exchange_rice_bran and is_others_product(product):
@@ -511,12 +614,67 @@ def edit_sale(sale_id):
 
                 subtotal = round(qty * rate, 2)
                 new_total += subtotal
-                item_updates.append({'id': item['id'], 'rate': rate, 'subtotal': subtotal})
-
-            if not Sale.update_items(item_updates):
-                flash('Failed to update sale items', 'danger')
-                return redirect(url_for('admin.edit_sale', sale_id=sale_id))
-
+                item_updates.append({
+                    'id': item_id, 
+                    'rate': rate, 
+                    'subtotal': subtotal,
+                    'quantity': qty,
+                    'unit': form_unit if form_unit else item.get('unit', 'Kg')
+                })
+            
+            # Process new items (with IDs starting with 'new_')
+            for key in request.form.keys():
+                if key.startswith('item_rate_new_'):
+                    new_item_id = key.replace('item_rate_', '')
+                    product_name_key = f'product_name_{new_item_id}'
+                    qty_key = f'item_qty_{new_item_id}'
+                    unit_key = f'item_unit_{new_item_id}'
+                    
+                    product_name = request.form.get(product_name_key)
+                    if not product_name:
+                        continue
+                    
+                    qty = float(request.form.get(qty_key, 0) or 0)
+                    unit = request.form.get(unit_key, 'Kg')
+                    rate = float(request.form.get(key, 0) or 0)
+                    
+                    # Apply exchange logic for new items
+                    if exchange_mustard_cake and is_mustard_extraction_product(product_name):
+                        rate = 0
+                    if exchange_rice_bran and is_others_product(product_name):
+                        rate = 0
+                    
+                    subtotal = round(qty * rate, 2)
+                    new_total += subtotal
+                    
+                    # Store new item to be created
+                    if not hasattr(request, '_new_items'):
+                        request._new_items = []
+                    request._new_items.append({
+                        'product_name': product_name,
+                        'quantity': qty,
+                        'unit': unit,
+                        'rate': rate,
+                        'subtotal': subtotal
+                    })
+            
+            # Update existing items
+            if item_updates:
+                for update in item_updates:
+                    # Update sale_items table
+                    supabase.table("sale_items").update({
+                        'rate': update['rate'],
+                        'subtotal': update['subtotal'],
+                        'quantity': update['quantity'],
+                        'unit': update['unit']
+                    }).eq("id", update['id']).execute()
+            
+            # Create new items
+            if hasattr(request, '_new_items'):
+                for new_item in request._new_items:
+                    new_item['sale_id'] = sale_id
+                    supabase.table("sale_items").insert(new_item).execute()
+            
             new_cash_paid = float(request.form.get('paid_amount', 0))
             new_advance_used = float(request.form.get('advance_used', 0))
             
@@ -527,11 +685,17 @@ def edit_sale(sale_id):
             
             # ========== VALIDATIONS ==========
             if new_cash_paid < 0 or new_advance_used < 0:
-                flash('Amounts cannot be negative.', 'danger')
+                error_msg = 'Amounts cannot be negative.'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg}), 400
+                flash(error_msg, 'danger')
                 return redirect(url_for('admin.edit_sale', sale_id=sale_id))
             
             if new_advance_used > total:
-                flash(f'Advance used cannot exceed total amount (Rs {total:.2f})', 'danger')
+                error_msg = f'Advance used cannot exceed total amount (Rs {total:.2f})'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg}), 400
+                flash(error_msg, 'danger')
                 return redirect(url_for('admin.edit_sale', sale_id=sale_id))
             
             # Get customer's ACTUAL advance balance
@@ -542,7 +706,10 @@ def edit_sale(sale_id):
             
             # CRITICAL: Block if trying to use more advance than available
             if advance_increase > 0 and advance_increase > customer_actual_balance:
-                flash(f'Cannot use Rs {advance_increase:,.2f} advance. Customer only has Rs {customer_actual_balance:,.2f} available.', 'danger')
+                error_msg = f'Cannot use Rs {advance_increase:,.2f} advance. Customer only has Rs {customer_actual_balance:,.2f} available.'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg}), 400
+                flash(error_msg, 'danger')
                 return redirect(url_for('admin.edit_sale', sale_id=sale_id))
             
             # Calculate new advance_amount (overpayment)
@@ -598,28 +765,33 @@ def edit_sale(sale_id):
                     supabase.table("advance_transactions").insert(transaction_data).execute()
                 
                 final_balance = User.get_advance_balance(customer_id) if customer_id else 0
+                
+                if is_ajax:
+                    return jsonify({
+                        'success': True,
+                        'message': f'Sale #{sale.get("invoice_number")} updated successfully! Customer advance balance: Rs {final_balance:,.2f}',
+                        'redirect': url_for('admin.sales_list')
+                    })
+                
                 flash(f'Sale updated! Customer advance balance: Rs {final_balance:,.2f}', 'success')
             else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to update sale'}), 500
                 flash('Failed to update sale', 'danger')
+            
+            if is_ajax:
+                return jsonify({'success': True, 'redirect': url_for('admin.sales_list')})
             
             return redirect(url_for('admin.sales_list'))
             
         except Exception as e:
             print(f"Error: {e}")
-            flash(f'Error: {str(e)}', 'danger')
+            error_msg = str(e)
+            if is_ajax:
+                return jsonify({'success': False, 'error': error_msg}), 500
+            flash(f'Error: {error_msg}', 'danger')
             return redirect(url_for('admin.edit_sale', sale_id=sale_id))
-    
-    # GET request - show form
-    sale = Sale.get_by_id_with_items(sale_id) or sale
-    exchange_mustard_cake, exchange_rice_bran = parse_exchange_from_note(sale.get('notes', ''))
-    current_balance = User.get_advance_balance(customer_id) if customer_id else 0
-    return render_template(
-        'admin/edit_sale.html',
-        sale=sale,
-        customer_advance_balance=current_balance,
-        exchange_mustard_cake=exchange_mustard_cake,
-        exchange_rice_bran=exchange_rice_bran
-    )
+
 
 @bp.route('/delete-sale/<int:sale_id>', methods=['POST'])
 @login_required
@@ -628,43 +800,68 @@ def delete_sale(sale_id):
     from app.models_supabase import User
     from datetime import datetime
     
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     # Get sale details BEFORE deleting
     sale = Sale.get_by_id(sale_id)
     
     if not sale:
+        if is_ajax:
+            return jsonify({'success': False, 'error': 'Sale not found'}), 404
         flash('Sale not found', 'danger')
         return redirect(url_for('admin.sales_list'))
     
     customer_id = sale.get('customer_id')
     advance_used = sale.get('advance_used', 0)
+    invoice_number = sale.get('invoice_number', '')
     
-   
-    if customer_id and advance_used > 0:
-        # Refund the advance amount back to customer's balance
-        result = User.update_advance_balance(customer_id, advance_used, "add")
+    try:
+        # Refund advance amount back to customer's balance if any was used
+        if customer_id and advance_used > 0:
+            result = User.update_advance_balance(customer_id, advance_used, "add")
+            
+            if result:
+                # Record audit transaction
+                transaction_data = {
+                    'customer_id': customer_id,
+                    'sale_id': sale_id,
+                    'amount': advance_used,
+                    'type': 'refund_on_delete',
+                    'notes': f'Advance refunded due to deletion of sale #{invoice_number}',
+                    'date': get_nepal_time().isoformat()
+                }
+                supabase.table("advance_transactions").insert(transaction_data).execute()
+                print(f"✅ Refunded Rs {advance_used:.2f} advance to customer {customer_id} (sale deleted)")
+        
+        # Delete sale items first (foreign key constraint)
+        supabase.table("sale_items").delete().eq("sale_id", sale_id).execute()
+        
+        # Then delete the sale
+        result = Sale.delete(sale_id)
         
         if result:
-            # Record audit transaction
-            transaction_data = {
-                'customer_id': customer_id,
-                'sale_id': sale_id,
-                'amount': advance_used,
-                'type': 'refund_on_delete',
-                'notes': f'Advance refunded due to deletion of sale #{sale.get("invoice_number", "")}',
-                'date': get_nepal_time().isoformat()
-            }
-            supabase.table("advance_transactions").insert(transaction_data).execute()
-            print(f"✅ Refunded Rs {advance_used:.2f} advance to customer {customer_id} (sale deleted)")
+            if is_ajax:
+                return jsonify({
+                    'success': True, 
+                    'message': f'Sale #{invoice_number} deleted successfully! Advance balance has been restored.'
+                })
+            flash('Sale deleted successfully! Advance balance has been restored.', 'success')
+        else:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Failed to delete sale'}), 500
+            flash('Failed to delete sale', 'danger')
+            
+    except Exception as e:
+        print(f"Error deleting sale: {e}")
+        if is_ajax:
+            return jsonify({'success': False, 'error': str(e)}), 500
+        flash(f'Error deleting sale: {str(e)}', 'danger')
     
-    # Now delete the sale
-    result = Sale.delete(sale_id)
+    if not is_ajax:
+        return redirect(url_for('admin.sales_list'))
     
-    if result:
-        flash('Sale deleted successfully! Advance balance has been restored.', 'success')
-    else:
-        flash('Failed to delete sale', 'danger')
-    
-    return redirect(url_for('admin.sales_list'))
+    return jsonify({'success': True})
 
 
 @bp.route('/sales/<int:sale_id>/invoice')
@@ -720,12 +917,17 @@ def customers_list():
 @login_required
 @admin_required
 def add_customer():
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     if request.method == 'POST':
         try:
             username = request.form.get('username')
             existing = User.get_by_username(username)
             
             if existing:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Username already exists!'}), 400
                 flash('Username already exists!', 'danger')
                 return redirect(url_for('admin.add_customer'))
             
@@ -740,12 +942,22 @@ def add_customer():
             
             result = User.create(user_data)
             if result:
+                if is_ajax:
+                    return jsonify({
+                        'success': True,
+                        'message': f'Customer "{user_data["name"]}" added successfully!',
+                        'redirect': url_for('admin.customers_list')
+                    })
                 flash('Customer added successfully', 'success')
             else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to add customer'}), 500
                 flash('Failed to add customer', 'danger')
             return redirect(url_for('admin.customers_list'))
             
         except Exception as e:
+            if is_ajax:
+                return jsonify({'success': False, 'error': str(e)}), 500
             flash(str(e), 'danger')
     
     return render_template('admin/add_customer.html')
@@ -778,40 +990,102 @@ def edit_customer(customer_id):
     customer = User.get_by_id(customer_id)
     
     if not customer:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'error': 'Customer not found'}), 404
         flash('Customer not found', 'danger')
         return redirect(url_for('admin.customers_list'))
     
     if request.method == 'POST':
-        result = User.update(customer_id, {
-            'name': request.form.get('name'),
-            'username': request.form.get('username'),
-            'phone': request.form.get('phone'),
-            'email': request.form.get('email'),
-            'address': request.form.get('address'),
-            'is_active': 'is_active' in request.form
-        })
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         
-        if result:
-            flash('Customer updated successfully!', 'success')
-        else:
-            flash('Failed to update customer', 'danger')
-        return redirect(url_for('admin.customers_list'))
+        try:
+            # Check if username already exists (excluding current customer)
+            username = request.form.get('username')
+            existing = User.get_by_username(username)
+            if existing and existing.get('id') != customer_id:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Username already exists!'}), 400
+                flash('Username already exists!', 'danger')
+                return redirect(url_for('admin.edit_customer', customer_id=customer_id))
+            
+            result = User.update(customer_id, {
+                'name': request.form.get('name'),
+                'username': username,
+                'phone': request.form.get('phone'),
+                'email': request.form.get('email'),
+                'address': request.form.get('address'),
+                'is_active': 'is_active' in request.form
+            })
+            
+            if result:
+                if is_ajax:
+                    return jsonify({
+                        'success': True,
+                        'message': f'Customer "{request.form.get("name")}" updated successfully!',
+                        'redirect': url_for('admin.customers_list')
+                    })
+                flash('Customer updated successfully!', 'success')
+            else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to update customer'}), 500
+                flash('Failed to update customer', 'danger')
+                
+        except Exception as e:
+            if is_ajax:
+                return jsonify({'success': False, 'error': str(e)}), 500
+            flash(f'Error: {str(e)}', 'danger')
+        
+        if not is_ajax:
+            return redirect(url_for('admin.customers_list'))
     
     return render_template('admin/edit_customer.html', customer=customer)
-
 
 @bp.route('/customers/<int:customer_id>/delete', methods=['POST'])
 @login_required
 @admin_required
 def delete_customer(customer_id):
-    result = User.delete(customer_id)
-    if result:
-        flash('Customer deleted successfully!', 'success')
-    else:
-        flash('Failed to delete customer', 'danger')
-    return redirect(url_for('admin.customers_list'))
-
-
+    """Delete a customer and all associated data - AJAX ready"""
+    from app.models_supabase import User
+    
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    try:
+        # Get customer details before deletion
+        customer = User.get_by_id(customer_id)
+        
+        if not customer:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Customer not found'}), 404
+            flash('Customer not found', 'danger')
+            return redirect(url_for('admin.customers_list'))
+        
+        customer_name = customer.get('name')
+        
+        # Delete the customer
+        result = User.delete(customer_id)
+        
+        if result:
+            if is_ajax:
+                return jsonify({
+                    'success': True,
+                    'message': f'Customer "{customer_name}" deleted successfully!'
+                })
+            flash(f'Customer "{customer_name}" deleted successfully!', 'success')
+        else:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Failed to delete customer'}), 500
+            flash('Failed to delete customer', 'danger')
+            
+    except Exception as e:
+        print(f"Error deleting customer: {e}")
+        if is_ajax:
+            return jsonify({'success': False, 'error': str(e)}), 500
+        flash(f'Error deleting customer: {str(e)}', 'danger')
+    
+    if not is_ajax:
+        return redirect(url_for('admin.customers_list'))
+    return jsonify({'success': True})
 
 
 @bp.route('/contact-messages')
@@ -866,8 +1140,7 @@ def expenses_list():
     
     expenses_data, total = Expense.get_all_paginated(page, 10, selected_category)
     
-    # Calculate stats for stat cards
-    total_expenses_amount = sum(e.get('amount', 0) for e in expenses_data) if expenses_data else 0
+    # Calculate stats for stat cards - RETURN NUMBERS, NOT FORMATTED STRINGS
     all_expenses, _ = Expense.get_all_paginated(1, 1000, selected_category)
     grand_total = sum(e.get('amount', 0) for e in all_expenses)
     
@@ -885,15 +1158,20 @@ def expenses_list():
         expenses=expenses,
         categories=categories,
         selected_category=selected_category,
-        total_expenses=f"Rs. {grand_total:,.2f}",
-        avg_per_transaction=f"{avg_per_transaction:,.2f}",
-        highest_expense=f"{highest_expense:,.2f}",
+        total_expenses=grand_total,  
+        avg_per_transaction=avg_per_transaction,  
+        highest_expense=highest_expense,  
         business_name=Config.BUSINESS_NAME
     )
+
+
 @bp.route('/expenses/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def add_expense():
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     if request.method == 'POST':
         try:
             expense_data = {
@@ -902,18 +1180,49 @@ def add_expense():
                 'amount': float(request.form.get('amount', 0)),
                 'notes': request.form.get('notes', ''),
                 'created_by': current_user.id,
+                'created_at': get_nepal_time().isoformat(),
                 'date': get_nepal_time().isoformat()
             }
+            
+            # Validate
+            if not expense_data['category']:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Category is required'}), 400
+                flash('Category is required', 'danger')
+                return redirect(url_for('admin.add_expense'))
+            
+            if expense_data['amount'] <= 0:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Amount must be greater than 0'}), 400
+                flash('Amount must be greater than 0', 'danger')
+                return redirect(url_for('admin.add_expense'))
+            
             result = Expense.create(expense_data)
+            
             if result:
+                if is_ajax:
+                    return jsonify({
+                        'success': True,
+                        'message': f'Expense of Rs {expense_data["amount"]:,.2f} added successfully!',
+                        'redirect': url_for('admin.expenses_list')
+                    })
                 flash('Expense added successfully', 'success')
             else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to add expense'}), 500
                 flash('Failed to add expense', 'danger')
-            return redirect(url_for('admin.expenses_list'))
+                
         except Exception as e:
+            print(f"Error adding expense: {e}")
+            if is_ajax:
+                return jsonify({'success': False, 'error': str(e)}), 500
             flash(str(e), 'danger')
+        
+        if not is_ajax:
+            return redirect(url_for('admin.expenses_list'))
     
     return render_template('admin/add_expense.html', business_name=Config.BUSINESS_NAME)
+
 
 @bp.route('/expenses/<int:expense_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -922,34 +1231,65 @@ def edit_expense(expense_id):
     expense = Expense.get_by_id(expense_id)
     
     if not expense:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'error': 'Expense not found'}), 404
         flash('Expense not found', 'danger')
         return redirect(url_for('admin.expenses_list'))
     
     if request.method == 'POST':
-        result = Expense.update(expense_id, {
-            'category': request.form.get('category'),
-            'description': request.form.get('description'),
-            'amount': float(request.form.get('amount') or 0)
-        })
-        if result:
-            flash('Expense updated successfully!', 'success')
-        else:
-            flash('Failed to update expense', 'danger')
-        return redirect(url_for('admin.expenses_list'))
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        try:
+            result = Expense.update(expense_id, {
+                'category': request.form.get('category'),
+                'description': request.form.get('description'),
+                'amount': float(request.form.get('amount') or 0),
+                'notes': request.form.get('notes', '')
+            })
+            
+            if result:
+                if is_ajax:
+                    return jsonify({
+                        'success': True,
+                        'message': f'Expense updated successfully!',
+                        'redirect': url_for('admin.expenses_list')
+                    })
+                flash('Expense updated successfully!', 'success')
+            else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to update expense'}), 500
+                flash('Failed to update expense', 'danger')
+                
+        except Exception as e:
+            if is_ajax:
+                return jsonify({'success': False, 'error': str(e)}), 500
+            flash(f'Error: {str(e)}', 'danger')
+        
+        if not is_ajax:
+            return redirect(url_for('admin.expenses_list'))
     
     return render_template('admin/edit_expense.html', expense=expense)
-
 
 @bp.route('/expenses/<int:expense_id>/delete', methods=['POST'])
 @login_required
 @admin_required
 def delete_expense(expense_id):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
     result = Expense.delete(expense_id)
+    
     if result:
+        if is_ajax:
+            return jsonify({'success': True, 'message': 'Expense deleted successfully!'})
         flash('Expense deleted successfully!', 'success')
     else:
+        if is_ajax:
+            return jsonify({'success': False, 'error': 'Failed to delete expense'}), 500
         flash('Failed to delete expense', 'danger')
-    return redirect(url_for('admin.expenses_list'))
+    
+    if not is_ajax:
+        return redirect(url_for('admin.expenses_list'))
+    return jsonify({'success': True})
 
 
 # ============================================
@@ -1666,11 +2006,16 @@ def api_get_advance_balance(customer_id):
 @login_required
 @admin_required
 def add_customer_advance(customer_id):
-    """Manually add advance balance to customer"""
+    """Manually add advance balance to customer - AJAX ready"""
     from app.models_supabase import User
+    
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
     customer = User.get_by_id(customer_id)
     if not customer:
+        if is_ajax:
+            return jsonify({'success': False, 'error': 'Customer not found'}), 404
         flash('Customer not found', 'danger')
         return redirect(url_for('admin.customers_list'))
     
@@ -1681,6 +2026,8 @@ def add_customer_advance(customer_id):
             payment_mode = request.form.get('payment_mode', 'Cash')
             
             if amount <= 0:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Amount must be greater than 0'}), 400
                 flash('Amount must be greater than 0', 'danger')
                 return redirect(url_for('admin.add_customer_advance', customer_id=customer_id))
             
@@ -1699,16 +2046,27 @@ def add_customer_advance(customer_id):
                 from app.models_supabase import Payment
                 Payment.create(payment_data)
                 
+                if is_ajax:
+                    return jsonify({
+                        'success': True,
+                        'message': f'Rs.{amount:,.2f} added to {customer["name"]}\'s advance balance!',
+                        'new_balance': User.get_advance_balance(customer_id)
+                    })
                 flash(f'Rs.{amount:,.2f} added to {customer["name"]}\'s advance balance!', 'success')
                 return redirect(url_for('admin.customer_dues'))
             else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to add advance balance'}), 500
                 flash('Failed to add advance balance', 'danger')
+                
         except Exception as e:
+            if is_ajax:
+                return jsonify({'success': False, 'error': str(e)}), 500
             flash(f'Error: {str(e)}', 'danger')
     
+    # GET request
     current_balance = User.get_advance_balance(customer_id)
     return render_template('admin/add_customer_advance.html', customer=customer, balance=current_balance)
-
 
 @bp.route('/customer/<int:customer_id>/advance-history')
 @login_required
@@ -2114,8 +2472,10 @@ def master_panel_get_advance(customer_id):
 @login_required
 @admin_required
 def master_panel_save_sales():
-    """Save all batch sales - EXACTLY LIKE add_sale route"""
+    """Save all batch sales - EXACTLY LIKE add_sale route with email support"""
     from app.utils import generate_invoice_number
+    from app.brevo_service import send_invoice_email
+    from app.config import Config
 
     data = request.get_json()
     customers_data = data.get('customers', [])
@@ -2134,6 +2494,7 @@ def master_panel_save_sales():
             advance_used = float(customer_entry.get('advance_used', 0) or 0)
             cash_paid = float(customer_entry.get('cash_paid', 0) or 0)
             email = customer_entry.get('email', '')
+            send_email_flag = customer_entry.get('send_email', False)  # NEW: get email flag
 
             # ========== BYPRODUCT EXCHANGE LOGIC (SAME AS ADD_SALE) ==========
             exchange_mustard_cake = customer_entry.get('exchange_mustard_cake', False)
@@ -2215,6 +2576,40 @@ def master_panel_save_sales():
             # Create sale (SAME AS ADD_SALE)
             sale = Sale.create(sale_data, sale_items_formatted, advance_used)
 
+            # NEW: Send email if requested
+            email_sent = False
+            if sale and send_email_flag and email:
+                try:
+                    # Prepare sale data for email template
+                    sale_for_email = sale.copy()
+                    sale_for_email['customer_name'] = customer_name
+                    sale_for_email['customer_email'] = email
+                    sale_for_email['items'] = sale_items_formatted
+                    sale_for_email['notes'] = sale_note
+                    
+                    # Calculate due amount
+                    due_amount = sale.get('due_amount', 0)
+                    if due_amount == 0 and cash_paid + advance_used > total_amount:
+                        due_amount = 0  # Overpayment becomes advance
+                    
+                    subject = f"Invoice from {Config.BUSINESS_NAME} - #{sale.get('invoice_number')}"
+                    
+                    html_content = render_template(
+                        'admin/invoice_email.html',
+                        sale=sale_for_email,
+                        business_name=Config.BUSINESS_NAME,
+                        total_amount=total_amount,
+                        paid_amount=cash_paid,
+                        due_amount=due_amount
+                    )
+                    
+                    email_sent = send_invoice_email(email, subject, html_content)
+                    print(f"Email sent to {email}: {email_sent}")
+                    
+                except Exception as e:
+                    print(f"Email error for {customer_name} ({email}): {e}")
+                    email_sent = False
+
             if sale:
                 results.append({
                     'customer': customer_name,
@@ -2224,7 +2619,8 @@ def master_panel_save_sales():
                     'cash_paid': cash_paid,
                     'due_amount': sale.get('due_amount', 0),
                     'advance_credit': sale.get('advance_amount', 0),
-                    'payment_status': sale.get('payment_status', 'partial')
+                    'payment_status': sale.get('payment_status', 'partial'),
+                    'email_sent': email_sent  # NEW: track email status
                 })
             else:
                 errors.append(f"Failed to create sale for {customer_name}")
@@ -2250,8 +2646,6 @@ def master_panel_save_sales():
         'message': f'Successfully created {len(results)} sale(s)',
         'results': results
     })
-
-
 # ============================================
 # EXCEL EXPORT / IMPORT - BATCH SALES
 # ============================================
@@ -2698,3 +3092,335 @@ def download_sales_template():
         as_attachment=True,
         download_name='sales_import_template.xlsx'
     )
+
+# ============================================
+# BATCH SALE ROLLBACK / UNDO FEATURE
+# ============================================
+
+@bp.route('/master-panel/save-with-rollback', methods=['POST'])
+@login_required
+@admin_required
+def master_panel_save_with_rollback():
+    """Save batch sales with rollback capability"""
+    from app.utils import generate_invoice_number
+    from app.brevo_service import send_invoice_email
+    from app.config import Config
+
+    data = request.get_json()
+    customers_data = data.get('customers', [])
+
+    if not customers_data:
+        return jsonify({'success': False, 'error': 'No sales data provided'})
+
+    # Generate unique batch ID for this save operation
+    batch_id = str(uuid.uuid4())
+    created_sales = []
+    errors = []
+    results = []
+
+    # Create batch history record
+    batch_history = {
+        'batch_id': batch_id,
+        'user_id': current_user.id,
+        'total_customers': len(customers_data),
+        'status': 'active'
+    }
+    
+    try:
+        supabase.table("batch_sales_history").insert(batch_history).execute()
+    except Exception as e:
+        print(f"Warning: Could not create batch history: {e}")
+
+    for customer_entry in customers_data:
+        try:
+            customer_name = (customer_entry.get('customer_name') or '').strip()
+            customer_id = customer_entry.get('customer_id')
+            items = customer_entry.get('items', [])
+            advance_used = float(customer_entry.get('advance_used', 0) or 0)
+            cash_paid = float(customer_entry.get('cash_paid', 0) or 0)
+            email = customer_entry.get('email', '')
+            send_email_flag = customer_entry.get('send_email', False)
+
+            # Byproduct exchange logic
+            exchange_mustard_cake = customer_entry.get('exchange_mustard_cake', False)
+            exchange_rice_bran = customer_entry.get('exchange_rice_bran', False)
+            
+            sale_items = apply_byproduct_exchange_to_line_items(
+                items, exchange_mustard_cake, exchange_rice_bran
+            )
+            sale_note = build_byproduct_note(exchange_mustard_cake, exchange_rice_bran)
+
+            # Resolve or create customer
+            customer_id_final = None
+            if customer_id and str(customer_id).isdigit():
+                customer_id_final = int(customer_id)
+                user_data = User.get_by_id(customer_id_final)
+                if user_data:
+                    customer_name = user_data.get('name')
+                    if email and not user_data.get('email'):
+                        User.update(customer_id_final, {'email': email})
+            else:
+                user_data = User.get_by_username(customer_name)
+                if user_data:
+                    customer_id_final = user_data.get('id')
+                    customer_name = user_data.get('name')
+                    if email and not user_data.get('email'):
+                        User.update(customer_id_final, {'email': email})
+                else:
+                    new_user = User.create({
+                        'name': customer_name,
+                        'username': customer_name,
+                        'email': email if email else None,
+                        'role': 'customer',
+                        'is_active': True
+                    })
+                    if new_user:
+                        customer_id_final = new_user.get('id')
+                        customer_name = new_user.get('name')
+
+            total_amount = sum(float(item.get('subtotal', 0)) for item in sale_items)
+
+            # Validate advance usage
+            if advance_used > 0 and customer_id_final:
+                available_balance = User.get_advance_balance(customer_id_final)
+                if advance_used > available_balance:
+                    errors.append(f'Insufficient advance balance for {customer_name}')
+                    continue
+                if advance_used > total_amount:
+                    errors.append(f'Advance cannot exceed total for {customer_name}')
+                    continue
+
+            # Prepare sale data
+            sale_data = {
+                'customer_id': customer_id_final,
+                'customer_name': customer_name if customer_name else 'Walk-in Customer',
+                'invoice_number': generate_invoice_number(),
+                'total_amount': float(total_amount),
+                'paid_amount': float(cash_paid),
+                'created_by': current_user.id if current_user.id else None,
+                'date': get_nepal_time().isoformat(),
+                'notes': sale_note
+            }
+
+            # Format sale items
+            sale_items_formatted = []
+            for item in sale_items:
+                sale_items_formatted.append({
+                    'product_name': item.get('product_name'),
+                    'quantity': float(item.get('quantity', 0)),
+                    'unit': item.get('unit', 'Kg'),
+                    'rate': float(item.get('rate', 0)),
+                    'subtotal': float(item.get('subtotal', 0))
+                })
+
+            # CREATE SNAPSHOT BEFORE SAVING (for rollback)
+            snapshot_data = {
+                'batch_id': batch_id,
+                'sale_data': sale_data,
+                'sale_items_data': sale_items_formatted,
+                'sale_id': None
+            }
+            
+            # Create sale
+            sale = Sale.create(sale_data, sale_items_formatted, advance_used)
+
+            if sale:
+                # Update snapshot with sale_id
+                snapshot_data['sale_id'] = sale.get('id')
+                supabase.table("batch_sale_snapshots").insert(snapshot_data).execute()
+                
+                created_sales.append(sale.get('id'))
+                
+                # Send email if requested
+                email_sent = False
+                if send_email_flag and email:
+                    try:
+                        sale_for_email = sale.copy()
+                        sale_for_email['customer_name'] = customer_name
+                        sale_for_email['customer_email'] = email
+                        sale_for_email['items'] = sale_items_formatted
+                        
+                        subject = f"Invoice from {Config.BUSINESS_NAME} - #{sale.get('invoice_number')}"
+                        html_content = render_template(
+                            'admin/invoice_email.html',
+                            sale=sale_for_email,
+                            business_name=Config.BUSINESS_NAME,
+                            total_amount=total_amount,
+                            paid_amount=cash_paid,
+                            due_amount=sale.get('due_amount', 0)
+                        )
+                        email_sent = send_invoice_email(email, subject, html_content)
+                    except Exception as e:
+                        print(f"Email error: {e}")
+                
+                results.append({
+                    'customer': customer_name,
+                    'invoice': sale.get('invoice_number'),
+                    'total': total_amount,
+                    'sale_id': sale.get('id'),
+                    'email_sent': email_sent
+                })
+            else:
+                errors.append(f"Failed to create sale for {customer_name}")
+
+        except Exception as e:
+            print(f"Error: {e}")
+            errors.append(str(e))
+            continue
+
+    # Update batch history with total amount
+    total_sales_amount = sum(r.get('total', 0) for r in results)
+    try:
+        supabase.table("batch_sales_history").update({
+            'total_amount': total_sales_amount
+        }).eq('batch_id', batch_id).execute()
+    except Exception as e:
+        print(f"Warning: Could not update batch history: {e}")
+
+    response_data = {
+        'success': len(results) > 0,
+        'batch_id': batch_id,
+        'results': results,
+        'errors': errors,
+        'total_sales': len(results),
+        'total_amount': total_sales_amount
+    }
+
+    if errors:
+        response_data['message'] = f'Created {len(results)} sale(s) with {len(errors)} error(s)'
+    else:
+        response_data['message'] = f'Successfully created {len(results)} sale(s)'
+
+    return jsonify(response_data)
+
+
+@bp.route('/master-panel/rollback/<batch_id>', methods=['POST'])
+@login_required
+@admin_required
+def rollback_batch_sales(batch_id):
+    """Rollback/undo a batch of sales"""
+    from app.models_supabase import User
+    
+    try:
+        # Get batch history
+        batch_response = supabase.table("batch_sales_history")\
+            .select("*")\
+            .eq('batch_id', batch_id)\
+            .execute()
+        
+        if not batch_response.data:
+            return jsonify({'success': False, 'error': 'Batch not found'})
+        
+        batch = batch_response.data[0]
+        
+        if batch.get('status') == 'rolled_back':
+            return jsonify({'success': False, 'error': 'This batch has already been rolled back'})
+        
+        # Get all snapshots for this batch
+        snapshots_response = supabase.table("batch_sale_snapshots")\
+            .select("*")\
+            .eq('batch_id', batch_id)\
+            .execute()
+        
+        if not snapshots_response.data:
+            return jsonify({'success': False, 'error': 'No snapshots found for this batch'})
+        
+        rolled_back_sales = []
+        rollback_errors = []
+        
+        for snapshot in snapshots_response.data:
+            sale_id = snapshot.get('sale_id')
+            if not sale_id:
+                continue
+            
+            try:
+                # Get the sale before deletion (for advance refund)
+                sale = Sale.get_by_id(sale_id)
+                
+                if sale:
+                    customer_id = sale.get('customer_id')
+                    advance_used = sale.get('advance_used', 0)
+                    
+                    # Refund advance back to customer
+                    if customer_id and advance_used > 0:
+                        User.update_advance_balance(customer_id, advance_used, "add")
+                        
+                        # Record refund transaction
+                        transaction_data = {
+                            'customer_id': customer_id,
+                            'sale_id': sale_id,
+                            'amount': advance_used,
+                            'type': 'rollback_refund',
+                            'notes': f'Refunded due to batch rollback (Batch: {batch_id})',
+                            'date': get_nepal_time().isoformat()
+                        }
+                        supabase.table("advance_transactions").insert(transaction_data).execute()
+                    
+                    # Delete sale items
+                    supabase.table("sale_items").delete().eq("sale_id", sale_id).execute()
+                    
+                    # Delete the sale
+                    supabase.table("sales").delete().eq("id", sale_id).execute()
+                    
+                    rolled_back_sales.append(sale_id)
+                    
+            except Exception as e:
+                rollback_errors.append(f"Failed to rollback sale {sale_id}: {str(e)}")
+        
+        # Update batch status
+        supabase.table("batch_sales_history").update({
+            'status': 'rolled_back',
+            'rolled_back_at': get_nepal_time().isoformat(),
+            'rolled_back_by': current_user.id,
+            'rollback_reason': request.json.get('reason', 'Manual rollback') if request.json else 'Manual rollback'
+        }).eq('batch_id', batch_id).execute()
+        
+        # Log the rollback
+        log_data = {
+            'batch_id': batch_id,
+            'rolled_back_by': current_user.id,
+            'reason': request.json.get('reason', 'Manual rollback') if request.json else 'Manual rollback',
+            'affected_sales': rolled_back_sales
+        }
+        supabase.table("batch_rollback_log").insert(log_data).execute()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully rolled back {len(rolled_back_sales)} sales',
+            'rolled_back_sales': rolled_back_sales,
+            'errors': rollback_errors
+        })
+        
+    except Exception as e:
+        print(f"Rollback error: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@bp.route('/master-panel/batch-history')
+@login_required
+@admin_required
+def get_batch_history():
+    """Get list of all batches for rollback selection"""
+    try:
+        response = supabase.table("batch_sales_history")\
+            .select("*, users!batch_sales_history_user_id_fkey(name)")\
+            .order('created_at', desc=True)\
+            .limit(50)\
+            .execute()
+        
+        batches = []
+        for batch in response.data:
+            batches.append({
+                'batch_id': batch.get('batch_id'),
+                'created_at': batch.get('created_at'),
+                'total_customers': batch.get('total_customers'),
+                'total_amount': batch.get('total_amount', 0),
+                'status': batch.get('status', 'active'),
+                'user_name': batch.get('users', {}).get('name', 'Unknown') if batch.get('users') else 'Unknown'
+            })
+        
+        return jsonify({'success': True, 'batches': batches})
+        
+    except Exception as e:
+        print(f"Error fetching batch history: {e}")
+        return jsonify({'success': False, 'error': str(e)})

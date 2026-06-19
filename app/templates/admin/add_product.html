@@ -5,6 +5,139 @@
 {% block content %}
 
 <style>
+    /* Modal Animation */
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-container {
+        background: white;
+        border-radius: 16px;
+        max-width: 450px;
+        width: 90%;
+        padding: 28px;
+        text-align: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    .modal-success-icon {
+        width: 80px;
+        height: 80px;
+        background: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+
+    .modal-success-icon i {
+        font-size: 48px;
+        color: white;
+    }
+
+    .modal-error-icon {
+        width: 80px;
+        height: 80px;
+        background: #ef4444;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+
+    .modal-error-icon i {
+        font-size: 48px;
+        color: white;
+    }
+
+    .modal-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--gray-800);
+    }
+
+    .modal-message {
+        color: var(--gray-600);
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .modal-button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .modal-button-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .modal-button-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
     /* ===== Form specific styles ===== */
     .preview-image {
         max-width: 200px;
@@ -108,8 +241,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
             <h1 class="fw-bold mb-1" style="font-size: 1.8rem;">
-                
-                Add New Product
+                <i class="bi bi-box-seam"></i> Add New Product
             </h1>
             <p class="text-muted mb-0">
                 Add product for public website
@@ -117,7 +249,7 @@
         </div>
         
         <a href="{{ url_for('admin_products.product_list') }}" 
-           class="btn-ui btn-outline-ui">
+           class="btn-ui btn-outline-ui" id="cancelBtn">
             <i class="bi bi-arrow-left"></i>
             Back to Products
         </a>
@@ -125,7 +257,7 @@
 
     <!-- FORM CARD - Using card-ui class for consistency -->
     <div class="card-ui">
-        <form method="POST" enctype="multipart/form-data">
+        <form id="addProductForm" enctype="multipart/form-data">
             
             <div class="row g-4">
                 
@@ -136,6 +268,7 @@
                     </label>
                     <input type="text" 
                            name="name" 
+                           id="productName"
                            class="form-control-ui" 
                            required 
                            placeholder="e.g., Pure Mustard Oil">
@@ -146,7 +279,7 @@
                     <label class="form-label">
                         Category <span class="text-danger">*</span>
                     </label>
-                    <select name="category" class="form-control-ui" required>
+                    <select name="category" id="productCategory" class="form-control-ui" required>
                         <option value="">Select Category</option>
                         <option value="Food">Food Products</option>
                         <option value="Oil">Oil Products</option>
@@ -159,6 +292,7 @@
                     <label class="form-label">Price (Rs.)</label>
                     <input type="number" 
                            name="price" 
+                           id="productPrice"
                            class="form-control-ui" 
                            step="0.01" 
                            placeholder="e.g., 500">
@@ -189,6 +323,7 @@
                 <div class="col-12">
                     <label class="form-label">Description</label>
                     <textarea name="description" 
+                              id="productDescription"
                               class="form-control-ui" 
                               rows="4" 
                               placeholder="Describe your product..."></textarea>
@@ -198,7 +333,7 @@
             
             <!-- Submit Buttons -->
             <div class="mt-4 pt-2">
-                <button type="submit" class="btn-ui btn-primary-ui">
+                <button type="submit" class="btn-ui btn-primary-ui" id="submitBtn">
                     <i class="bi bi-save"></i> Save Product
                 </button>
                 <a href="{{ url_for('admin_products.product_list') }}" 
@@ -217,6 +352,7 @@
     /* ===== Unified UI Components (must match Sales page) ===== */
     :root {
         --primary: #0C5B3F;
+        --primary-dark: #09452F;
         --accent: #138A52;
         --radius-lg: 16px;
         --radius-md: 12px;
@@ -251,7 +387,7 @@
         font-size: 0.9rem;
     }
     
-    .btn-ui:hover {
+    .btn-ui:hover:not(:disabled) {
         transform: translateY(-2px);
     }
     
@@ -260,9 +396,15 @@
         color: white;
     }
     
-    .btn-primary-ui:hover {
+    .btn-primary-ui:hover:not(:disabled) {
         color: white;
         box-shadow: 0 6px 18px rgba(19,138,82,0.25);
+    }
+    
+    .btn-primary-ui:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
     }
     
     .btn-outline-ui {
@@ -357,47 +499,151 @@
     }
 </style>
 
-{% endblock %}
-
-{% block extra_js %}
 <script>
-    // Image preview functionality
-    const imageInput = document.getElementById('imageInput');
-    const previewContainer = document.getElementById('previewContainer');
-    const imagePreview = document.getElementById('imagePreview');
+// Close modal function
+function closeModal(modalId = null) {
+    if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+    } else {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => modal.remove());
+    }
+}
+
+// Show success/error modal
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
     
-    imageInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File size exceeds 5MB. Please choose a smaller image.');
-                imageInput.value = '';
-                previewContainer.style.display = 'none';
-                imagePreview.src = '';
-                return;
-            }
-            
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
-            if (!allowedTypes.includes(file.type)) {
-                alert('Please select a valid image file (JPG, PNG, or GIF).');
-                imageInput.value = '';
-                previewContainer.style.display = 'none';
-                imagePreview.src = '';
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                previewContainer.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
-        } else {
+    document.getElementById('modalCloseBtn').onclick = function() {
+        closeModal('resultModal');
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    };
+}
+
+// Image preview functionality
+const imageInput = document.getElementById('imageInput');
+const previewContainer = document.getElementById('previewContainer');
+const imagePreview = document.getElementById('imagePreview');
+
+imageInput.addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showModal('Validation Error', 'File size exceeds 5MB. Please choose a smaller image.', 'error');
+            imageInput.value = '';
             previewContainer.style.display = 'none';
             imagePreview.src = '';
+            return;
         }
-    });
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
+            showModal('Validation Error', 'Please select a valid image file (JPG, PNG, or GIF).', 'error');
+            imageInput.value = '';
+            previewContainer.style.display = 'none';
+            imagePreview.src = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.style.display = 'none';
+        imagePreview.src = '';
+    }
+});
+
+// AJAX Form Submission
+let isSubmitting = false;
+
+document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (isSubmitting) return false;
+    
+    // Validate required fields
+    const name = document.getElementById('productName').value.trim();
+    const category = document.getElementById('productCategory').value;
+    
+    if (!name) {
+        showModal('Validation Error', 'Please enter product name', 'error');
+        return false;
+    }
+    
+    if (!category) {
+        showModal('Validation Error', 'Please select a category', 'error');
+        return false;
+    }
+    
+    // Collect form data
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('category', category);
+    formData.append('price', document.getElementById('productPrice').value);
+    formData.append('description', document.getElementById('productDescription').value);
+    
+    const imageFile = document.getElementById('imageInput').files[0];
+    if (imageFile) {
+        formData.append('image', imageFile);
+    }
+    
+    // Mark as submitting
+    isSubmitting = true;
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving Product...';
+    
+    try {
+        const response = await fetch('{{ url_for("admin_products.add_product") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showModal('Success!', data.message || 'Product added successfully!', 'success', data.redirect || '{{ url_for("admin_products.product_list") }}');
+        } else {
+            showModal('Error', data.error || 'Failed to add product', 'error');
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-save"></i> Save Product';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-save"></i> Save Product';
+    }
+});
 </script>
+
 {% endblock %}

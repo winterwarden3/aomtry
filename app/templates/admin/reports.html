@@ -6,11 +6,13 @@
 
 <style>
 /* ============================================
-   CONSISTENT UI WITH PROFIT ANALYSIS PAGE
+   PROFESSIONAL UI - EXACTLY MATCHES OTHER PAGES
+   FULLY MOBILE OPTIMIZED
    ============================================ */
 
 :root {
     --primary: #0C5B3F;
+    --primary-light: #138A52;
     --accent: #138A52;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
@@ -33,21 +35,90 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+/* Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+}
+
+/* Container */
 .container-fluid {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 1rem;
 }
 
-/* Header - Matching Profit Analysis */
+/* Cards */
+.stat-card, .card-ui {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.stat-card {
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-ui {
+    padding: 0;
+    overflow: hidden;
+}
+
+.stat-card h6 {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--gray-800);
+}
+
+.stat-footer {
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    margin-top: 0.25rem;
+}
+
+.icon-box {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* Header */
 .page-header {
-    margin-bottom: 28px;
+    margin-bottom: 1.5rem;
 }
 
 .page-header h1 {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--gray-800);
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
 }
 
 .page-header p {
@@ -55,194 +126,67 @@
     color: var(--gray-500);
 }
 
-/* Filter Card */
-.filter-card {
-    background: white;
+/* Buttons */
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary-ui {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary-ui:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.btn-outline-ui {
+    background: transparent;
     border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 24px;
+    color: var(--gray-600);
 }
 
-.filter-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    align-items: end;
+.btn-outline-ui:hover {
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
-.filter-group {
+/* Search/Filter */
+.search-wrapper {
     display: flex;
-    flex-direction: column;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
-.filter-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--gray-500);
-    margin-bottom: 6px;
-}
-
-.filter-input {
-    padding: 10px 14px;
+.search-input {
+    flex: 1;
+    padding: 0.6rem 0.875rem;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     transition: all 0.2s ease;
     font-family: inherit;
 }
 
-.filter-input:focus {
+.search-input:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--primary-light);
     box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
-.filter-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md);
-    padding: 10px 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    width: 100%;
-}
-
-.filter-btn:hover {
-    background: var(--accent);
-    transform: translateY(-1px);
-}
-
-/* KPI Cards - Matching Profit Analysis */
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 28px;
-}
-
-.kpi-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    transition: all 0.2s ease;
-}
-
-.kpi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.kpi-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.kpi-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--gray-500);
-}
-
-.kpi-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--gray-800);
-    margin-bottom: 4px;
-}
-
-.kpi-footer {
-    font-size: 0.7rem;
-    color: var(--gray-400);
-}
-
-.kpi-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gray-100);
-    color: var(--gray-600);
-}
-
-/* Chart Cards */
-.chart-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 28px;
-}
-
-.chart-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.chart-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--gray-200);
-    background: var(--gray-50);
-}
-
-.chart-header h4 {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.chart-body {
-    padding: 20px;
-    height: 320px;
-    position: relative;
-}
-
-/* Table Card */
-.table-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.table-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--gray-200);
-    background: var(--gray-50);
-}
-
-.table-header h4 {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
+/* Table */
 .reports-table {
     width: 100%;
     border-collapse: collapse;
@@ -250,7 +194,7 @@
 
 .reports-table th {
     text-align: left;
-    padding: 12px 16px;
+    padding: 0.875rem 0.75rem;
     background: var(--gray-50);
     font-size: 0.7rem;
     font-weight: 600;
@@ -261,7 +205,7 @@
 }
 
 .reports-table td {
-    padding: 12px 16px;
+    padding: 0.875rem 0.75rem;
     border-bottom: 1px solid var(--gray-100);
     font-size: 0.85rem;
     vertical-align: middle;
@@ -290,22 +234,55 @@
     color: var(--success);
 }
 
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.chart-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--gray-50);
+}
+
+.chart-header h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chart-body {
+    padding: 1.25rem;
+    height: 320px;
+    position: relative;
+}
+
+/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 3rem 1.5rem;
 }
 
 .empty-icon {
-    font-size: 48px;
+    font-size: 3rem;
     color: var(--gray-300);
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
 }
 
 .empty-title {
     font-size: 1rem;
     font-weight: 500;
     color: var(--gray-600);
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .empty-desc {
@@ -313,145 +290,286 @@
     color: var(--gray-400);
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .kpi-grid, .chart-grid {
-        gap: 16px;
+/* Toast Notifications */
+.toast-notification {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.toast-success {
+    background: var(--success);
+    color: white;
+}
+
+.toast-error {
+    background: var(--danger);
+    color: white;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
     }
 }
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Profit Percentage Badge */
+.profit-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.profit-positive {
+    background: rgba(16,185,129,0.1);
+    color: #10b981;
+}
+
+.profit-negative {
+    background: rgba(239,68,68,0.1);
+    color: #ef4444;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
 
 @media (max-width: 768px) {
-    .filter-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
+    .container-fluid {
+        padding: 0.75rem;
     }
     
-    .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+    .stat-value {
+        font-size: 1.2rem;
     }
     
-    .chart-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+    .icon-box {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
     }
     
-    .reports-table th:nth-child(2),
-    .reports-table td:nth-child(2) {
-        display: table-cell;
+    .page-header h1 {
+        font-size: 1.25rem;
     }
     
-    .kpi-value {
-        font-size: 1.3rem;
+    .search-wrapper {
+        flex-direction: column;
     }
     
-    .kpi-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+    .chart-body {
+        height: 250px;
+    }
+    
+    .reports-table thead {
+        display: none;
+    }
+    
+    .reports-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        background: white;
+    }
+    
+    .reports-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.7rem 1rem;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .reports-table td:last-child {
+        border-bottom: none;
+    }
+    
+    .reports-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--gray-500);
+        min-width: 100px;
+    }
+    
+    .profit-badge {
+        margin-left: 0;
+        margin-top: 0.25rem;
     }
 }
 
-@media (max-width: 576px) {
-    .kpi-grid {
-        grid-template-columns: 1fr;
+@media (max-width: 480px) {
+    .reports-table td {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .reports-table td::before {
+        min-width: auto;
+    }
+    
+    .chart-body {
+        height: 220px;
     }
 }
 </style>
 
-<div class="container-fluid px-md-3 py-3">
-
-    <!-- Header - Matching Profit Analysis -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h1 class="fw-bold mb-1" style="font-size: 1.5rem;">
-                <i class="bi bi-graph-up"></i> Reports & Analytics
-            </h1>
-            <p class="text-muted mb-0" style="font-size: 0.8rem;">Business performance overview</p>
+            <h1><i class="bi bi-graph-up"></i> Reports & Analytics</h1>
+            <p>Business performance overview</p>
         </div>
     </div>
 
     <!-- Filter Card -->
-    <div class="filter-card">
-        <form method="GET" action="{{ url_for('admin.reports') }}">
-            <div class="filter-grid">
-                <div class="filter-group">
-                    <label class="filter-label">Start Date</label>
-                    <input type="date" class="filter-input" name="start_date" value="{{ start_date }}">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">End Date</label>
-                    <input type="date" class="filter-input" name="end_date" value="{{ end_date }}">
-                </div>
-                <div class="filter-group">
-                    <button type="submit" class="filter-btn">
+    <div class="card-ui mb-4">
+        <div style="padding: 1rem;">
+            <form method="GET" action="{{ url_for('admin.reports') }}">
+                <div class="search-wrapper">
+                    <input type="date" class="search-input" name="start_date" value="{{ start_date }}" style="flex: 1;">
+                    <input type="date" class="search-input" name="end_date" value="{{ end_date }}" style="flex: 1;">
+                    <button type="submit" class="btn-ui btn-primary-ui">
                         <i class="bi bi-search"></i> Generate Report
                     </button>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
-    <!-- KPI Cards - Matching Profit Analysis -->
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Total Sales</span>
-                <span class="kpi-icon"><i class="bi bi-cart"></i></span>
+    <!-- KPI Cards - 4 columns now (Sales, Expenses, Profit, Profit %) -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Total Sales</h6>
+                        <div class="stat-value" style="color: var(--primary);">Rs {{ "%.2f"|format(total_sales) }}</div>
+                        <div class="stat-footer">Selected period revenue</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
+                        <i class="bi bi-cart"></i>
+                    </div>
+                </div>
             </div>
-            <div class="kpi-value" style="color: var(--primary);">
-                Rs {{ total_sales|round(2) }}
-            </div>
-            <div class="kpi-footer">Selected period revenue</div>
         </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Total Expenses</span>
-                <span class="kpi-icon"><i class="bi bi-receipt"></i></span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Total Expenses</h6>
+                        <div class="stat-value" style="color: var(--danger);">Rs {{ "%.2f"|format(total_expenses) }}</div>
+                        <div class="stat-footer">Selected period costs</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                </div>
             </div>
-            <div class="kpi-value text-danger">
-                Rs {{ total_expenses|round(2) }}
-            </div>
-            <div class="kpi-footer">Selected period costs</div>
         </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Net Profit</span>
-                <span class="kpi-icon"><i class="bi bi-trophy"></i></span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Net Profit</h6>
+                        <div class="stat-value" style="color: var(--success);">Rs {{ "%.2f"|format(profit) }}</div>
+                        <div class="stat-footer">Selected period profit</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                </div>
             </div>
-            <div class="kpi-value text-success">
-                Rs {{ profit|round(2) }}
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Profit Percentage</h6>
+                        <div class="stat-value" style="color: var(--info);">
+                            {% set profit_percent = (profit / total_sales * 100) if total_sales > 0 else 0 %}
+                            {{ "%.2f"|format(profit_percent) }}%
+                        </div>
+                        <div class="stat-footer">
+                            
+                            {% if profit_percent > 0 %}
+                                <span class="profit-badge profit-positive"><i class="bi bi-arrow-up"></i> Positive</span>
+                            {% elif profit_percent < 0 %}
+                                <span class="profit-badge profit-negative"><i class="bi bi-arrow-down"></i> Negative</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
+                        <i class="bi bi-pie-chart"></i>
+                    </div>
+                </div>
             </div>
-            <div class="kpi-footer">Selected period profit</div>
         </div>
     </div>
 
     <!-- Charts Section -->
-    <div class="chart-grid">
-        <div class="chart-card">
-            <div class="chart-header">
-                <h4><i class="bi bi-pie-chart"></i> Sales by Product</h4>
-            </div>
-            <div class="chart-body">
-                <canvas id="salesByTypeChart"></canvas>
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h4><i class="bi bi-pie-chart"></i> Sales by Product</h4>
+                </div>
+                <div class="chart-body">
+                    <canvas id="salesByTypeChart"></canvas>
+                </div>
             </div>
         </div>
-
-        <div class="chart-card">
-            <div class="chart-header">
-                <h4><i class="bi bi-bar-chart"></i> Expenses by Category</h4>
-            </div>
-            <div class="chart-body">
-                <canvas id="expensesByCategoryChart"></canvas>
+        <div class="col-12 col-md-6">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h4><i class="bi bi-bar-chart"></i> Expenses by Category</h4>
+                </div>
+                <div class="chart-body">
+                    <canvas id="expensesByCategoryChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Top Customers Table -->
-    <div class="table-card">
-        <div class="table-header">
+    <div class="card-ui">
+        <div class="chart-header">
             <h4><i class="bi bi-trophy"></i> Top Customers</h4>
         </div>
         <div style="overflow-x: auto;">
@@ -466,9 +584,9 @@
                 <tbody>
                     {% for customer, total in top_customers %}
                     <tr>
-                        <td class="customer-rank">{{ loop.index }}</td>
-                        <td class="customer-name">{{ customer }}</td>
-                        <td class="customer-amount">Rs {{ total|round(2) }}</td>
+                        <td data-label="#" class="customer-rank">{{ loop.index }}</td>
+                        <td data-label="Customer Name" class="customer-name">{{ customer }}</td>
+                        <td data-label="Total Purchase" class="customer-amount">Rs {{ "%.2f"|format(total) }}</td>
                     </tr>
                     {% else %}
                     <tr>
@@ -485,14 +603,9 @@
             </table>
         </div>
     </div>
-
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     
@@ -599,7 +712,21 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         expenseCanvas.parentElement.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="bi bi-receipt"></i></div><div class="empty-title">No expense data</div><div class="empty-desc">No expense data available for selected period</div></div>';
     }
-    
 });
+
+// Show toast for flashed messages
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'}"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+
 </script>
+
 {% endblock %}

@@ -201,30 +201,52 @@ class User:
             return False
     
     @staticmethod
-    def find_by_username_or_email(identifier):
-        """Find user by username or name (flexible search)"""
+    def find_by_username_or_email(identifier, retry=True):
+        """Find user by username or email with retry on first failure"""
         try:
             identifier = identifier.strip()
             
             # First try exact match on username
             response = supabase.table(User.table_name).select("*").eq("username", identifier).execute()
             if response.data:
-                return response.data[0]
+                user = response.data[0]
+                # Validate password_hash exists
+                if user.get('password_hash'):
+                    return user
+                elif retry:
+                    print(f"⚠️ password_hash missing for {identifier}, retrying...")
+                    return User.find_by_username_or_email(identifier, retry=False)
+                return user
             
             # Try case-insensitive match on name
             response = supabase.table(User.table_name).select("*").ilike("name", identifier).execute()
             if response.data:
-                return response.data[0]
+                user = response.data[0]
+                if user.get('password_hash'):
+                    return user
+                elif retry:
+                    print(f"⚠️ password_hash missing for {identifier}, retrying...")
+                    return User.find_by_username_or_email(identifier, retry=False)
+                return user
             
             # Try email if it contains @
             if '@' in identifier:
                 response = supabase.table(User.table_name).select("*").eq("email", identifier).execute()
                 if response.data:
-                    return response.data[0]
+                    user = response.data[0]
+                    if user.get('password_hash'):
+                        return user
+                    elif retry:
+                        print(f"⚠️ password_hash missing for {identifier}, retrying...")
+                        return User.find_by_username_or_email(identifier, retry=False)
+                    return user
             
             return None
         except Exception as e:
             print(f"Error finding user: {e}")
+            if retry:
+                print(f"Retrying after error...")
+                return User.find_by_username_or_email(identifier, retry=False)
             return None
 
     # ============================================

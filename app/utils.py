@@ -400,3 +400,89 @@ class Pagination:
     @property
     def next_num(self):
         return min(self.pages, self.page + 1)
+    
+def format_time_ago(date_val):
+    """
+    Format UTC datetime to Nepal time relative time string
+    Used for recent activities display
+    """
+    if not date_val:
+        return "Unknown"
+    try:
+        import pytz
+        from datetime import datetime
+        
+        nepal_tz = pytz.timezone('Asia/Kathmandu')
+        now = datetime.now(nepal_tz)
+        
+        # Parse the date value
+        if isinstance(date_val, str):
+            # Handle different date formats (UTC from Supabase)
+            if 'T' in date_val:
+                date_val = date_val.replace('T', ' ').replace('Z', '').split('.')[0]
+            
+            # Parse as naive datetime (assume UTC)
+            naive_date = datetime.strptime(date_val[:19], '%Y-%m-%d %H:%M:%S')
+            
+            # Make it timezone-aware as UTC
+            utc_tz = pytz.timezone('UTC')
+            date_utc = utc_tz.localize(naive_date)
+            
+            # Convert to Nepal time
+            date = date_utc.astimezone(nepal_tz)
+        else:
+            # If it's already a datetime object
+            date = date_val
+            if date.tzinfo is None:
+                # Assume UTC if no timezone
+                utc_tz = pytz.timezone('UTC')
+                date = utc_tz.localize(date)
+            # Convert to Nepal time
+            date = date.astimezone(nepal_tz)
+        
+        # Calculate difference
+        diff = now - date
+        seconds = diff.total_seconds()
+        
+        if seconds < 60:
+            return "Just now"
+        elif seconds < 3600:
+            mins = int(seconds // 60)
+            return f"{mins} minute{'s' if mins > 1 else ''} ago"
+        elif seconds < 86400:
+            hours = int(seconds // 3600)
+            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+        elif seconds < 604800:  # 7 days
+            days = int(seconds // 86400)
+            return f"{days} day{'s' if days > 1 else ''} ago"
+        else:
+            # Return formatted date for older entries
+            return date.strftime('%b %d, %Y')
+            
+    except Exception as e:
+        print(f"Error formatting time: {e}")
+        return str(date_val)[:10] if date_val else "Unknown"
+
+
+def format_nepal_date(date_string):
+    """
+    Convert UTC datetime string to Nepal date only (YYYY-MM-DD)
+    """
+    if not date_string:
+        return '-'
+    
+    try:
+        if isinstance(date_string, str):
+            if 'T' in date_string:
+                date_string = date_string.replace('T', ' ').replace('Z', '').split('.')[0]
+            naive_date = datetime.strptime(date_string[:19], '%Y-%m-%d %H:%M:%S')
+            utc_tz = pytz.timezone('UTC')
+            date_utc = utc_tz.localize(naive_date)
+            nepal_tz = pytz.timezone('Asia/Kathmandu')
+            nepal_date = date_utc.astimezone(nepal_tz)
+            return nepal_date.strftime('%Y-%m-%d')
+        else:
+            return date_string.strftime('%Y-%m-%d') if date_string else '-'
+    except Exception as e:
+        print(f"Error formatting date: {e}")
+        return str(date_string)[:10] if date_string else '-'

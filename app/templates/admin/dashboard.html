@@ -5,253 +5,545 @@
 {% block content %}
 
 <style>
-/* General Styles for Cards and Sections */
-.stat-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* ============================================
+   PROFESSIONAL UI - EXACTLY MATCHES OTHER PAGES
+   FULLY MOBILE OPTIMIZED
+   ============================================ */
+
+:root {
+    --primary: #0C5B3F;
+    --primary-light: #138A52;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
+
+/* Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+}
+
+/* Container */
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Cards */
+.stat-card, .card-ui {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.stat-card {
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
+
+.card-ui {
+    padding: 0;
+    overflow: hidden;
+}
+
 .stat-card h6 {
-    font-size: 0.8rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 8px;
-    color: #6b7280;
+    color: var(--gray-500);
+    margin-bottom: 0.5rem;
 }
-.stat-card .stat-value {
-    font-size: 1.8rem;
+
+.stat-value {
+    font-size: 1.5rem;
     font-weight: 700;
     line-height: 1.2;
-    margin-bottom: 4px;
+    color: var(--gray-800);
 }
-.stat-card .stat-footer {
-    font-size: 0.7rem;
-    color: #9ca3af;
+
+.stat-footer {
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    margin-top: 0.25rem;
 }
+
 .icon-box {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-.section-title {
-    margin: 30px 0 20px 0;
-    position: relative;
-}
-.section-title h5 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--primary, #0C5B3F);
-    display: inline-block;
-    margin-bottom: 0;
-}
-.section-title h5:after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 0;
-    width: 50px;
-    height: 3px;
-    background: var(--accent, #138A52);
-    border-radius: 2px;
-}
-.action-btn {
-    border: none;
-    border-radius: 12px;
-    padding: 12px 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-.action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-.activity-item {
-    display: flex;
-    gap: 15px;
-    padding: 15px 0;
-    border-bottom: 1px solid #e5e7eb;
-}
-.activity-item:last-child {
-    border-bottom: none;
-}
-.activity-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     flex-shrink: 0;
 }
+
+/* Header */
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+}
+
+.page-header p {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+/* Buttons */
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary-ui {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary-ui:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+}
+
+.btn-outline-ui:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-success-ui {
+    background: var(--success);
+    color: white;
+}
+
+.btn-success-ui:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-danger-ui {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger-ui:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-warning-ui {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-warning-ui:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+.btn-info-ui {
+    background: var(--info);
+    color: white;
+}
+
+.btn-info-ui:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Section Title */
+.section-title {
+    margin: 1.5rem 0 1rem 0;
+}
+
+.section-title h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Action Buttons Grid */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.action-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 0.75rem auto;
+}
+
+.action-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.25rem;
+}
+
+.action-desc {
+    font-size: 0.65rem;
+    color: var(--gray-400);
+}
+
+/* Activity List */
+.activity-list {
+    padding: 0;
+}
+
+.activity-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100);
+    transition: background 0.2s ease;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-item:hover {
+    background: var(--gray-50);
+}
+
+.activity-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
 .activity-content {
     flex: 1;
     min-width: 0;
 }
+
 .activity-title {
     font-weight: 600;
-    margin-bottom: 4px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
 }
+
 .activity-text {
-    font-size: 0.8rem;
-    color: #6b7280;
+    font-size: 0.75rem;
+    color: var(--gray-500);
     word-break: break-word;
 }
-.activity-time {
-    font-size: 0.7rem;
-    color: #9ca3af;
-    margin-top: 4px;
-}
-.card-ui {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 20px;
-}
-.month-icon {
-    font-size: 11px;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-.text-success { color: #16a34a !important; }
-.text-danger { color: #dc2626 !important; }
-.text-warning { color: #f59e0b !important; }
 
-/* Responsive Adjustments */
-@media(max-width: 768px) {
-    .stat-card {
-        padding: 16px;
+.activity-time {
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: var(--gray-300);
+    margin-bottom: 1rem;
+}
+
+.empty-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+}
+
+.empty-desc {
+    font-size: 0.85rem;
+    color: var(--gray-400);
+}
+
+/* Month Badge */
+.month-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Toast Notifications */
+.toast-notification {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.toast-success {
+    background: var(--success);
+    color: white;
+}
+
+.toast-error {
+    background: var(--danger);
+    color: white;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
     }
-    .stat-card .stat-value {
-        font-size: 1.4rem;
-    }
-    .icon-box {
-        width: 45px;
-        height: 45px;
-    }
-    .action-btn {
-        padding: 10px 16px;
-        font-size: 0.85rem;
-    }
-    .section-title h5 {
-        font-size: 1rem;
+    to {
+        transform: translateX(0);
+        opacity: 1;
     }
 }
-@media(max-width: 576px) {
-    .stat-card .stat-value {
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .action-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.75rem;
+    }
+    
+    .stat-value {
         font-size: 1.2rem;
     }
+    
     .icon-box {
-        width: 40px;
-        height: 40px;
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
     }
-    .month-icon {
-        font-size: 9px;
+    
+    .page-header h1 {
+        font-size: 1.25rem;
     }
-    .action-btn {
-        padding: 8px 12px;
-        font-size: 0.8rem;
+    
+    .row.g-3 {
+        --bs-gutter-y: 0.75rem;
+    }
+    
+    .action-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .action-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.2rem;
+    }
+    
+    .action-title {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+    }
+    
+    .activity-item {
+        padding: 0.75rem 1rem;
+    }
+    
+    .activity-icon {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .stat-value {
+        font-size: 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.25rem;
     }
 }
 </style>
 
-<div class="container-fluid px-0">
-
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h1 class="fw-bold mb-1" style="font-size: 1.6rem;">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </h1>
-            <p class="text-muted mb-0" style="font-size: 0.85rem;">Welcome back! Here's your business overview</p>
+            <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
+            <p>Welcome back! Here's your business overview</p>
         </div>
     </div>
 
-    <!-- STATISTICS ROW 1 -->
+    <!-- Stats Row 1 - Today's Stats -->
     <div class="row g-3 mb-4">
-        <!-- Today's Sales -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Today's Sales</h6>
-                        <div class="stat-value text-success">
-                            Rs {{ "%.2f"|format(today_sales|default(0)) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--success);">Rs {{ "%.2f"|format(today_sales|default(0)) }}</div>
                         <div class="stat-footer">{{ today_sales_count|default(0) }} transactions</div>
                     </div>
-                    <div class="icon-box" style="background: rgba(34,197,94,0.1); color: #16a34a;">
+                    <div class="icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
                         <i class="bi bi-currency-rupee"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Today's Expenses -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Today's Expenses</h6>
-                        <div class="stat-value text-danger">
-                            Rs {{ "%.2f"|format(today_expenses|default(0)) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--danger);">Rs {{ "%.2f"|format(today_expenses|default(0)) }}</div>
                         <div class="stat-footer">{{ today_expenses_count|default(0) }} expenses</div>
                     </div>
-                    <div class="icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
                         <i class="bi bi-receipt"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Today's Profit -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Today's Profit</h6>
-                        <div class="stat-value" style="color: #138A52;">
-                            Rs {{ "%.2f"|format(today_profit|default(0)) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--primary);">Rs {{ "%.2f"|format(today_profit|default(0)) }}</div>
                         <div class="stat-footer">Sales - Expenses</div>
                     </div>
-                    <div class="icon-box" style="background: rgba(19,138,82,0.1); color: #138A52;">
+                    <div class="icon-box" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
                         <i class="bi bi-graph-up"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Pending Dues -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Pending Dues</h6>
-                        <div class="stat-value text-danger">
-                            Rs {{ "%.2f"|format(pending_dues|default(0)) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--danger);">Rs {{ "%.2f"|format(pending_dues|default(0)) }}</div>
                         <div class="stat-footer">From credit sales</div>
                     </div>
-                    <div class="icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
                         <i class="bi bi-exclamation-triangle-fill"></i>
                     </div>
                 </div>
@@ -259,71 +551,56 @@
         </div>
     </div>
 
-    <!-- STATISTICS ROW 2 -->
+    <!-- Stats Row 2 - Monthly Stats -->
     <div class="row g-3 mb-4">
-        <!-- Monthly Sales -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>{{ current_month_name }} Sales</h6>
-                        <div class="stat-value" style="color: #0C5B3F;">
-                            Rs {{ "%.2f"|format(monthly_sales|default(0)) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--primary);">Rs {{ "%.2f"|format(monthly_sales|default(0)) }}</div>
                         <div class="stat-footer">{{ current_month_name }} to date</div>
                     </div>
                     <div class="icon-box" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
-                        <span class="month-icon">{{ current_month_abbr }}</span>
                         <i class="bi bi-calendar3"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Monthly Expenses -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>{{ current_month_name }} Expenses</h6>
-                        <div class="stat-value text-warning">
-                            Rs {{ "%.2f"|format(monthly_expenses|default(0)) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--warning);">Rs {{ "%.2f"|format(monthly_expenses|default(0)) }}</div>
                         <div class="stat-footer">{{ current_month_name }} to date</div>
                     </div>
                     <div class="icon-box" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
-                        <span class="month-icon">{{ current_month_abbr }}</span>
                         <i class="bi bi-calendar3"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Monthly Profit -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>{{ current_month_name }} Profit</h6>
-                        <div class="stat-value text-success">
-                            Rs {{ "%.2f"|format(monthly_profit|default(0)) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--success);">Rs {{ "%.2f"|format(monthly_profit|default(0)) }}</div>
                         <div class="stat-footer">Sales - Expenses</div>
                     </div>
-                    <div class="icon-box" style="background: rgba(34,197,94,0.1); color: #16a34a;">
-                        <span class="month-icon">{{ current_month_abbr }}</span>
+                    <div class="icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
                         <i class="bi bi-calendar3"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Total Customers -->
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Total Customers</h6>
-                        <div class="stat-value" style="color: #3b82f6;">
-                            {{ total_customers|default(0) }}
-                        </div>
+                        <div class="stat-value" style="color: var(--info);">{{ total_customers|default(0) }}</div>
                         <div class="stat-footer">{{ new_customers_this_month|default(0) }} new this month</div>
                     </div>
                     <div class="icon-box" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
@@ -334,70 +611,93 @@
         </div>
     </div>
 
-    <!-- QUICK ACTIONS -->
+    <!-- Quick Actions -->
     <div class="section-title">
-        <h5>Quick Actions</h5>
+        <h3><i class="bi bi-lightning-charge"></i> Quick Actions</h3>
     </div>
-    <div class="row g-3 mb-4">
-        <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('admin.add_sale') }}" class="action-btn" style="background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff;">
-                <i class="bi bi-plus-circle"></i> Add Sale
-            </a>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('admin.add_expense') }}" class="action-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;">
-                <i class="bi bi-plus-circle"></i> Add Expense
-            </a>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('admin.add_customer') }}" class="action-btn" style="background: linear-gradient(135deg, #0C5B3F, #138A52); color: #fff;">
-                <i class="bi bi-person-plus"></i> Add Customer
-            </a>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <a href="{{ url_for('admin.reports') }}" class="action-btn" style="background: linear-gradient(135deg, #1f2937, #374151); color: #fff;">
-                <i class="bi bi-file-text-fill"></i> View Reports
-            </a>
-        </div>
+    <div class="action-grid">
+        <a href="{{ url_for('admin.add_sale') }}" class="action-card">
+            <div class="action-icon" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                <i class="bi bi-plus-circle"></i>
+            </div>
+            <div class="action-title">Add Sale</div>
+            <div class="action-desc">Record new transaction</div>
+        </a>
+        <a href="{{ url_for('admin.add_expense') }}" class="action-card">
+            <div class="action-icon" style="background: rgba(239,68,68,0.1); color: #ef4444;">
+                <i class="bi bi-plus-circle"></i>
+            </div>
+            <div class="action-title">Add Expense</div>
+            <div class="action-desc">Record new expense</div>
+        </a>
+        <a href="{{ url_for('admin.add_customer') }}" class="action-card">
+            <div class="action-icon" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <div class="action-title">Add Customer</div>
+            <div class="action-desc">Register new customer</div>
+        </a>
+        <a href="{{ url_for('admin.reports') }}" class="action-card">
+            <div class="action-icon" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
+                <i class="bi bi-file-text-fill"></i>
+            </div>
+            <div class="action-title">View Reports</div>
+            <div class="action-desc">Business analytics</div>
+        </a>
     </div>
 
-    <!-- RECENT ACTIVITIES -->
+    <!-- Recent Activities -->
     <div class="section-title">
-        <h5>Recent Activities</h5>
+        <h3><i class="bi bi-clock-history"></i> Recent Activities</h3>
     </div>
     <div class="card-ui">
         {% if recent_activities and recent_activities|length > 0 %}
-            {% for activity in recent_activities[:5] %}
-                <div class="activity-item">
-                    <div class="activity-icon" style="background: {{ activity.icon_bg }}; color: {{ activity.icon_color }};">
-                        <i class="{{ activity.icon }}"></i>
-                    </div>
-                    <div class="activity-content">
-                        <div class="activity-title">{{ activity.title }}</div>
-                        <div class="activity-text">{{ activity.description }}</div>
-                        <div class="activity-time">
-                            <i class="bi bi-clock"></i> {{ activity.time_ago }}
+            <div class="activity-list">
+                {% for activity in recent_activities[:5] %}
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: {{ activity.icon_bg }}; color: {{ activity.icon_color }};">
+                            <i class="{{ activity.icon }}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">{{ activity.title }}</div>
+                            <div class="activity-text">{{ activity.description }}</div>
+                            <div class="activity-time">
+                                <i class="bi bi-clock"></i> {{ activity.time_ago }}
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         {% else %}
-            <div class="text-center py-5">
-                <i class="bi bi-inbox" style="font-size: 2.5rem; color: #ccc;"></i>
-                <p class="text-muted mt-3 mb-0" style="font-size: 0.85rem;">No recent activities</p>
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                <div class="empty-title">No recent activities</div>
+                <div class="empty-desc">Start adding sales and expenses to see activity here</div>
             </div>
         {% endif %}
     </div>
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.performance && window.performance.mark) {
-        window.performance.mark('dashboard-loaded');
-    }
-});
+// Show toast for flashed messages
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'}"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            showToast('{{ message|safe }}', '{{ category }}');
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 </script>
+
 {% endblock %}

@@ -30,6 +30,29 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+/* Toast Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
 .container-fluid {
     max-width: 1200px;
     margin: 0 auto;
@@ -200,7 +223,6 @@
     vertical-align: middle;
 }
 
-/* Fix action button alignment */
 .items-table td:last-child {
     text-align: center;
     vertical-align: middle;
@@ -522,6 +544,83 @@ input[readonly] {
         font-size: 1.5rem;
     }
 }
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    padding: 24px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-success-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-error-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-error-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.modal-message {
+    color: var(--gray-600);
+    margin-bottom: 24px;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
 </style>
 
 <div class="container-fluid px-md-3 py-3">
@@ -533,13 +632,13 @@ input[readonly] {
                 <h1><i class="bi bi-plus-lg"></i> New Sale</h1>
                 <p>Create a new sales invoice</p>
             </div>
-            <a href="{{ url_for('admin.sales_list') }}" class="btn-icon">
+            <a href="{{ url_for('admin.sales_list') }}" class="btn-icon" id="cancelBtn">
                 <i class="bi bi-arrow-left"></i> Cancel
             </a>
         </div>
     </div>
 
-    <form method="POST" action="{{ url_for('admin.add_sale') }}" id="saleForm">
+    <form id="saleForm">
         <!-- Form Token - Prevents duplicate submissions -->
         <input type="hidden" name="form_token" value="{{ form_token }}">
         
@@ -721,15 +820,12 @@ const PRODUCTS = [
 
 // ========== PRODUCT DEFAULTS ==========
 const PRODUCT_DEFAULTS = {
-    // Services
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
     "Paddy Grinding": { rate: 4, unit: "Kg" },
     "Turmeric Grinding": { rate: 40, unit: "Kg" },
     "Spice Grinding": { rate: 40, unit: "Kg" },
     "Others": { rate: 0, unit: "Kg" },
-    
-    // Products
     "Rice Bran": { rate: 45, unit: "Kg", fluctuates: true },
     "Mustard Cake": { rate: 45, unit: "Kg", fluctuates: true },
     "Wheat Flour": { rate: 80, unit: "Kg", fluctuates: true },
@@ -740,8 +836,83 @@ const PRODUCT_DEFAULTS = {
     "Paddy": { rate: 40, unit: "Kg", fluctuates: true },
     "Spices": { rate: 100, unit: "Kg", fluctuates: true },
     "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
-    
 };
+
+// Show modal dialog
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <button class="modal-button" onclick="closeModal('${redirectUrl}')">${redirectUrl ? 'View Sales' : 'Continue'}</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeModal(redirectUrl) {
+    const modal = document.getElementById('resultModal');
+    if (modal) modal.remove();
+    if (redirectUrl) {
+        window.location.href = redirectUrl;
+    } else {
+        // Reset form for new entry
+        resetForm();
+    }
+}
+
+function resetForm() {
+    // Reset customer fields
+    document.getElementById('customer_input').value = '';
+    document.getElementById('customer_id').value = '';
+    document.getElementById('customer_email').value = '';
+    document.getElementById('advanceBalanceSection').style.display = 'none';
+    document.getElementById('useAdvanceCheckbox').checked = false;
+    document.getElementById('advanceAmount').value = '0';
+    document.getElementById('advanceAmountSection').style.display = 'none';
+    currentAdvanceBalance = 0;
+    
+    // Reset payment
+    document.getElementById('paidAmount').value = '0';
+    document.getElementById('paidAmount').removeAttribute('data-manual');
+    document.getElementById('sendInvoiceToggle').checked = false;
+    
+    // Reset exchange checkboxes
+    const mustardCheckbox = document.getElementById('exchangeMustardCake');
+    const riceCheckbox = document.getElementById('exchangeRiceBran');
+    if (mustardCheckbox) mustardCheckbox.checked = false;
+    if (riceCheckbox) riceCheckbox.checked = false;
+    
+    // Clear all items except first row
+    const itemBody = document.getElementById('itemBody');
+    const rows = itemBody.querySelectorAll('tr');
+    for (let i = rows.length - 1; i > 0; i--) {
+        rows[i].remove();
+    }
+    
+    // Reset first row
+    const firstRow = rows[0];
+    if (firstRow) {
+        firstRow.querySelector('.product-input').value = '';
+        firstRow.querySelector('.qty').value = '0';
+        firstRow.querySelector('.rate').value = '';
+        firstRow.querySelector('.subtotal').value = '';
+        const unitSelect = firstRow.querySelector('.unit');
+        if (unitSelect) unitSelect.value = 'Kg';
+    }
+    
+    // Reset totals
+    updateGrandTotal();
+    updateExchangeVisibility();
+    
+    // Focus on customer name
+    document.getElementById('customer_input').focus();
+}
 
 function setProductDefaults(productName, row) {
     const defaults = PRODUCT_DEFAULTS[productName];
@@ -749,13 +920,11 @@ function setProductDefaults(productName, row) {
         const rateInput = row.querySelector('.rate');
         const unitSelect = row.querySelector('.unit');
         
-        // Set rate
         if (rateInput && (!rateInput.value || parseFloat(rateInput.value) === 0)) {
             rateInput.value = defaults.rate;
             rateInput.dataset.originalRate = defaults.rate;
         }
         
-        // Set unit - auto select based on product
         if (unitSelect && defaults.unit) {
             for (let i = 0; i < unitSelect.options.length; i++) {
                 if (unitSelect.options[i].value === defaults.unit) {
@@ -765,13 +934,11 @@ function setProductDefaults(productName, row) {
             }
         }
         
-        // Add visual indicator for fluctuating rates
         if (defaults.fluctuates && rateInput && !rateInput.hasAttribute('data-fluctuating')) {
             rateInput.setAttribute('data-fluctuating', 'true');
             rateInput.title = 'Rate fluctuates - can be changed';
         }
         
-        // Recalculate subtotal
         const qty = parseFloat(row.querySelector('.qty')?.value) || 0;
         const rate = parseFloat(rateInput?.value) || 0;
         const subtotal = row.querySelector('.subtotal');
@@ -823,7 +990,6 @@ function applyExchangeToRows() {
     updateGrandTotal();
 }
 
-// ========== HIDE/SHOW EXCHANGE OPTIONS BASED ON PRODUCTS ==========
 function updateExchangeVisibility() {
     const products = document.querySelectorAll('.product-input');
     let hasMustardOil = false;
@@ -863,13 +1029,11 @@ function updateExchangeVisibility() {
         }
     }
     
-    // Show/hide entire byproduct section
     if (byproductSection) {
         const anyVisible = (hasMustardOil || hasOthers);
         byproductSection.style.display = anyVisible ? 'block' : 'none';
     }
     
-    // Recalculate totals after visibility change
     applyExchangeToRows();
 }
 
@@ -877,7 +1041,6 @@ let currentAdvanceBalance = 0;
 let selectedCustomerId = null;
 let isSubmitting = false;
 
-// Product Suggestions
 function handleProductInput(e) {
     let input = e.target;
     let row = input.closest("tr");
@@ -919,7 +1082,6 @@ function attachProductListeners() {
     });
 }
 
-// Calculations
 function updateGrandTotal() {
     let total = 0;
     document.querySelectorAll(".subtotal").forEach(el => {
@@ -927,7 +1089,6 @@ function updateGrandTotal() {
     });
     document.getElementById("grandTotal").value = total.toFixed(2);
     
-    // Auto-fill cash payment with total amount if not manually edited
     let cashInput = document.getElementById("paidAmount");
     if (!cashInput.hasAttribute('data-manual')) {
         cashInput.value = total.toFixed(2);
@@ -1010,7 +1171,6 @@ function removeRow(btn) {
     }
 }
 
-// Event listeners for calculations
 document.addEventListener("input", function(e) {
     if (e.target.classList.contains("qty") || e.target.classList.contains("rate")) {
         let row = e.target.closest("tr");
@@ -1029,7 +1189,6 @@ document.addEventListener("input", function(e) {
 document.getElementById('exchangeMustardCake')?.addEventListener('change', applyExchangeToRows);
 document.getElementById('exchangeRiceBran')?.addEventListener('change', applyExchangeToRows);
 
-// Customer search
 const customerInput = document.getElementById("customer_input");
 const suggestionsDiv = document.getElementById("suggestions");
 
@@ -1090,13 +1249,11 @@ document.addEventListener("click", function(e) {
     }
 });
 
-// Allow manual edit of cash payment
 document.getElementById("paidAmount").addEventListener('input', function() {
     this.setAttribute('data-manual', 'true');
     updatePaymentCalculation();
 });
 
-// Advance checkbox
 const useAdvanceCheckbox = document.getElementById("useAdvanceCheckbox");
 if (useAdvanceCheckbox) {
     useAdvanceCheckbox.addEventListener("change", function() {
@@ -1123,7 +1280,6 @@ if (advanceAmountInput) {
     advanceAmountInput.addEventListener("input", updatePaymentCalculation);
 }
 
-// Watch for changes in the items table to update exchange visibility
 const itemObserver = new MutationObserver(function() {
     updateExchangeVisibility();
 });
@@ -1133,21 +1289,20 @@ if (itemBodyElement) {
     itemObserver.observe(itemBodyElement, { childList: true, subtree: true });
 }
 
-// ========== PREVENT DUPLICATE SUBMISSIONS ==========
-document.getElementById('saleForm').addEventListener('submit', function(e) {
+// ========== AJAX FORM SUBMISSION ==========
+document.getElementById('saleForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
     const submitBtn = document.getElementById('submitBtn');
     
-    // If already submitting, block
     if (isSubmitting) {
-        e.preventDefault();
         return false;
     }
     
     // Validate customer name
     const customerName = document.getElementById('customer_input').value.trim();
     if (!customerName) {
-        alert('Please enter customer name');
-        e.preventDefault();
+        showModal('Validation Error', 'Please enter customer name', 'error');
         return false;
     }
     
@@ -1159,8 +1314,7 @@ document.getElementById('saleForm').addEventListener('submit', function(e) {
     });
     
     if (!hasProduct) {
-        alert('Please add at least one product');
-        e.preventDefault();
+        showModal('Validation Error', 'Please add at least one product', 'error');
         return false;
     }
     
@@ -1172,26 +1326,51 @@ document.getElementById('saleForm').addEventListener('submit', function(e) {
     });
     
     if (!hasValidQty) {
-        alert('Please enter valid quantity for at least one product');
-        e.preventDefault();
+        showModal('Validation Error', 'Please enter valid quantity for at least one product', 'error');
         return false;
     }
     
-    // Mark as submitting and disable button
+    // Collect form data
+    const formData = new FormData(this);
+    
+    // Mark as submitting
     isSubmitting = true;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="loading-spinner"></span> Creating Invoice...';
     
-    // Safety: Re-enable after 15 seconds (in case of network timeout)
-    setTimeout(() => {
-        if (isSubmitting) {
+    try {
+        const response = await fetch('{{ url_for("admin.add_sale") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Success - show modal with success message
+            let message = data.message || 'Sale created successfully!';
+            if (data.invoice_number) {
+                message = `Invoice #${data.invoice_number} created successfully!`;
+            }
+            showModal('Success!', message, 'success', data.redirect || '{{ url_for("admin.sales_list") }}');
+        } else {
+            // Error - show modal with error message
+            showModal('Error', data.error || 'Failed to create sale', 'error');
+            // Re-enable button
             isSubmitting = false;
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';
         }
-    }, 15000);
-    
-    // Form will submit normally
+    } catch (error) {
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';
+    }
 });
 
 attachProductListeners();

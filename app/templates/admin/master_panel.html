@@ -2,64 +2,21 @@
 
 {% block title %}Batch Sales - {{ business_name }}{% endblock %}
 
-{% block content %}
-
+{% block extra_css %}
 <style>
-:root {
-    --primary: #0C5B3F;
-    --accent: #138A52;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --success: #10b981;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --info: #3b82f6;
-    --radius-lg: 12px;
-    --radius-md: 8px;
-    --radius-sm: 6px;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.container-fluid {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.page-header {
-    margin-bottom: 28px;
-}
-
-.page-header h1 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 6px;
-}
-
-.page-header p {
-    font-size: 0.95rem;
-    color: var(--gray-500);
-}
-
+/* Master Panel Custom Styles */
 .form-card {
     background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
 }
 
 .form-section {
-    padding: 28px;
-    border-bottom: 1px solid var(--gray-100);
+    padding: 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
 }
 
 .form-section:last-child {
@@ -67,26 +24,29 @@
 }
 
 .section-title {
-    margin-bottom: 24px;
+    margin-bottom: 1rem;
 }
 
 .section-title h3 {
-    font-size: 1.2rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 4px;
+    color: #374151;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .section-title p {
-    font-size: 0.85rem;
-    color: var(--gray-400);
-    margin-top: 4px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin: 0;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .form-group {
@@ -94,48 +54,53 @@
     flex-direction: column;
 }
 
-.form-group.full-width {
-    grid-column: span 2;
+.form-group label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    margin-bottom: 0.375rem;
 }
 
-.form-label {
+.customer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.customer-title {
     font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--gray-700);
-    margin-bottom: 8px;
+    font-weight: 600;
+    color: #0C5B3F;
 }
 
-.form-label .required {
-    color: var(--danger);
-}
-
-.form-control, .form-select {
-    padding: 12px 14px;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    font-size: 0.95rem;
+.btn-remove-customer {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    color: #ef4444;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    cursor: pointer;
     transition: all 0.2s;
-    background: white;
-    width: 100%;
 }
 
-.form-control:focus, .form-select:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
-}
-
-.form-control[readonly] {
-    background: var(--gray-50);
-    color: var(--gray-600);
+.btn-remove-customer:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
 }
 
 .advance-alert {
     background: #eff6ff;
     border: 1px solid #bfdbfe;
-    border-radius: var(--radius-md);
-    padding: 20px;
-    margin-top: 20px;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
 }
 
 .advance-info {
@@ -143,31 +108,32 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 1rem;
 }
 
 .advance-label {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: var(--gray-600);
+    color: #6b7280;
 }
 
 .advance-amount {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--info);
+    font-size: 1rem;
+    font-weight: 700;
+    color: #3b82f6;
 }
 
 .advance-checkbox {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.9rem;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.8rem;
 }
 
 .advance-checkbox input {
-    width: 18px;
-    height: 18px;
+    width: 1rem;
+    height: 1rem;
     cursor: pointer;
 }
 
@@ -182,109 +148,359 @@
 
 .items-table th {
     text-align: left;
-    padding: 14px 12px;
-    background: var(--gray-50);
-    font-size: 0.8rem;
+    padding: 0.75rem 0.5rem;
+    background: #f9fafb;
+    font-size: 0.65rem;
     font-weight: 600;
-    color: var(--gray-600);
-    border-bottom: 1px solid var(--gray-200);
+    text-transform: uppercase;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .items-table td {
-    padding: 12px;
-    border-bottom: 1px solid var(--gray-100);
+    padding: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
     vertical-align: middle;
-}
-
-.items-table td:last-child {
-    text-align: center;
-    vertical-align: middle;
-    width: 60px;
 }
 
 .items-table input, 
 .items-table select {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    height: 42px;
-    box-sizing: border-box;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.8rem;
 }
 
 .items-table input:focus, 
 .items-table select:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: #138A52;
 }
 
 .remove-item {
-    background: none;
+    background: transparent;
     border: none;
-    color: var(--gray-400);
+    color: #9ca3af;
     cursor: pointer;
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
     font-size: 1rem;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
 }
 
 .remove-item:hover {
-    color: var(--danger);
-    background: var(--gray-100);
+    color: #ef4444;
+    background: #f3f4f6;
 }
 
 .add-item-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: none;
-    border: 1px dashed var(--gray-300);
-    border-radius: var(--radius-md);
-    color: var(--gray-600);
-    font-size: 0.9rem;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s;
     width: 100%;
 }
 
 .add-item-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: #f0fdf4;
+    border-color: #138A52;
+    color: #138A52;
+    background: rgba(19,138,82,0.05);
 }
 
 .exchange-options {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
 }
 
 .exchange-checkbox {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 14px 16px;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
     background: #f0fdf4;
     border: 1px solid #bbf7d0;
-    border-radius: var(--radius-md);
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.9rem;
-    color: var(--gray-700);
+    font-size: 0.8rem;
 }
 
 .exchange-checkbox input {
-    width: 18px;
-    height: 18px;
-    margin-top: 2px;
+    width: 1rem;
+    height: 1rem;
     cursor: pointer;
-    accent-color: var(--primary);
+    accent-color: #0C5B3F;
+}
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.payment-item label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.payment-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.payment-value.due { color: #ef4444; }
+.payment-value.advance { color: #3b82f6; }
+.payment-value.paid { color: #10b981; }
+
+.batch-summary {
+    background: linear-gradient(135deg, #f9fafb 0%, white 100%);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid #e5e7eb;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.summary-card {
+    text-align: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #f3f4f6;
+}
+
+.summary-card small {
+    display: block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.summary-card strong {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.bulk-edit-bar {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.toolbar-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn-ui {
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-primary-ui {
+    background: #0C5B3F;
+    color: white;
+}
+
+.btn-primary-ui:hover {
+    background: #138A52;
+    color: white;
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.btn-outline-ui:hover {
+    border-color: #0C5B3F;
+    color: #0C5B3F;
+}
+
+.btn-success-ui {
+    background: #10b981;
+    color: white;
+}
+
+.btn-success-ui:hover {
+    background: #059669;
+    color: white;
+}
+
+.btn-add-customer {
+    background: transparent;
+    border: 1px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 0.75rem;
+    width: 100%;
+    color: #6b7280;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+}
+
+.btn-add-customer:hover {
+    border-color: #0C5B3F;
+    color: #0C5B3F;
+    background: rgba(12,91,63,0.05);
+}
+
+.save-bar {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    z-index: 99;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    margin-top: 1rem;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    z-index: 9999;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: calc(100% - 1rem);
+    margin-top: 0.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.suggestion-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.suggestion-item:hover {
+    background: #f9fafb;
+}
+
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    right: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.toast-success { background: #10b981; color: white; }
+.toast-error { background: #ef4444; color: white; }
+.toast-warning { background: #f59e0b; color: white; }
+.toast-info { background: #3b82f6; color: white; }
+
+.progress-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    min-width: 300px;
+    max-width: 500px;
+    text-align: center;
+}
+
+.progress-bar-container {
+    background: #e5e7eb;
+    border-radius: 10px;
+    height: 8px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background: #10b981;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+    border-radius: 10px;
+}
+
+.auto-save-indicator {
+    position: fixed;
+    bottom: 5rem;
+    right: 1rem;
+    background: #10b981;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 999;
+    pointer-events: none;
 }
 
 .rate-fluctuating {
@@ -292,293 +508,184 @@
     background: #fffbeb !important;
 }
 
-.payment-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-top: 24px;
-    padding: 20px;
-    background: var(--gray-50);
-    border-radius: var(--radius-md);
+.keyboard-hint {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    margin-left: 0.5rem;
 }
 
-.payment-item label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--gray-500);
-    margin-bottom: 6px;
-    display: block;
-}
-
-.payment-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--gray-800);
-}
-
-.payment-value.due { color: var(--danger); }
-.payment-value.advance { color: var(--info); }
-.payment-value.paid { color: var(--success); }
-
-.submit-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--success);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.submit-btn:hover:not(:disabled) {
-    background: #059669;
-}
-
-.submit-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.loading-spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-    margin-right: 8px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.suggestions-dropdown {
-    position: absolute;
-    z-index: 9999;
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    max-height: 220px;
-    overflow-y: auto;
-    width: 100%;
-    margin-top: 4px;
-    box-shadow: var(--shadow-md);
-}
-
-.suggestion-item {
-    padding: 12px 14px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.2s;
-}
-
-.suggestion-item:hover {
-    background: var(--gray-50);
-}
-
-.position-relative {
-    position: relative !important;
-}
-
-.toolbar-card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: 16px 24px;
-    margin-bottom: 24px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.btn-icon {
-    background: none;
-    border: 1px solid var(--gray-200);
-    padding: 8px 16px;
-    border-radius: var(--radius-md);
-    text-decoration: none;
-    color: var(--gray-600);
+.unsaved-changes-warning {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
     font-size: 0.8rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s;
-    cursor: pointer;
+    display: none;
 }
 
-.btn-icon:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--gray-50);
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
-.btn-primary-icon {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-}
-
-.btn-primary-icon:hover {
-    background: var(--accent);
-    color: white;
-}
-
-.customer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--gray-200);
-}
-
-.customer-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--gray-700);
-}
-
-.btn-remove-customer {
-    background: none;
-    border: none;
-    color: var(--danger);
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-}
-
-.btn-remove-customer:hover {
-    background: #fee2e2;
-}
-
-.save-bar {
-    position: fixed;
-    bottom: 0;
-    left: 280px;
-    right: 0;
-    background: white;
-    border-top: 1px solid var(--gray-200);
-    padding: 16px 24px;
-    display: flex;
-    justify-content: center;
-    z-index: 900;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.page-bottom-spacer {
-    height: 80px;
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
 }
 
 @media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    .payment-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    .items-table thead {
-        display: none;
-    }
+    .form-grid { grid-template-columns: 1fr !important; gap: 0.75rem; }
+    .payment-grid { grid-template-columns: 1fr !important; gap: 0.75rem; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.5rem; }
+    
+    .items-table thead { display: none; }
     .items-table tbody tr {
         display: block;
-        margin-bottom: 20px;
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-md);
-        padding: 16px;
+        margin-bottom: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
     }
     .items-table td {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 0;
+        padding: 0.5rem 0;
         border: none;
     }
     .items-table td::before {
         content: attr(data-label);
         font-weight: 600;
-        font-size: 0.8rem;
-        color: var(--gray-600);
+        font-size: 0.7rem;
+        color: #6b7280;
         min-width: 100px;
     }
-    .advance-info {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .form-section {
-        padding: 20px;
-    }
-    .save-bar {
-        left: 0;
-    }
+    .advance-info { flex-direction: column; align-items: flex-start; }
+    .bulk-edit-bar, .toolbar-card { justify-content: center; }
 }
 </style>
+{% endblock %}
 
-<div class="container-fluid px-md-3 py-3">
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto; padding: 0 1rem;">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 0.25rem;">
+                <i class="bi bi-layers"></i> Batch Sales
+            </h1>
+            <p style="color: #6b7280; margin: 0;">Add multiple customers with multiple items in one go</p>
+        </div>
+        <a href="{{ url_for('admin.sales_list') }}" class="btn-ui btn-outline-ui">
+            <i class="bi bi-arrow-left"></i> Back to Sales
+        </a>
+    </div>
 
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1><i class="bi bi-layers"></i> Batch Sales</h1>
-                <p>Add multiple customers with multiple items in one go</p>
+   
+
+
+    <!-- Batch Summary Panel -->
+    <div class="batch-summary" id="batchSummary">
+        <div class="summary-grid">
+            <div class="summary-card">
+                <small><i class="bi bi-people"></i> Total Customers</small>
+                <strong id="totalCustomers">0</strong>
             </div>
-            <a href="{{ url_for('admin.sales_list') }}" class="btn-icon">
-                <i class="bi bi-arrow-left"></i> Back to Sales
-            </a>
+            <div class="summary-card">
+                <small><i class="bi bi-calculator"></i> Total Sales</small>
+                <strong id="totalSalesAmount">Rs 0</strong>
+            </div>
+            <div class="summary-card">
+                <small><i class="bi bi-credit-card"></i> Total Advance Used</small>
+                <strong id="totalAdvanceUsed">Rs 0</strong>
+            </div>
+            <div class="summary-card">
+                <small><i class="bi bi-cash-stack"></i> Total Cash</small>
+                <strong id="totalCashCollected">Rs 0</strong>
+            </div>
+            <div class="summary-card">
+                <small><i class="bi bi-envelope"></i> Emails to Send</small>
+                <strong id="totalEmailsToSend">0</strong>
+            </div>
         </div>
     </div>
 
+    <!-- Bulk Edit Toolbar -->
+    <div class="bulk-edit-bar">
+        <button type="button" class="btn-ui btn-outline-ui" onclick="bulkSetCashPaid()">
+            <i class="bi bi-cash-stack"></i> Set All Cash Paid
+        </button>
+        <button type="button" class="btn-ui btn-outline-ui" onclick="bulkClearAdvance()">
+            <i class="bi bi-credit-card"></i> Clear All Advance
+        </button>
+        <button type="button" class="btn-ui btn-outline-ui" onclick="bulkSetAllEmails()">
+            <i class="bi bi-envelope-check"></i> Enable All Emails
+        </button>
+        <button type="button" class="btn-ui btn-outline-ui" onclick="exportBatchToExcel()">
+            <i class="bi bi-file-spreadsheet"></i> Export Batch
+        </button>
+        <button type="button" class="btn-ui btn-outline-ui" onclick="printBatchSummary()">
+            <i class="bi bi-printer"></i> Print Summary
+        </button>
+
+    </div>
+
+    <!-- Toolbar -->
     <div class="toolbar-card">
-        <button type="button" class="btn-icon" onclick="exportSales()">
-            <i class="bi bi-file-earmark-excel"></i> Export
+        <button type="button" class="btn-ui btn-outline-ui" onclick="downloadTemplate()">
+            <i class="bi bi-download"></i> Download Template
         </button>
-        <button type="button" class="btn-icon" onclick="downloadTemplate()">
-            <i class="bi bi-download"></i> Template
-        </button>
-        <label class="btn-icon">
+        <label class="btn-ui btn-outline-ui" style="cursor: pointer;">
             <i class="bi bi-upload"></i> Import to Form
             <input type="file" id="importExcelPreview" accept=".xlsx,.xls" style="display:none" onchange="importSales(this, true)">
         </label>
-        <label class="btn-icon btn-primary-icon">
+        <label class="btn-ui btn-primary-ui" style="cursor: pointer;">
             <i class="bi bi-lightning"></i> Import & Save
             <input type="file" id="importExcelSave" accept=".xlsx,.xls" style="display:none" onchange="importSales(this, false)">
         </label>
-    </div>
-
-    <div id="customersContainer"></div>
-
-    <div class="text-center mb-3">
-        <button type="button" class="btn-icon" id="addCustomerBtn" style="border-color: var(--accent); color: var(--accent);">
-            <i class="bi bi-plus-lg"></i> Add Another Customer
+        <button type="button" class="btn-ui btn-outline-ui" onclick="loadDraft()">
+            <i class="bi bi-arrow-counterclockwise"></i> Restore Draft
+        </button>
+        <button type="button" class="btn-ui btn-outline-ui" onclick="showRollbackDialog()" id="rollbackBtn" style="display: none;">
+            <i class="bi bi-arrow-undo"></i> Undo Last Batch
+        </button>
+        <button type="button" class="btn-ui btn-outline-ui" onclick="showBatchHistory()">
+            <i class="bi bi-clock-history"></i> Batch History
         </button>
     </div>
 
-    <div class="page-bottom-spacer"></div>
+    <!-- Customers Container -->
+    <div id="customersContainer"></div>
+
+    <!-- Add Customer Button -->
+    <button type="button" class="btn-add-customer" id="addCustomerBtn">
+        <i class="bi bi-plus-lg"></i> Add Another Customer
+    </button>
 </div>
 
+<!-- Save Bar -->
 <div class="save-bar">
-    <button type="button" class="submit-btn" id="saveAllBtn" style="width: auto; padding: 12px 32px;">
+    <button type="button" class="btn-ui btn-success-ui" id="saveAllBtn" style="padding: 0.75rem 2rem; min-width: 200px;">
         <i class="bi bi-check2-circle"></i> Save All Sales
     </button>
 </div>
 
+<!-- Auto-save Indicator -->
+<div class="auto-save-indicator" id="autoSaveIndicator">
+    <i class="bi bi-check-circle"></i> Draft Saved
+</div>
+
 <script>
-// Product list for suggestions
+// ============================================
+// PRODUCT DATA
+// ============================================
 const PRODUCTS = [
     "Mustard Oil Extraction", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
     "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
     "Turmeric Powder", "Others"
 ];
 
-// PRODUCT DEFAULTS
 const PRODUCT_DEFAULTS = {
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
@@ -598,20 +705,19 @@ const PRODUCT_DEFAULTS = {
     "Others": { rate: 0, unit: "Kg" }
 };
 
-function isMustardExtraction(name) {
-    return (name || '').toLowerCase().includes('mustard oil extraction');
-}
-
-function isOthersProduct(name) {
-    const n = (name || '').toLowerCase().trim();
-    return n === 'others' || n === 'mustard cake, others' || n.endsWith(', others');
-}
-
+// ============================================
+// GLOBAL VARIABLES
+// ============================================
 let customerUidCounter = 0;
 let itemUidCounter = 0;
 let customers = [];
 let isSaving = false;
-
+let autoSaveTimer = null;
+let hasUnsavedChanges = false;
+let lastBatchId = null;
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
 function nextCustomerId() { return ++customerUidCounter; }
 function nextItemId() { return ++itemUidCounter; }
 
@@ -623,6 +729,36 @@ function findItem(customer, itemUid) {
     return customer.items.find(i => i.uid === itemUid);
 }
 
+function isMustardExtraction(name) {
+    return (name || '').toLowerCase().includes('mustard oil extraction');
+}
+
+function isOthersProduct(name) {
+    const n = (name || '').toLowerCase().trim();
+    return n === 'others' || n === 'mustard cake, others' || n.endsWith(', others');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[m]));
+}
+
+function showToast(message, type, duration = 4000) {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `<i class="bi ${type === 'success' ? 'bi-check-circle-fill' : type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill'}"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// ============================================
+// CORE FUNCTIONS
+// ============================================
 function createEmptyItem() {
     return {
         uid: nextItemId(),
@@ -652,7 +788,8 @@ function createEmptyCustomer() {
         maxAdvance: 0,
         paymentStatus: 'pending',
         exchangeMustardCake: false,
-        exchangeRiceBran: false
+        exchangeRiceBran: false,
+        sendEmail: false
     };
 }
 
@@ -725,52 +862,459 @@ function paymentStatusLabel(customer) {
     return { cls: '', text: 'Rs 0.00' };
 }
 
-function addCustomer() {
-    const customer = createEmptyCustomer();
-    customers.push(customer);
-    render();
+// ============================================
+// BATCH SUMMARY UPDATE
+// ============================================
+function updateBatchSummary() {
+    const totalCustomers = customers.length;
+    const totalSales = customers.reduce((sum, c) => sum + (c.totalAmount || 0), 0);
+    const totalAdvance = customers.reduce((sum, c) => sum + (c.advanceUsed || 0), 0);
+    const totalCash = customers.reduce((sum, c) => sum + (c.cashPaid || 0), 0);
+    const totalEmails = customers.filter(c => c.sendEmail && c.email).length;
+    
+    document.getElementById('totalCustomers').textContent = totalCustomers;
+    document.getElementById('totalSalesAmount').innerHTML = `Rs ${totalSales.toFixed(2)}`;
+    document.getElementById('totalAdvanceUsed').innerHTML = `Rs ${totalAdvance.toFixed(2)}`;
+    document.getElementById('totalCashCollected').innerHTML = `Rs ${totalCash.toFixed(2)}`;
+    document.getElementById('totalEmailsToSend').textContent = totalEmails;
 }
 
-function addItem(customerUid) {
-    const customer = findCustomer(customerUid);
-    if (!customer) return;
-    customer.items.push(createEmptyItem());
-    calculateTotals(customer);
-    render();
+// ============================================
+// AUTO-SAVE DRAFT
+// ============================================
+function autoSaveDraft() {
+    if (customers.length === 0) return;
+    
+    const hasData = customers.some(c => c.customerName || c.items.some(i => i.product_name));
+    if (!hasData) return;
+    
+    const draft = {
+        data: customers,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    };
+    localStorage.setItem('batch_sales_draft', JSON.stringify(draft));
+    
+    const indicator = document.getElementById('autoSaveIndicator');
+    indicator.style.opacity = '1';
+    setTimeout(() => { indicator.style.opacity = '0'; }, 1000);
 }
 
-function removeItem(customerUid, itemUid) {
-    const customer = findCustomer(customerUid);
-    if (!customer) return;
-    if (customer.items.length === 1) {
-        customer.items[0] = createEmptyItem();
-        notify('Cannot remove last item. Clear values instead.', 'warning');
-    } else {
-        customer.items = customer.items.filter(i => i.uid !== itemUid);
+function loadDraft() {
+    const saved = localStorage.getItem('batch_sales_draft');
+    if (!saved) {
+        showToast('No saved draft found', 'info');
+        return;
     }
-    calculateTotals(customer);
-    render();
+    
+    try {
+        const draft = JSON.parse(saved);
+        const minutesAgo = (new Date() - new Date(draft.timestamp)) / 60000;
+        
+        if (draft.data && draft.data.length > 0) {
+            if (minutesAgo < 60) {
+                if (confirm(`Restore draft from ${Math.floor(minutesAgo)} minutes ago?`)) {
+                    customers = draft.data;
+                    customerUidCounter = Math.max(...customers.map(c => c.uid), 0);
+                    itemUidCounter = Math.max(...customers.flatMap(c => c.items.map(i => i.uid)), 0);
+                    render();
+                    showToast('Draft restored successfully', 'success');
+                }
+            } else {
+                showToast('Draft is too old (> 60 minutes)', 'warning');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading draft:', error);
+        showToast('Failed to load draft', 'error');
+    }
 }
 
-function removeCustomer(customerUid) {
-    customers = customers.filter(c => c.uid !== customerUid);
-    if (customers.length === 0) addCustomer();
-    else render();
+function markUnsavedChanges() {
+    if (!hasUnsavedChanges) {
+        hasUnsavedChanges = true;
+        document.getElementById('unsavedWarning').style.display = 'block';
+    }
+    
+    clearTimeout(window.unsavedTimer);
+    window.unsavedTimer = setTimeout(() => {
+        autoSaveDraft();
+    }, 2000);
 }
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>"']/g, m => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[m]));
+// ============================================
+// BULK EDIT FUNCTIONS
+// ============================================
+function bulkSetCashPaid() {
+    const amount = prompt('Enter cash paid amount for ALL customers:', '0');
+    if (amount !== null && !isNaN(parseFloat(amount))) {
+        customers.forEach(c => {
+            c.cashPaid = parseFloat(amount) || 0;
+            calculateTotals(c);
+        });
+        render();
+        showToast(`Set cash paid to Rs ${parseFloat(amount).toFixed(2)} for all customers`, 'success');
+        markUnsavedChanges();
+    }
 }
 
-function formatNumber(num) {
-    if (num === undefined || num === null) return '0.00';
-    return num.toFixed(2);
+function bulkClearAdvance() {
+    if (confirm('Clear advance usage for ALL customers?')) {
+        customers.forEach(c => {
+            c.advanceUsed = 0;
+            c.useAdvance = false;
+            calculateTotals(c);
+        });
+        render();
+        showToast('All advance usage cleared', 'success');
+        markUnsavedChanges();
+    }
 }
 
-// PRODUCT SUGGESTION HANDLER - FIXED VERSION
+function bulkSetAllEmails() {
+    if (confirm('Enable email sending for ALL customers with email addresses?')) {
+        customers.forEach(c => {
+            if (c.email) {
+                c.sendEmail = true;
+            }
+        });
+        render();
+        showToast('Email sending enabled for all customers with email', 'success');
+        markUnsavedChanges();
+    }
+}
+
+function exportBatchToExcel() {
+    const { salesData } = validateBeforeSave();
+    if (!salesData.length) {
+        showToast('No data to export', 'warning');
+        return;
+    }
+    
+    let csv = 'Customer Name,Email,Product,Quantity,Unit,Rate,Subtotal,Advance Used,Cash Paid\n';
+    salesData.forEach(customer => {
+        customer.items.forEach(item => {
+            csv += `"${customer.customer_name}","${customer.email || ''}","${item.product_name}",${item.quantity},${item.unit},${item.rate},${item.subtotal},${customer.advance_used},${customer.cash_paid}\n`;
+        });
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `batch_export_${new Date().toISOString().slice(0,19)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Export complete', 'success');
+}
+
+function printBatchSummary() {
+    const { salesData } = validateBeforeSave();
+    if (!salesData.length) {
+        showToast('No data to print', 'warning');
+        return;
+    }
+    
+    const printWindow = window.open('', '_blank');
+    const totalSales = salesData.reduce((sum, c) => sum + c.items.reduce((s, i) => s + i.subtotal, 0), 0);
+    const totalCash = salesData.reduce((sum, c) => sum + c.cash_paid, 0);
+    const totalAdvance = salesData.reduce((sum, c) => sum + c.advance_used, 0);
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Batch Sales Summary</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1 { color: #0C5B3F; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background: #f5f5f5; }
+                .summary { margin: 20px 0; padding: 10px; background: #f9fafb; border-radius: 8px; }
+                .total { font-weight: bold; font-size: 1.2em; margin-top: 20px; }
+            </style>
+        </head>
+        <body>
+            <h1>Batch Sales Summary</h1>
+            <div class="summary">
+                <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+                <p><strong>Total Customers:</strong> ${salesData.length}</p>
+                <p><strong>Total Sales:</strong> Rs ${totalSales.toFixed(2)}</p>
+                <p><strong>Total Cash Collected:</strong> Rs ${totalCash.toFixed(2)}</p>
+                <p><strong>Total Advance Used:</strong> Rs ${totalAdvance.toFixed(2)}</p>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Customer</th><th>Email</th><th>Products</th><th>Total</th><th>Cash</th><th>Advance</th><th>Due</th></tr>
+                </thead>
+                <tbody>
+                    ${salesData.map(c => `
+                        <tr>
+                            <td>${c.customer_name}</td>
+                            <td>${c.email || '-'}</td>
+                            <td>${c.items.map(i => `${i.product_name}(${i.quantity})`).join(', ')}</td>
+                            <td>Rs ${c.items.reduce((s,i)=>s+i.subtotal,0).toFixed(2)}</td>
+                            <td>Rs ${c.cash_paid}</td>
+                            <td>Rs ${c.advance_used}</td>
+                            <td>Rs ${(c.items.reduce((s,i)=>s+i.subtotal,0) - c.cash_paid - c.advance_used).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div class="total">
+                <p>Total Collected: Rs ${(totalCash + totalAdvance).toFixed(2)}</p>
+            </div>
+            <script>window.print();setTimeout(()=>window.close(),500);<\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+// ============================================
+// PROGRESS INDICATOR
+// ============================================
+function showProgressModal(total, current = 0, message = '') {
+    let modal = document.getElementById('progressModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'progressModal';
+        modal.className = 'progress-overlay';
+        modal.innerHTML = `
+            <div class="progress-modal">
+                <h4><i class="bi bi-hourglass-split"></i> Saving Sales...</h4>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                <div class="progress-stats" id="progressStats">0/${total} completed</div>
+                <div class="progress-message" id="progressMessage" style="margin-top: 10px; font-size: 0.85rem;"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    const percent = (current / total) * 100;
+    modal.querySelector('.progress-bar-fill').style.width = `${percent}%`;
+    modal.querySelector('#progressStats').textContent = `${current}/${total} completed`;
+    if (message) modal.querySelector('#progressMessage').textContent = message;
+    
+    modal.style.display = 'flex';
+}
+
+function hideProgressModal() {
+    const modal = document.getElementById('progressModal');
+    if (modal) modal.remove();
+}
+
+// ============================================
+// VALIDATION BEFORE SAVE
+// ============================================
+function validateBeforeSave() {
+    const salesData = [];
+    const validationErrors = [];
+    
+    for (const customer of customers) {
+        const name = (customer.customerName || '').trim();
+        const validItems = customer.items.filter(item => {
+            if (!item.product_name || !item.product_name.trim()) return false;
+            if ((parseFloat(item.quantity) || 0) <= 0) return false;
+            return true;
+        });
+        
+        if (!name || !validItems.length) continue;
+        
+        calculateTotals(customer);
+        
+        if (customer.advanceUsed > 0 && !customer.customerId) {
+            validationErrors.push(`${name}: Cannot use advance without selecting a registered customer`);
+            continue;
+        }
+        if (customer.advanceUsed > (customer.advanceBalance || 0)) {
+            validationErrors.push(`${name}: Insufficient advance balance. Available: Rs ${(customer.advanceBalance || 0).toFixed(2)}`);
+            continue;
+        }
+        if (customer.advanceUsed > customer.totalAmount) {
+            validationErrors.push(`${name}: Advance cannot exceed total amount (Rs ${customer.totalAmount.toFixed(2)})`);
+            continue;
+        }
+        
+        salesData.push({
+            customer_id: customer.customerId,
+            customer_name: name,
+            email: customer.email,
+            send_email: customer.sendEmail,
+            items: validItems.map(item => ({
+                product_name: item.product_name.trim(),
+                quantity: parseFloat(item.quantity) || 0,
+                unit: item.unit || 'Kg',
+                rate: parseFloat(item.rate) || 0,
+                subtotal: parseFloat(item.subtotal) || 0
+            })),
+            advance_used: parseFloat(customer.advanceUsed) || 0,
+            cash_paid: parseFloat(customer.cashPaid) || 0,
+            exchange_mustard_cake: !!customer.exchangeMustardCake,
+            exchange_rice_bran: !!customer.exchangeRiceBran
+        });
+    }
+    
+    return { salesData, validationErrors };
+}
+
+// ============================================
+// SAVE ALL SALES WITH PROGRESS
+// ============================================
+async function saveAllSales() {
+    if (isSaving) return;
+    
+    const { salesData, validationErrors } = validateBeforeSave();
+    
+    if (validationErrors.length) {
+        showToast(validationErrors.join('\n'), 'error');
+        return;
+    }
+    
+    if (!salesData.length) {
+        showToast('No valid sales data to save. Please add customer name and at least one product with quantity.', 'warning');
+        return;
+    }
+    
+    const saveBtn = document.getElementById('saveAllBtn');
+    isSaving = true;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+    
+    try {
+        const response = await fetch('/admin/master-panel/save-with-rollback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ customers: salesData })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            lastBatchId = result.batch_id;
+            
+            // Show rollback button
+            const rollbackBtn = document.getElementById('rollbackBtn');
+            if (rollbackBtn) {
+                rollbackBtn.style.display = 'inline-flex';
+            }
+            
+            showToast(result.message, 'success');
+            
+            localStorage.removeItem('batch_sales_draft');
+            customers = [];
+            addCustomer();
+            hasUnsavedChanges = false;
+            document.getElementById('unsavedWarning').style.display = 'none';
+        } else {
+            showToast(result.error || 'Save failed', 'error');
+        }
+    } catch (error) {
+        showToast('Error saving sales: ' + error.message, 'error');
+    } finally {
+        isSaving = false;
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="bi bi-check2-circle"></i> Save All Sales';
+    }
+}
+
+// ============================================
+// CUSTOMER INPUT HANDLER (with auto email fetch)
+// ============================================
+function handleCustomerInput(e) {
+    let input = e.target;
+    let card = input.closest('.form-card');
+    let box = card.querySelector(".customer-suggestions");
+    let query = input.value.toLowerCase().trim();
+    let customerUid = parseInt(input.getAttribute("data-customer-uid"));
+    
+    if (!query || query.length < 2) {
+        box.style.display = "none";
+        return;
+    }
+    
+    fetch(`/admin/master-panel/api/customer/search?name=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            box.innerHTML = "";
+            
+            if (data.suggestions && data.suggestions.length) {
+                box.style.display = "block";
+                data.suggestions.forEach(s => {
+                    let div = document.createElement("div");
+                    div.className = "suggestion-item";
+                    div.textContent = s.name;
+                    div.onclick = () => {
+                        fetch(`/admin/master-panel/api/customer/${s.id}/advance`)
+                            .then(res => res.json())
+                            .then(advanceData => {
+                                const customer = findCustomer(customerUid);
+                                if (customer) {
+                                    customer.customerId = s.id;
+                                    customer.customerName = s.name;
+                                    customer.advanceBalance = advanceData.advance_balance || 0;
+                                    
+                                    if (s.email) {
+                                        customer.email = s.email;
+                                        const emailInput = card.querySelector('.customer-email-input');
+                                        if (emailInput) emailInput.value = s.email;
+                                    }
+                                    
+                                    calculateTotals(customer);
+                                    render();
+                                    markUnsavedChanges();
+                                }
+                            });
+                        input.value = s.name;
+                        box.style.display = "none";
+                    };
+                    box.appendChild(div);
+                });
+            }
+            
+            if (data.can_create && query) {
+                let div = document.createElement("div");
+                div.className = "suggestion-item";
+                div.style.borderTop = "1px solid #e5e7eb";
+                div.style.color = "#0C5B3F";
+                div.innerHTML = `<i class="bi bi-plus-circle"></i> Create "${escapeHtml(query)}"`;
+                div.onclick = () => {
+                    fetch('/admin/master-panel/api/customer/create', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: query })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            const customer = findCustomer(customerUid);
+                            if (customer) {
+                                customer.customerId = data.customer.id;
+                                customer.customerName = data.customer.name;
+                                customer.advanceBalance = 0;
+                                calculateTotals(customer);
+                                render();
+                                markUnsavedChanges();
+                            }
+                            input.value = data.customer.name;
+                            showToast('Customer created successfully!', 'success');
+                        } else {
+                            showToast('Failed to create customer', 'error');
+                        }
+                    });
+                    box.style.display = "none";
+                };
+                box.appendChild(div);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// ============================================
+// PRODUCT INPUT HANDLER
+// ============================================
 function handleProductInput(e) {
     let input = e.target;
     let row = input.closest("tr");
@@ -812,6 +1356,7 @@ function handleProductInput(e) {
                     }
                     calculateTotals(customer);
                     render();
+                    markUnsavedChanges();
                 }
             };
             box.appendChild(div);
@@ -823,109 +1368,9 @@ function handleProductInput(e) {
     }
 }
 
-function attachProductListeners() {
-    document.querySelectorAll('.product-input').forEach(input => {
-        input.removeEventListener('input', handleProductInput);
-        input.addEventListener('input', handleProductInput);
-    });
-}
-
-// Hide suggestions when clicking outside
-document.addEventListener('click', function(e) {
-    if (!e.target.classList.contains('product-input')) {
-        document.querySelectorAll('.product-suggestions').forEach(box => {
-            box.style.display = 'none';
-        });
-    }
-});
-
-function handleCustomerInput(e) {
-    let input = e.target;
-    let card = input.closest('.form-card');
-    let box = card.querySelector(".customer-suggestions");
-    let query = input.value.toLowerCase().trim();
-    let customerUid = parseInt(input.getAttribute("data-customer-uid"));
-    
-    if (!query || query.length < 2) {
-        box.style.display = "none";
-        return;
-    }
-    
-    fetch(`/admin/master-panel/api/customer/search?name=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-            box.innerHTML = "";
-            
-            if (data.suggestions && data.suggestions.length) {
-                box.style.display = "block";
-                data.suggestions.forEach(s => {
-                    let div = document.createElement("div");
-                    div.className = "suggestion-item";
-                    div.textContent = s.name;
-                    div.onclick = () => {
-                        fetch(`/admin/master-panel/api/customer/${s.id}/advance`)
-                            .then(res => res.json())
-                            .then(advanceData => {
-                                const customer = findCustomer(customerUid);
-                                if (customer) {
-                                    customer.customerId = s.id;
-                                    customer.customerName = s.name;
-                                    customer.advanceBalance = advanceData.advance_balance || 0;
-                                    calculateTotals(customer);
-                                    render();
-                                }
-                            });
-                        input.value = s.name;
-                        box.style.display = "none";
-                    };
-                    box.appendChild(div);
-                });
-            }
-            
-            if (data.can_create && query) {
-                let div = document.createElement("div");
-                div.className = "suggestion-item";
-                div.style.borderTop = "1px solid var(--gray-200)";
-                div.style.color = "var(--primary)";
-                div.innerHTML = `<i class="bi bi-plus-circle"></i> Create "${escapeHtml(query)}"`;
-                div.onclick = () => {
-                    fetch('/admin/master-panel/api/customer/create', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: query })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            const customer = findCustomer(customerUid);
-                            if (customer) {
-                                customer.customerId = data.customer.id;
-                                customer.customerName = data.customer.name;
-                                customer.advanceBalance = 0;
-                                calculateTotals(customer);
-                                render();
-                            }
-                            input.value = data.customer.name;
-                            notify('Customer created successfully!', 'success');
-                        } else {
-                            notify('Failed to create customer', 'danger');
-                        }
-                    });
-                    box.style.display = "none";
-                };
-                box.appendChild(div);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-function attachCustomerListeners() {
-    document.querySelectorAll('.customer-name-input').forEach(input => {
-        input.removeEventListener('input', handleCustomerInput);
-        input.addEventListener('input', handleCustomerInput);
-    });
-}
-
+// ============================================
+// RENDER FUNCTION
+// ============================================
 function render() {
     const container = document.getElementById('customersContainer');
     if (!container) return;
@@ -936,7 +1381,6 @@ function render() {
         const status = paymentStatusLabel(customer);
         const hasMustardOil = customer.items.some(item => isMustardExtraction(item.product_name));
         const hasOthers = customer.items.some(item => isOthersProduct(item.product_name));
-        const showExchange = hasMustardOil || hasOthers;
         
         return `
         <div class="form-card" data-customer-uid="${customer.uid}">
@@ -952,14 +1396,21 @@ function render() {
                 
                 <div class="form-grid">
                     <div class="form-group position-relative">
-                        <label class="form-label">Customer Name <span class="required">*</span></label>
-                        <input type="text" class="form-control customer-name-input" data-customer-uid="${customer.uid}" value="${escapeHtml(customer.customerName)}" placeholder="Search or enter customer name..." autocomplete="off">
+                        <label>Customer Name <span style="color: #ef4444;">*</span></label>
+                        <input type="text" class="form-control customer-name-input" data-customer-uid="${customer.uid}" value="${escapeHtml(customer.customerName)}" placeholder="Search or enter customer name..." autocomplete="off" oninput="markUnsavedChanges()">
                         <div class="suggestions-dropdown customer-suggestions" style="display: none;"></div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" class="form-control customer-email-input" data-customer-uid="${customer.uid}" value="${escapeHtml(customer.email)}" placeholder="for invoice">
+                        <label>Email Address</label>
+                        <input type="email" class="form-control customer-email-input" data-customer-uid="${customer.uid}" value="${escapeHtml(customer.email)}" placeholder="for invoice" oninput="updateEmail(${customer.uid}, this.value); markUnsavedChanges()">
                     </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 0.5rem;">
+                    <label class="advance-checkbox">
+                        <input type="checkbox" class="send-email-checkbox" data-customer-uid="${customer.uid}" ${customer.sendEmail ? 'checked' : ''} onchange="toggleSendEmail(${customer.uid}, this.checked); markUnsavedChanges()">
+                        <span><i class="bi bi-envelope"></i> Send invoice email to customer</span>
+                    </label>
                 </div>
                 
                 ${customer.advanceBalance > 0 ? `
@@ -970,14 +1421,14 @@ function render() {
                             <div class="advance-amount">Rs ${customer.advanceBalance.toFixed(2)}</div>
                         </div>
                         <label class="advance-checkbox">
-                            <input type="checkbox" class="use-advance-checkbox" data-customer-uid="${customer.uid}" ${customer.useAdvance ? 'checked' : ''} onchange="toggleAdvance(${customer.uid}, this.checked)">
+                            <input type="checkbox" class="use-advance-checkbox" data-customer-uid="${customer.uid}" ${customer.useAdvance ? 'checked' : ''} onchange="toggleAdvance(${customer.uid}, this.checked); markUnsavedChanges()">
                             <span>Use advance balance</span>
                         </label>
                     </div>
                     <div id="advanceAmountSection_${customer.uid}" style="display: ${customer.useAdvance ? 'block' : 'none'}; margin-top: 12px;">
-                        <label class="form-label">Amount to use (Rs)</label>
-                        <input type="number" class="form-control advance-used-input" data-customer-uid="${customer.uid}" step="0.01" min="0" value="${customer.advanceUsed}" onchange="updateAdvance(${customer.uid}, this.value)">
-                        <small class="text-muted">Max available: Rs ${customer.maxAdvance.toFixed(2)}</small>
+                        <label style="font-size: 0.7rem; font-weight: 600;">Amount to use (Rs)</label>
+                        <input type="number" class="form-control advance-used-input" data-customer-uid="${customer.uid}" step="0.01" min="0" value="${customer.advanceUsed}" onchange="updateAdvance(${customer.uid}, this.value); markUnsavedChanges()">
+                        <small style="color: #6b7280;">Max available: Rs ${customer.maxAdvance.toFixed(2)}</small>
                     </div>
                 </div>
                 ` : ''}
@@ -1007,49 +1458,53 @@ function render() {
                                 const isFluctuating = defaults && defaults.fluctuates;
                                 return `
                             <tr>
-                                <td data-label="Product" class="position-absolute">
-                                    <input type="text" class="form-control product-input" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" value="${escapeHtml(item.product_name)}" placeholder="Type product name..." autocomplete="off">
+                                <td data-label="Product" class="position-relative">
+                                    <input type="text" class="form-control product-input" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" value="${escapeHtml(item.product_name)}" placeholder="Type product name..." autocomplete="off" oninput="markUnsavedChanges()">
                                     <div class="suggestions-dropdown product-suggestions" style="display: none;"></div>
-                                 </td>
+                                  </td>
                                 <td data-label="Quantity">
-                                    <input type="number" class="form-control qty-input" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" step="any" value="${item.quantity}" onchange="updateItem(${customer.uid}, ${item.uid}, 'qty', this.value)">
-                                 </td>
+                                    <input type="number" class="form-control qty-input" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" step="any" value="${item.quantity}" onchange="updateItem(${customer.uid}, ${item.uid}, 'qty', this.value); markUnsavedChanges()">
+                                  </td>
                                 <td data-label="Unit">
-                                    <select class="form-control unit-select" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" onchange="updateItem(${customer.uid}, ${item.uid}, 'unit', this.value)">
+                                    <select class="form-control unit-select" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" onchange="updateItem(${customer.uid}, ${item.uid}, 'unit', this.value); markUnsavedChanges()">
                                         <option value="Kg" ${item.unit === 'Kg' ? 'selected' : ''}>Kg</option>
                                         <option value="Liter" ${item.unit === 'Liter' ? 'selected' : ''}>Liter</option>
                                         <option value="Piece" ${item.unit === 'Piece' ? 'selected' : ''}>Piece</option>
                                         <option value="Quintal" ${item.unit === 'Quintal' ? 'selected' : ''}>Quintal</option>
                                     </select>
-                                 </td>
+                                  </td>
                                 <td data-label="Rate">
-                                    <input type="number" class="form-control rate ${isFluctuating ? 'rate-fluctuating' : ''}" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" step="any" value="${item.rate}" ${isFluctuating ? 'data-fluctuating="true"' : ''} onchange="updateItem(${customer.uid}, ${item.uid}, 'rate', this.value)">
-                                 </td>
+                                    <input type="number" class="form-control rate ${isFluctuating ? 'rate-fluctuating' : ''}" data-customer-uid="${customer.uid}" data-item-uid="${item.uid}" step="any" value="${item.rate}" onchange="updateItem(${customer.uid}, ${item.uid}, 'rate', this.value); markUnsavedChanges()">
+                                  </td>
                                 <td data-label="Subtotal">
-                                    <input type="text" class="form-control subtotal-display" readonly style="background: var(--gray-50);" value="Rs ${item.subtotal.toFixed(2)}">
-                                 </td>
+                                    <input type="text" class="form-control subtotal-display" readonly style="background: #f9fafb;" value="Rs ${item.subtotal.toFixed(2)}">
+                                  </td>
                                 <td data-label="Action">
-                                    <button type="button" class="remove-item" onclick="removeItem(${customer.uid}, ${item.uid})">✕</button>
-                                 </td>
+                                    <button type="button" class="remove-item" onclick="removeItem(${customer.uid}, ${item.uid}); markUnsavedChanges()">✕</button>
+                                  </td>
                             </tr>`;
                             }).join('')}
                         </tbody>
                     </table>
                 </div>
                 
-                <button type="button" class="add-item-btn" onclick="addItem(${customer.uid})">
+                <button type="button" class="add-item-btn" onclick="addItem(${customer.uid}); markUnsavedChanges()">
                     <i class="bi bi-plus"></i> Add another item
                 </button>
                 
-                <div class="exchange-options" style="display: flex; margin-top: 20px;">
-                    <label class="exchange-checkbox" style="display: ${hasMustardOil ? 'flex' : 'none'};">
-                        <input type="checkbox" class="exchange-mustard-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeMustardCake ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'mustard', this.checked)">
+                <div class="exchange-options">
+                    ${hasMustardOil ? `
+                    <label class="exchange-checkbox">
+                        <input type="checkbox" class="exchange-mustard-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeMustardCake ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'mustard', this.checked); markUnsavedChanges()">
                         <span>Customer left <strong>Mustard Cake</strong></span>
                     </label>
-                    <label class="exchange-checkbox" style="display: ${hasOthers ? 'flex' : 'none'};">
-                        <input type="checkbox" class="exchange-rice-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeRiceBran ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'rice', this.checked)">
+                    ` : ''}
+                    ${hasOthers ? `
+                    <label class="exchange-checkbox">
+                        <input type="checkbox" class="exchange-rice-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeRiceBran ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'rice', this.checked); markUnsavedChanges()">
                         <span>Customer left <strong>Rice Bran</strong></span>
                     </label>
+                    ` : ''}
                 </div>
                 
                 <div class="payment-grid">
@@ -1059,7 +1514,7 @@ function render() {
                     </div>
                     <div class="payment-item">
                         <label>Cash Payment</label>
-                        <input type="number" class="form-control cash-paid-input" data-customer-uid="${customer.uid}" step="1" value="${customer.cashPaid}" onchange="updateCashPaid(${customer.uid}, this.value)">
+                        <input type="number" class="form-control cash-paid-input" data-customer-uid="${customer.uid}" step="1" value="${customer.cashPaid}" onchange="updateCashPaid(${customer.uid}, this.value); markUnsavedChanges()">
                     </div>
                     <div class="payment-item">
                         <label>Due / Advance</label>
@@ -1068,8 +1523,8 @@ function render() {
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Payment Mode</label>
-                    <select class="form-select payment-mode-select" data-customer-uid="${customer.uid}">
+                    <label>Payment Mode</label>
+                    <select class="form-control payment-mode-select" data-customer-uid="${customer.uid}" onchange="markUnsavedChanges()">
                         <option value="Cash">Cash</option>
                         <option value="Bank Transfer">Bank Transfer</option>
                         <option value="Khalti">Khalti</option>
@@ -1083,9 +1538,49 @@ function render() {
     
     attachProductListeners();
     attachCustomerListeners();
+    updateBatchSummary();
 }
 
-// Global functions for inline event handlers
+// ============================================
+// ACTION FUNCTIONS
+// ============================================
+function addCustomer() {
+    const customer = createEmptyCustomer();
+    customers.push(customer);
+    render();
+    markUnsavedChanges();
+}
+
+function addItem(customerUid) {
+    const customer = findCustomer(customerUid);
+    if (!customer) return;
+    customer.items.push(createEmptyItem());
+    calculateTotals(customer);
+    render();
+    markUnsavedChanges();
+}
+
+function removeItem(customerUid, itemUid) {
+    const customer = findCustomer(customerUid);
+    if (!customer) return;
+    if (customer.items.length === 1) {
+        customer.items[0] = createEmptyItem();
+        showToast('Cannot remove last item. Clear values instead.', 'warning');
+    } else {
+        customer.items = customer.items.filter(i => i.uid !== itemUid);
+    }
+    calculateTotals(customer);
+    render();
+    markUnsavedChanges();
+}
+
+function removeCustomer(customerUid) {
+    customers = customers.filter(c => c.uid !== customerUid);
+    if (customers.length === 0) addCustomer();
+    else render();
+    markUnsavedChanges();
+}
+
 function toggleAdvance(customerUid, checked) {
     const customer = findCustomer(customerUid);
     if (customer) {
@@ -1097,6 +1592,7 @@ function toggleAdvance(customerUid, checked) {
         }
         calculateTotals(customer);
         render();
+        markUnsavedChanges();
     }
 }
 
@@ -1109,6 +1605,7 @@ function updateAdvance(customerUid, value) {
         }
         calculateTotals(customer);
         render();
+        markUnsavedChanges();
     }
 }
 
@@ -1121,6 +1618,7 @@ function updateItem(customerUid, itemUid, field, value) {
         if (field === 'unit') item.unit = value;
         calculateTotals(customer);
         render();
+        markUnsavedChanges();
     }
 }
 
@@ -1130,6 +1628,22 @@ function updateCashPaid(customerUid, value) {
         customer.cashPaid = parseFloat(value) || 0;
         calculateTotals(customer);
         render();
+        markUnsavedChanges();
+    }
+}
+
+function updateEmail(customerUid, email) {
+    const customer = findCustomer(customerUid);
+    if (customer) {
+        customer.email = email;
+    }
+}
+
+function toggleSendEmail(customerUid, checked) {
+    const customer = findCustomer(customerUid);
+    if (customer) {
+        customer.sendEmail = checked;
+        updateBatchSummary();
     }
 }
 
@@ -1140,106 +1654,22 @@ function toggleExchange(customerUid, type, checked) {
         if (type === 'rice') customer.exchangeRiceBran = checked;
         calculateTotals(customer);
         render();
+        markUnsavedChanges();
     }
 }
 
-function validateBeforeSave() {
-    const salesData = [];
-    const validationErrors = [];
-    
-    for (const customer of customers) {
-        const name = (customer.customerName || '').trim();
-        const validItems = customer.items.filter(item => {
-            if (!item.product_name || !item.product_name.trim()) return false;
-            if ((parseFloat(item.quantity) || 0) <= 0) return false;
-            return true;
-        });
-        
-        if (!name || !validItems.length) continue;
-        
-        calculateTotals(customer);
-        
-        if (customer.advanceUsed > 0 && !customer.customerId) {
-            validationErrors.push(`${name}: Cannot use advance without selecting a registered customer`);
-            continue;
-        }
-        if (customer.advanceUsed > (customer.advanceBalance || 0)) {
-            validationErrors.push(`${name}: Insufficient advance balance. Available: Rs ${(customer.advanceBalance || 0).toFixed(2)}`);
-            continue;
-        }
-        if (customer.advanceUsed > customer.totalAmount) {
-            validationErrors.push(`${name}: Advance cannot exceed total amount (Rs ${customer.totalAmount.toFixed(2)})`);
-            continue;
-        }
-        
-        salesData.push({
-            customer_id: customer.customerId,
-            customer_name: name,
-            email: customer.email,
-            items: validItems.map(item => ({
-                product_name: item.product_name.trim(),
-                quantity: parseFloat(item.quantity) || 0,
-                unit: item.unit || 'Kg',
-                rate: parseFloat(item.rate) || 0,
-                subtotal: parseFloat(item.subtotal) || 0
-            })),
-            advance_used: parseFloat(customer.advanceUsed) || 0,
-            cash_paid: parseFloat(customer.cashPaid) || 0,
-            exchange_mustard_cake: !!customer.exchangeMustardCake,
-            exchange_rice_bran: !!customer.exchangeRiceBran
-        });
-    }
-    
-    return { salesData, validationErrors };
+function attachProductListeners() {
+    document.querySelectorAll('.product-input').forEach(input => {
+        input.removeEventListener('input', handleProductInput);
+        input.addEventListener('input', handleProductInput);
+    });
 }
 
-async function saveAllSales() {
-    if (isSaving) return;
-    
-    const { salesData, validationErrors } = validateBeforeSave();
-    
-    if (validationErrors.length) {
-        notify(validationErrors.join('\n'), 'danger');
-        return;
-    }
-    
-    if (!salesData.length) {
-        notify('No valid sales data to save. Please add customer name and at least one product with quantity.', 'warning');
-        return;
-    }
-    
-    const saveBtn = document.getElementById('saveAllBtn');
-    isSaving = true;
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
-    
-    try {
-        const response = await fetch('/admin/master-panel/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ customers: salesData })
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-            notify(result.message, 'success');
-            customers = [];
-            addCustomer();
-        } else {
-            const errorMsg = result.errors ? result.errors.join('\n') : (result.message || 'Unknown error');
-            notify(errorMsg, 'danger');
-        }
-    } catch (error) {
-        notify('Error saving sales: ' + error.message, 'danger');
-    } finally {
-        isSaving = false;
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="bi bi-check2-circle"></i> Save All Sales';
-    }
-}
-
-function exportSales() { 
-    window.location.href = '/admin/export-sales-excel'; 
+function attachCustomerListeners() {
+    document.querySelectorAll('.customer-name-input').forEach(input => {
+        input.removeEventListener('input', handleCustomerInput);
+        input.addEventListener('input', handleCustomerInput);
+    });
 }
 
 function downloadTemplate() { 
@@ -1253,7 +1683,7 @@ async function importSales(fileInput, previewOnly) {
     formData.append('file', fileInput.files[0]);
     if (previewOnly) formData.append('preview', 'true');
     
-    notify(previewOnly ? 'Loading Excel...' : 'Importing sales...', 'info');
+    showToast(previewOnly ? 'Loading Excel...' : 'Importing sales...', 'info');
     
     try {
         const response = await fetch('/admin/import-sales-excel', { method: 'POST', body: formData });
@@ -1262,17 +1692,20 @@ async function importSales(fileInput, previewOnly) {
         if (result.success) {
             if (result.preview && result.customers) {
                 loadCustomersFromImport(result.customers);
-                notify(result.message, 'success');
+                showToast(result.message, 'success');
+                markUnsavedChanges();
             } else {
-                notify(result.message, 'success');
+                showToast(result.message, 'success');
                 customers = [];
                 addCustomer();
+                localStorage.removeItem('batch_sales_draft');
+                hasUnsavedChanges = false;
             }
         } else {
-            notify(result.error || 'Import failed', 'danger');
+            showToast(result.error || 'Import failed', 'error');
         }
     } catch (error) {
-        notify('Error importing file', 'danger');
+        showToast('Error importing file', 'error');
     }
     
     fileInput.value = '';
@@ -1304,7 +1737,8 @@ function loadCustomersFromImport(importedCustomers) {
             maxAdvance: 0,
             paymentStatus: 'pending',
             exchangeMustardCake: !!entry.exchange_mustard_cake,
-            exchangeRiceBran: !!entry.exchange_rice_bran
+            exchangeRiceBran: !!entry.exchange_rice_bran,
+            sendEmail: false
         };
         if (!customer.items.length) customer.items = [createEmptyItem()];
         calculateTotals(customer);
@@ -1313,23 +1747,185 @@ function loadCustomersFromImport(importedCustomers) {
     
     if (!customers.length) addCustomer();
     else render();
+    markUnsavedChanges();
 }
 
-function notify(message, type = 'success') {
-    if (typeof window.showToast === 'function') {
-        window.showToast(message, type);
-    } else {
-        alert(message);
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        saveAllSales();
+    }
+    if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault();
+        addCustomer();
+        showToast('New customer added (Ctrl+N)', 'info', 1000);
+    }
+});
+
+
+
+
+// ============================================
+// ROLLBACK FUNCTIONS
+// ============================================
+
+function showRollbackDialog() {
+    if (!lastBatchId) {
+        showToast('No recent batch to undo', 'warning');
+        return;
+    }
+    
+    const reason = prompt('Reason for rollback (optional):', 'Error in data entry');
+    
+    if (confirm('⚠️ WARNING: This will DELETE all sales from the last batch and refund any advance amounts used.\n\nAre you sure you want to undo this batch?')) {
+        rollbackBatch(lastBatchId, reason || 'Manual rollback');
     }
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    addCustomer();
+async function rollbackBatch(batchId, reason) {
+    showToast('Rolling back batch...', 'info');
+    
+    try {
+        const response = await fetch(`/admin/master-panel/rollback/${batchId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            
+            const rollbackBtn = document.getElementById('rollbackBtn');
+            if (rollbackBtn) {
+                rollbackBtn.style.display = 'none';
+            }
+            lastBatchId = null;
+            
+            if (confirm('Rollback complete. Refresh page to see changes?')) {
+                window.location.reload();
+            }
+        } else {
+            showToast(result.error || 'Rollback failed', 'error');
+        }
+    } catch (error) {
+        showToast('Error during rollback: ' + error.message, 'error');
+    }
+}
+
+async function showBatchHistory() {
+    try {
+        const response = await fetch('/admin/master-panel/batch-history');
+        const data = await response.json();
+        
+        if (data.success && data.batches && data.batches.length) {
+            let modalHtml = `
+                <div class="progress-overlay" id="historyModal" style="z-index: 100000;">
+                    <div class="progress-modal" style="max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                        <h4><i class="bi bi-clock-history"></i> Batch History</h4>
+                        <hr>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 8px; text-align: left;">Time</th>
+                                    <th style="padding: 8px; text-align: left;">User</th>
+                                    <th style="padding: 8px; text-align: left;">Customers</th>
+                                    <th style="padding: 8px; text-align: left;">Amount</th>
+                                    <th style="padding: 8px; text-align: left;">Status</th>
+                                    <th style="padding: 8px; text-align: left;">Action</th>
+                                 </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            data.batches.forEach(batch => {
+                const isActive = batch.status === 'active';
+                modalHtml += `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 8px;">${new Date(batch.created_at).toLocaleString()}</td>
+                        <td style="padding: 8px;">${batch.user_name}</td>
+                        <td style="padding: 8px;">${batch.total_customers}</td>
+                        <td style="padding: 8px;">Rs ${(batch.total_amount || 0).toFixed(2)}</td>
+                        <td style="padding: 8px;">
+                            <span style="padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; ${isActive ? 'background: #d1fae5; color: #065f46;' : 'background: #fee2e2; color: #991b1b;'}">
+                                ${batch.status}
+                            </span>
+                        </td>
+                        <td style="padding: 8px;">
+                            ${isActive ? `<button onclick="rollbackBatch('${batch.batch_id}', 'Rollback from history')" class="btn-ui btn-outline-ui" style="padding: 2px 8px; font-size: 0.7rem;"><i class="bi bi-arrow-undo"></i> Undo</button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            modalHtml += `
+                            </tbody>
+                        </table>
+                        <hr>
+                        <button onclick="closeHistoryModal()" class="btn-ui btn-primary-ui" style="margin-top: 1rem;">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        } else {
+            showToast('No batch history found', 'info');
+        }
+    } catch (error) {
+        showToast('Error loading batch history', 'error');
+    }
+}
+
+function closeHistoryModal() {
+    const modal = document.getElementById('historyModal');
+    if (modal) modal.remove();
+}
+
+
+
+// ============================================
+// PAGE BEFORE UNLOAD WARNING
+// ============================================
+window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges && customers.length > 0) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+    }
 });
 
-document.getElementById('addCustomerBtn').addEventListener('click', addCustomer);
-document.getElementById('saveAllBtn').addEventListener('click', saveAllSales);
-</script>
+// ============================================
+// INITIALIZATION
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    addCustomer();
+    
+    autoSaveTimer = setInterval(() => {
+        if (hasUnsavedChanges && customers.length > 0) {
+            autoSaveDraft();
+        }
+    }, 30000);
+    
+    const saved = localStorage.getItem('batch_sales_draft');
+    if (saved) {
+        try {
+            const draft = JSON.parse(saved);
+            const minutesAgo = (new Date() - new Date(draft.timestamp)) / 60000;
+            if (draft.data && draft.data.length > 0 && minutesAgo < 60) {
+                setTimeout(() => {
+                    if (confirm(`Found draft from ${Math.floor(minutesAgo)} minutes ago. Restore?`)) {
+                        loadDraft();
+                    }
+                }, 500);
+            }
+        } catch(e) {}
+    }
+});
 
+document.getElementById('addCustomerBtn')?.addEventListener('click', addCustomer);
+document.getElementById('saveAllBtn')?.addEventListener('click', saveAllSales);
+</script>
 {% endblock %}

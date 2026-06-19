@@ -66,13 +66,36 @@ def record_login_attempt(username, ip_address, success):
 
 
 def cleanup_old_login_attempts():
-    """Remove login attempts older than 1 hour"""
+    """Remove login attempts older than 1 hour AND expired OTPs"""
     try:
+        # Clean login attempts
         cutoff = (datetime.now() - timedelta(hours=1)).isoformat()
-        supabase.table("login_attempts").delete().lt("attempt_time", cutoff).execute()
+        login_result = supabase.table("login_attempts").delete().lt("attempt_time", cutoff).execute()
+        
+        # Clean expired OTPs
+        now = datetime.now().isoformat()
+        otp_result = supabase.table("otp_requests").delete().lt("expires_at", now).execute()
+        
+        if login_result.data:
+            print(f"🧹 Cleaned {len(login_result.data)} old login attempts")
+        if otp_result.data:
+            print(f"🧹 Cleaned {len(otp_result.data)} expired OTPs")
+            
     except Exception as e:
-        print(f"Error cleaning login attempts: {e}")
+        print(f"Error cleaning data: {e}")
 
+
+def cleanup_expired_otps():
+    """Standalone function to clean expired OTPs (call when needed)"""
+    try:
+        now = datetime.now().isoformat()
+        result = supabase.table("otp_requests").delete().lt("expires_at", now).execute()
+        if result.data:
+            print(f"🧹 Cleaned {len(result.data)} expired OTPs")
+        return len(result.data) if result.data else 0
+    except Exception as e:
+        print(f"Error cleaning expired OTPs: {e}")
+        return 0
 
 # ============================================
 # OTP FUNCTIONS (Database-based for Vercel)
@@ -168,6 +191,9 @@ def login():
         password = request.form.get('password')
         login_type = request.form.get('login_type', 'customer')
         
+        # Check if AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
         # Get client IP address
         ip_address = request.headers.get('X-Forwarded-For', request.remote_addr)
         
@@ -175,31 +201,61 @@ def login():
         is_locked, attempt_count = get_recent_login_attempts(username, ip_address)
         
         if is_locked:
-            flash(f'Too many failed login attempts. Please wait {Config.LOCKOUT_MINUTES} minutes before trying again.', 'danger')
+            error_msg = f'Too many failed login attempts. Please wait {Config.LOCKOUT_MINUTES} minutes before trying again.'
+            if is_ajax:
+                return jsonify({'success': False, 'error': error_msg, 'locked': True})
+            flash(error_msg, 'danger')
             return render_template('auth/login.html', user_type=user_type)
         
         try:
-            user_data = User.find_by_username_or_email(username)
+            # Direct query for user (most reliable)
+            user_data = None
+            response = supabase.table("users").select("*").eq("username", username).execute()
+            if response.data:
+                user_data = response.data[0]
             
+            # If not found, try case-insensitive
+            if not user_data:
+                response = supabase.table("users").select("*").ilike("username", username).execute()
+                if response.data:
+                    user_data = response.data[0]
+
             if user_data and user_data.get('is_active', True):
-                if check_password_hash(user_data['password_hash'], password):
+                # Ensure password_hash exists
+                if not user_data.get('password_hash'):
+                    hash_response = supabase.table("users").select("password_hash").eq("id", user_data['id']).execute()
+                    if hash_response.data and hash_response.data[0].get('password_hash'):
+                        user_data['password_hash'] = hash_response.data[0]['password_hash']
+                
+                if user_data.get('password_hash') and check_password_hash(user_data['password_hash'], password):
                     user = LoginUser(user_data)
                     
                     # Role checks
                     if login_type == 'admin' and user.role != 'admin':
-                        flash('This account is not an admin account. Please use Customer Login.', 'danger')
+                        error_msg = 'This account is not an admin account. Please use Customer Login.'
+                        if is_ajax:
+                            return jsonify({'success': False, 'error': error_msg})
+                        flash(error_msg, 'danger')
                         return redirect(url_for('auth.login', type='admin'))
                     
                     if login_type == 'customer' and user.role == 'admin':
-                        flash('This is an admin account. Please use Admin Login.', 'danger')
+                        error_msg = 'This is an admin account. Please use Admin Login.'
+                        if is_ajax:
+                            return jsonify({'success': False, 'error': error_msg})
+                        flash(error_msg, 'danger')
                         return redirect(url_for('auth.login', type='customer'))
                     
                     # Record SUCCESSFUL attempt
                     record_login_attempt(username, ip_address, True)
                     
                     login_user(user)
-                    flash('Login successful', 'success')
                     
+                    if is_ajax:
+                        if user.role == 'admin':
+                            return jsonify({'success': True, 'redirect': url_for('admin.dashboard')})
+                        return jsonify({'success': True, 'redirect': url_for('customer.dashboard')})
+                    
+                    flash('Login successful', 'success')
                     if user.role == 'admin':
                         return redirect(url_for('admin.dashboard'))
                     return redirect(url_for('customer.dashboard'))
@@ -212,20 +268,32 @@ def login():
                     remaining = Config.MAX_LOGIN_ATTEMPTS - new_count
                     
                     if remaining > 0:
-                        flash(f'Invalid credentials. {remaining} attempt(s) remaining.', 'danger')
+                        error_msg = f'Invalid credentials. {remaining} attempt(s) remaining.'
+                        if is_ajax:
+                            return jsonify({'success': False, 'error': error_msg, 'remaining_attempts': remaining})
+                        flash(error_msg, 'danger')
                         return render_template('auth/login.html', user_type=user_type, remaining_attempts=remaining)
                     else:
-                        flash(f'Too many failed attempts. Account locked for {Config.LOCKOUT_MINUTES} minutes.', 'danger')
+                        error_msg = f'Too many failed attempts. Account locked for {Config.LOCKOUT_MINUTES} minutes.'
+                        if is_ajax:
+                            return jsonify({'success': False, 'error': error_msg, 'locked': True})
+                        flash(error_msg, 'danger')
                         return render_template('auth/login.html', user_type=user_type)
             else:
-                # User not found - still record attempt to prevent username enumeration
+                # User not found
                 record_login_attempt(username, ip_address, False)
-                flash('Invalid credentials', 'danger')
+                error_msg = 'Invalid credentials'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg})
+                flash(error_msg, 'danger')
                 return render_template('auth/login.html', user_type=user_type)
                 
         except Exception as e:
             print(f"Login error: {e}")
-            flash('Login failed. Please try again.', 'danger')
+            error_msg = 'Login failed. Please try again.'
+            if is_ajax:
+                return jsonify({'success': False, 'error': error_msg})
+            flash(error_msg, 'danger')
             return render_template('auth/login.html', user_type=user_type)
     
     return render_template('auth/login.html', user_type=user_type)
@@ -338,28 +406,41 @@ def change_password():
         confirm_password = request.form.get('confirm_password')
         otp = request.form.get('otp')  # Only required for admin
         
+        # Check if AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
         # Basic validations
         if new_password != confirm_password:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'New passwords do not match!'})
             flash('New passwords do not match!', 'danger')
             return redirect(url_for('auth.change_password'))
         
         if len(new_password) < 6:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Password must be at least 6 characters long!'})
             flash('Password must be at least 6 characters long!', 'danger')
             return redirect(url_for('auth.change_password'))
         
         if not current_user.check_password(old_password):
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Current password is incorrect!'})
             flash('Current password is incorrect!', 'danger')
             return redirect(url_for('auth.change_password'))
         
         # ========== OTP VERIFICATION FOR ADMIN ONLY ==========
         if current_user.role == 'admin':
             if not otp:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'OTP is required to change admin password!'})
                 flash('OTP is required to change admin password!', 'danger')
                 return redirect(url_for('auth.change_password'))
             
             # Verify OTP
             success, message = verify_otp(current_user.username, otp, "change_password")
             if not success:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': message})
                 flash(message, 'danger')
                 return redirect(url_for('auth.change_password'))
         
@@ -368,12 +449,19 @@ def change_password():
         result = User.update_password(current_user.id, new_hash)
         
         if result:
+            if is_ajax:
+                if current_user.role == 'admin':
+                    return jsonify({'success': True, 'message': 'Password changed successfully!', 'redirect': url_for('admin.dashboard')})
+                return jsonify({'success': True, 'message': 'Password changed successfully!', 'redirect': url_for('customer.dashboard')})
+            
             flash('Password changed successfully!', 'success')
             if current_user.role == 'admin':
                 return redirect(url_for('admin.dashboard'))
             else:
                 return redirect(url_for('customer.dashboard'))
         else:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Failed to update password. Please try again.'})
             flash('Failed to update password. Please try again.', 'danger')
             return redirect(url_for('auth.change_password'))
     
@@ -393,27 +481,41 @@ def forgot_password():
         username = request.form.get('username')
         forgot_type = request.form.get('forgot_type', 'customer')
         
+        # Check if AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
         if action == 'send_otp':
             user_data = User.get_by_username(username)
             
             if not user_data:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'User not found'})
                 flash('User not found', 'danger')
                 return redirect(url_for('auth.forgot_password', type=forgot_type))
             
             # Rate limit check using database
             recent_count = get_recent_otp_count(username)
             if recent_count >= Config.MAX_OTP_REQUESTS:
-                flash(f'Too many OTP requests. Please wait {Config.OTP_WINDOW_HOURS} hour before trying again.', 'danger')
+                error_msg = f'Too many OTP requests. Please wait {Config.OTP_WINDOW_HOURS} hour before trying again.'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg})
+                flash(error_msg, 'danger')
                 return redirect(url_for('auth.forgot_password', type=forgot_type))
             
             user_role = user_data.get('role')
             
             if forgot_type == 'admin' and user_role != 'admin':
-                flash('You can only reset ADMIN passwords from this page. Please use Customer Forgot Password.', 'danger')
+                error_msg = 'You can only reset ADMIN passwords from this page. Please use Customer Forgot Password.'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg})
+                flash(error_msg, 'danger')
                 return redirect(url_for('auth.forgot_password', type='customer'))
             
             if forgot_type == 'customer' and user_role == 'admin':
-                flash('You can only reset CUSTOMER passwords from this page. Please use Admin Forgot Password.', 'danger')
+                error_msg = 'You can only reset CUSTOMER passwords from this page. Please use Admin Forgot Password.'
+                if is_ajax:
+                    return jsonify({'success': False, 'error': error_msg})
+                flash(error_msg, 'danger')
                 return redirect(url_for('auth.forgot_password', type='admin'))
             
             otp = str(random.randint(100000, 999999))
@@ -430,21 +532,24 @@ def forgot_password():
                 }).execute()
             except Exception as e:
                 print(f"Error storing OTP: {e}")
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to generate OTP. Please try again.'})
                 flash('Failed to generate OTP. Please try again.', 'danger')
                 return redirect(url_for('auth.forgot_password', type=forgot_type))
             
             remaining = Config.MAX_OTP_REQUESTS - (recent_count + 1)
             
             # Send email
+            email_sent = False
             if user_role == 'admin':
                 recipient_email = 'admin@adarshoilmill.com.np'
-                flash(f'OTP sent to admin email ({remaining} requests remaining)', 'info')
             else:
                 recipient_email = user_data.get('email')
                 if not recipient_email:
+                    if is_ajax:
+                        return jsonify({'success': False, 'error': 'No email registered. Please contact admin.'})
                     flash('No email registered. Please contact admin.', 'danger')
                     return redirect(url_for('auth.forgot_password', type=forgot_type))
-                flash(f'OTP sent to your email! ({remaining} requests remaining)', 'success')
             
             if recipient_email:
                 subject = "Password Reset OTP - Adarsh Oil Mill"
@@ -484,8 +589,23 @@ def forgot_password():
                 """
                 
                 email_sent = send_reset_email(recipient_email, subject, html_body)
-                if not email_sent:
-                    flash('Failed to send OTP. Please try again.', 'danger')
+            
+            if is_ajax:
+                if email_sent:
+                    success_msg = f'OTP sent successfully! {remaining} request(s) remaining.'
+                    return jsonify({
+                        'success': True,
+                        'message': success_msg,
+                        'redirect_to': url_for('auth.forgot_password', type=forgot_type, username=username)
+                    })
+                else:
+                    return jsonify({'success': False, 'error': 'Failed to send OTP. Please try again.'})
+            
+            # Non-AJAX response
+            if user_role == 'admin':
+                flash(f'OTP sent to admin email ({remaining} requests remaining)', 'info')
+            else:
+                flash(f'OTP sent to your email! ({remaining} requests remaining)', 'success')
             
             return render_template('auth/forgot_password.html', username=username, user_type=forgot_type)
         
@@ -495,16 +615,22 @@ def forgot_password():
             confirm_password = request.form.get('confirm_password')
             
             if new_password != confirm_password:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Passwords do not match!'})
                 flash('Passwords do not match!', 'danger')
                 return render_template('auth/forgot_password.html', username=username, user_type=forgot_type)
             
             if len(new_password) < 6:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Password must be at least 6 characters long!'})
                 flash('Password must be at least 6 characters long!', 'danger')
                 return render_template('auth/forgot_password.html', username=username, user_type=forgot_type)
             
             # ========== VERIFY OTP USING REUSABLE FUNCTION ==========
             success, message = verify_otp(username, otp, "forgot_password")
             if not success:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': message})
                 flash(message, 'danger')
                 return redirect(url_for('auth.forgot_password', type=forgot_type))
             
@@ -513,10 +639,14 @@ def forgot_password():
             user_role = user_data.get('role') if user_data else None
             
             if forgot_type == 'admin' and user_role != 'admin':
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Security error: Cannot reset customer password from admin page.'})
                 flash('Security error: Cannot reset customer password from admin page.', 'danger')
                 return redirect(url_for('auth.forgot_password', type='customer'))
             
             if forgot_type == 'customer' and user_role == 'admin':
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Security error: Cannot reset admin password from customer page.'})
                 flash('Security error: Cannot reset admin password from customer page.', 'danger')
                 return redirect(url_for('auth.forgot_password', type='admin'))
             
@@ -527,12 +657,23 @@ def forgot_password():
             if result:
                 # Clean up (verify_otp already deleted the OTP, but clean up any others)
                 supabase.table("otp_requests").delete().eq("username", username).eq("purpose", "forgot_password").execute()
+                
+                if is_ajax:
+                    redirect_url = url_for('auth.login', type=forgot_type)
+                    return jsonify({
+                        'success': True,
+                        'message': 'Password reset successful! Please login with your new password.',
+                        'redirect_to': redirect_url
+                    })
+                
                 flash('Password reset successful! Please login with your new password.', 'success')
                 if forgot_type == 'admin':
                     return redirect(url_for('auth.login', type='admin'))
                 else:
                     return redirect(url_for('auth.login', type='customer'))
             else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Failed to reset password. Please try again.'})
                 flash('Failed to reset password. Please try again.', 'danger')
     
     return render_template('auth/forgot_password.html', username=None, user_type=user_type)

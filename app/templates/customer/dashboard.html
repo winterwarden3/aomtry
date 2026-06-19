@@ -4,11 +4,14 @@
 
 <style>
 /* ============================================
-   CONSISTENT UI WITH OTHER PAGES
+   PROFESSIONAL UI - MATCHES ADMIN PAGES
+   FULLY MOBILE OPTIMIZED
    ============================================ */
 
 :root {
     --primary: #0C5B3F;
+    --primary-light: #138A52;
+    --primary-dark: #09452F;
     --accent: #138A52;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
@@ -31,61 +34,107 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+/* Modal Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Refresh Button */
+.refresh-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray-500);
+    font-size: 1.1rem;
+    padding: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+    color: var(--primary);
+    transform: rotate(180deg);
+}
+
+.refresh-btn.loading {
+    animation: spin 0.6s linear infinite;
+}
+
+/* Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+}
+
+/* Container */
 .container-fluid {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 1rem;
 }
 
-/* Header */
-.page-header {
-    margin-bottom: 28px;
-}
-
-.page-header h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 4px;
-}
-
-.page-header p {
-    font-size: 0.8rem;
-    color: var(--gray-500);
-}
-
-/* Hero Section - Matching Admin Dashboard */
+/* Hero Section */
 .hero-section {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     border-radius: var(--radius-lg);
-    padding: 32px;
-    margin-bottom: 32px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
     color: white;
 }
 
 .hero-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
 }
 
 .hero-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     opacity: 0.9;
 }
 
-/* Stats Grid - Matching Other Pages */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 32px;
-}
-
+/* Cards */
 .stat-card {
     background: white;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
-    padding: 20px;
+    padding: 1rem;
     transition: all 0.2s ease;
 }
 
@@ -94,70 +143,66 @@
     box-shadow: var(--shadow-md);
 }
 
-.stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.stat-label {
-    font-size: 0.7rem;
+.stat-card h6 {
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.5px;
     color: var(--gray-500);
+    margin-bottom: 0.5rem;
 }
 
 .stat-value {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 700;
     line-height: 1.2;
     color: var(--gray-800);
-    margin-bottom: 4px;
 }
 
 .stat-footer {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--gray-400);
+    margin-top: 0.25rem;
 }
 
-.stat-icon {
-    width: 42px;
-    height: 42px;
+.icon-box {
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gray-100);
-    color: var(--gray-600);
+    font-size: 1.2rem;
+    flex-shrink: 0;
 }
 
 /* Section Header */
 .section-header {
-    margin-bottom: 20px;
+    margin: 1.5rem 0 1rem 0;
 }
 
-.section-title {
-    font-size: 1.1rem;
+.section-header h3 {
+    font-size: 0.9rem;
     font-weight: 600;
-    color: var(--gray-800);
+    color: var(--gray-700);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
-.section-subtitle {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-    margin-top: 2px;
+.section-header p {
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    margin-top: 0.25rem;
 }
 
 /* Invoice Grid */
 .invoice-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-    gap: 24px;
+    gap: 1.25rem;
 }
 
-/* Invoice Card - Matching Admin Sales Card */
+/* Invoice Card */
 .invoice-card {
     background: white;
     border: 1px solid var(--gray-200);
@@ -172,57 +217,56 @@
 }
 
 .invoice-header {
-    padding: 20px;
+    padding: 1rem 1.25rem;
     background: var(--gray-50);
     border-bottom: 1px solid var(--gray-200);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 0.75rem;
 }
 
-/* Invoice Brand */
 .brand-icon {
-    width: 48px;
-    height: 48px;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: var(--radius-md);
     background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: white;
 }
 
 .brand-title {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--gray-800);
 }
 
-/* Meta Info */
 .meta-label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--gray-500);
 }
 
 .meta-value {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--gray-700);
 }
 
-/* Status Badges - Matching Other Pages */
+/* Status Badges */
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
+    gap: 4px;
+    padding: 0.25rem 0.6rem;
     border-radius: 30px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
 }
 
@@ -246,80 +290,92 @@
     color: #1976d2;
 }
 
-/* Invoice Content */
-.invoice-content {
-    padding: 20px;
+/* Notes Box */
+.notes-box {
+    margin: 0 1rem 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    color: #166534;
+    font-weight: 500;
 }
 
 /* Items Table */
 .items-header {
     display: grid;
     grid-template-columns: 2fr 0.8fr 1.2fr;
-    gap: 12px;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
     border-bottom: 1px solid var(--gray-200);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--gray-500);
 }
 
 .invoice-item {
     display: grid;
     grid-template-columns: 2fr 0.8fr 1.2fr;
-    gap: 12px;
-    padding: 10px 0;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
     border-bottom: 1px solid var(--gray-100);
+}
+
+.invoice-item:last-child {
+    border-bottom: none;
 }
 
 .item-main {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0.5rem;
 }
 
 .product-badge {
-    width: 36px;
-    height: 36px;
+    width: 2rem;
+    height: 2rem;
     border-radius: var(--radius-sm);
     background: var(--gray-100);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--primary);
 }
 
 .product-name {
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--gray-700);
 }
 
 .product-unit {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--gray-400);
     margin-top: 2px;
 }
 
 .product-qty {
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--gray-600);
 }
 
 .product-price {
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--gray-700);
     text-align: right;
 }
 
 /* Summary Section */
 .invoice-summary {
-    margin-top: 20px;
-    padding: 16px;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
     background: var(--gray-50);
     border-radius: var(--radius-md);
 }
@@ -328,27 +384,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
-    font-size: 0.85rem;
+    padding: 0.5rem 0;
+    font-size: 0.8rem;
 }
 
 .summary-row.final {
-    margin-top: 8px;
-    padding-top: 10px;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
     border-top: 1px solid var(--gray-200);
     font-weight: 700;
 }
 
-/* Footer */
+/* Invoice Footer */
 .invoice-footer {
-    padding: 16px 20px;
+    padding: 1rem 1.25rem;
     background: var(--gray-50);
     border-top: 1px solid var(--gray-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 0.75rem;
 }
 
 .thank-you {
@@ -356,10 +412,10 @@
     color: var(--gray-500);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.25rem;
 }
 
-/* Buttons - Matching Other Pages */
+/* Buttons */
 .btn-ui {
     border: none;
     border-radius: var(--radius-sm);
@@ -368,11 +424,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 0.5rem;
     text-decoration: none;
     cursor: pointer;
     font-size: 0.75rem;
-    padding: 6px 12px;
+    padding: 0.4rem 0.75rem;
 }
 
 .btn-primary-ui {
@@ -381,30 +437,41 @@
 }
 
 .btn-primary-ui:hover {
-    background: var(--accent);
+    background: var(--primary-light);
     transform: translateY(-1px);
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+}
+
+.btn-outline-ui:hover {
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 3rem 1.5rem;
     background: white;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
 }
 
 .empty-icon {
-    font-size: 48px;
+    font-size: 3rem;
     color: var(--gray-300);
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
 }
 
 .empty-title {
     font-size: 1rem;
     font-weight: 500;
     color: var(--gray-600);
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .empty-desc {
@@ -412,21 +479,75 @@
     color: var(--gray-400);
 }
 
-/* Responsive */
+/* Load More Button */
+.load-more-container {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.load-more-btn {
+    background: white;
+    border: 1px solid var(--gray-200);
+    padding: 0.75rem 2rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.load-more-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.load-more-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
 @media (max-width: 1024px) {
-    .stats-grid {
-        gap: 16px;
+    .invoice-grid {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+    .container-fluid {
+        padding: 0.75rem;
     }
     
-    .invoice-grid {
-        grid-template-columns: 1fr;
+    .hero-section {
+        padding: 1rem;
+    }
+    
+    .hero-title {
+        font-size: 1.1rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.7rem;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .icon-box {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
+    }
+    
+    .row.g-3 {
+        --bs-gutter-y: 0.75rem;
+    }
+    
+    .invoice-header {
+        flex-direction: column;
     }
     
     .items-header {
@@ -435,7 +556,8 @@
     
     .invoice-item {
         grid-template-columns: 1fr;
-        gap: 8px;
+        gap: 0.5rem;
+        padding: 0.75rem 0;
     }
     
     .item-main {
@@ -451,192 +573,228 @@
         text-align: center;
     }
     
-    .hero-title {
-        font-size: 1.2rem;
-    }
-    
-    .stat-value {
-        font-size: 1.3rem;
-    }
-    
-    .stat-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+    .invoice-footer .btn-ui {
+        width: 100%;
     }
 }
 
-@media (max-width: 576px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
+@media (max-width: 480px) {
+    .stat-value {
+        font-size: 1rem;
     }
     
-    .stat-value {
-        font-size: 1.2rem;
+    .invoice-summary {
+        padding: 0.5rem;
+    }
+    
+    .summary-row {
+        font-size: 0.75rem;
     }
 }
 </style>
 
-<div class="container-fluid px-md-3 py-3">
-
+<div class="container-fluid">
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="hero-title">Welcome back, {{ current_user.name }}</div>
         <div class="hero-subtitle">Track purchases, manage invoices, monitor balances, and access transaction records.</div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Total Purchase</span>
-                <span class="stat-icon"><i class="bi bi-cart"></i></span>
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Total Purchase</h6>
+                        <div class="stat-value stat-total-purchases" style="color: var(--primary);">Rs {{ "%.2f"|format(total_purchases) }}</div>
+                        <div class="stat-footer">Lifetime spending</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
+                        <i class="bi bi-cart"></i>
+                    </div>
+                </div>
             </div>
-            <div class="stat-value">Rs {{ total_purchases|round(2) }}</div>
-            <div class="stat-footer">Lifetime spending</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Total Payment</span>
-                <span class="stat-icon"><i class="bi bi-wallet2"></i></span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Total Payment</h6>
+                        <div class="stat-value stat-total-payments" style="color: var(--success);">Rs {{ "%.2f"|format(total_payments) }}</div>
+                        <div class="stat-footer">Amount paid</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                </div>
             </div>
-            <div class="stat-value" style="color: var(--success);">Rs {{ total_payments|round(2) }}</div>
-            <div class="stat-footer">Amount paid</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Due Balance</span>
-                <span class="stat-icon"><i class="bi bi-exclamation-circle"></i></span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Due Balance</h6>
+                        <div class="stat-value stat-due-balance" style="color: var(--danger);">
+                            {% if pending_due > 0 %}Rs {{ "%.2f"|format(pending_due) }}{% else %}Rs 0{% endif %}
+                        </div>
+                        <div class="stat-footer">You owe us</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                </div>
             </div>
-            <div class="stat-value" style="color: var(--danger);">
-                {% if pending_due > 0 %}Rs {{ pending_due|round(2) }}{% else %}Rs 0{% endif %}
-            </div>
-            <div class="stat-footer">You owe us</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Advance Balance</span>
-                <span class="stat-icon"><i class="bi bi-piggy-bank"></i></span>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6>Advance Balance</h6>
+                        <div class="stat-value stat-advance-balance" style="color: var(--info);">
+                            {% if advance_balance and advance_balance > 0 %}Rs {{ "%.2f"|format(advance_balance) }}{% else %}Rs 0{% endif %}
+                        </div>
+                        <div class="stat-footer">Prepaid amount</div>
+                    </div>
+                    <div class="icon-box" style="background: rgba(59,130,246,0.1); color: #3b82f6;">
+                        <i class="bi bi-piggy-bank"></i>
+                    </div>
+                </div>
             </div>
-            <div class="stat-value" style="color: var(--info);">
-                {% if advance_balance and advance_balance > 0 %}Rs {{ advance_balance|round(2) }}{% else %}Rs 0{% endif %}
-            </div>
-            <div class="stat-footer">Prepaid amount</div>
         </div>
     </div>
 
-    <!-- Section Header -->
-    <div class="section-header">
+    <!-- Section Header with Refresh Button -->
+    <div class="section-header d-flex justify-content-between align-items-center">
         <div>
-            <div class="section-title">Recent Invoices</div>
-            <div class="section-subtitle">{{ recent_sales|length }} invoices available</div>
+            <h3><i class="bi bi-receipt"></i> Recent Invoices</h3>
+            <p id="invoiceCount">{{ recent_sales|length }} invoices available</p>
         </div>
+        <button class="refresh-btn" id="refreshBtn" title="Refresh Invoices">
+            <i class="bi bi-arrow-repeat"></i>
+        </button>
     </div>
 
-    <!-- Invoices -->
-    {% if recent_sales %}
-    <div class="invoice-grid">
-        {% for sale in recent_sales %}
-        <div class="invoice-card">
-            <div class="invoice-header">
-                <div>
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="brand-icon"><i class="bi bi-receipt"></i></div>
-                        <div>
-                            <div class="brand-title">Adarsh Oil Mill</div>
+    <!-- Invoices Grid -->
+    <div id="invoicesContainer">
+        <div class="invoice-grid" id="invoiceGrid">
+            {% for sale in recent_sales %}
+            <div class="invoice-card" data-sale-id="{{ sale.get('id') }}">
+                <div class="invoice-header">
+                    <div>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="brand-icon"><i class="bi bi-receipt"></i></div>
+                            <div>
+                                <div class="brand-title">Adarsh Oil Mill</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-4">
+                            <div>
+                                <div class="meta-label">Invoice Number</div>
+                                <div class="meta-value">#{{ sale.get('invoice_number', '') }}</div>
+                            </div>
+                            <div>
+                                <div class="meta-label">Invoice Date</div>
+                                <div class="meta-value">{{ sale.get('date', '')[:10] if sale.get('date') else '' }}</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex flex-wrap gap-4">
-                        <div>
-                            <div class="meta-label">Invoice Number</div>
-                            <div class="meta-value">#{{ sale.get('invoice_number','') }}</div>
+                    <div>
+                        {% if sale.get('payment_status') == "paid" %}
+                            <span class="status-badge status-paid"><i class="bi bi-check-circle"></i> Paid</span>
+                        {% elif sale.get('payment_status') == "partial" %}
+                            <span class="status-badge status-partial"><i class="bi bi-clock"></i> Partial</span>
+                        {% elif sale.get('payment_status') == "advance" %}
+                            <span class="status-badge status-advance"><i class="bi bi-wallet2"></i> Advance</span>
+                        {% else %}
+                            <span class="status-badge status-credit"><i class="bi bi-exclamation-triangle"></i> Due</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if sale.get('notes') %}
+                <div class="notes-box">
+                    <i class="bi bi-info-circle"></i> {{ sale.get('notes') }}
+                </div>
+                {% endif %}
+
+                <div class="invoice-content" style="padding: 1rem 1.25rem;">
+                    <div class="items-header">
+                        <div>Product</div>
+                        <div>Qty</div>
+                        <div>Total</div>
+                    </div>
+
+                    {% for item in sale.get('items', [])[:3] %}
+                    <div class="invoice-item">
+                        <div class="item-main">
+                            <div class="product-badge"><i class="bi bi-box-seam"></i></div>
+                            <div>
+                                <div class="product-name">{{ item.get('product_name', '') }}</div>
+                                <div class="product-unit">{{ item.get('unit', '') }}</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="meta-label">Invoice Date</div>
-                            <div class="meta-value">{{ sale.get('date','')[:10] if sale.get('date') else '' }}</div>
-                        </div>
+                        <div class="product-qty">{{ item.get('quantity', 0) }}</div>
+                        <div class="product-price">Rs {{ "%.2f"|format(item.get('subtotal', 0)) }}</div>
                     </div>
-                </div>
-                <div>
-                    {% if sale.get('payment_status') == "paid" %}
-                        <span class="status-badge status-paid">✓ Paid</span>
-                    {% elif sale.get('payment_status') == "partial" %}
-                        <span class="status-badge status-partial">⚠ Partial</span>
-                    {% elif sale.get('payment_status') == "advance" %}
-                        <span class="status-badge status-advance">↑ Advance</span>
-                    {% else %}
-                        <span class="status-badge status-credit">! Due</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if sale.get('notes') %}
-            <div style="margin: 0 20px 12px; padding: 12px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; font-size: 0.8rem; color: #166534; font-weight: 500;">
-                📋 {{ sale.get('notes') }}
-            </div>
-            {% endif %}
-
-            <div class="invoice-content">
-                <div class="items-header">
-                    <div>Product</div>
-                    <div>Qty</div>
-                    <div>Total</div>
-                </div>
-
-                {% for item in sale.get('items',[]) %}
-                <div class="invoice-item">
-                    <div class="item-main">
-                        <div class="product-badge"><i class="bi bi-box-seam"></i></div>
-                        <div>
-                            <div class="product-name">{{ item.get('product_name','') }}</div>
-                            <div class="product-unit">{{ item.get('unit','') }}</div>
-                        </div>
-                    </div>
-                    <div class="product-qty">{{ item.get('quantity',0) }}</div>
-                    <div class="product-price">Rs {{ item.get('subtotal',0)|round(2) }}</div>
-                </div>
-                {% endfor %}
-
-                <div class="invoice-summary">
-                    <div class="summary-row">
-                        <span>Total Amount</span>
-                        <strong>Rs {{ sale.get('total_amount',0)|round(2) }}</strong>
-                    </div>
-                    <div class="summary-row">
-                        <span>Cash Paid</span>
-                        <strong>Rs {{ sale.get('paid_amount',0)|round(2) }}</strong>
-                    </div>
-                    {% if sale.get('advance_used',0) > 0 %}
-                    <div class="summary-row">
-                        <span>Advance Used</span>
-                        <strong>Rs {{ sale.get('advance_used',0)|round(2) }}</strong>
+                    {% endfor %}
+                    
+                    {% if sale.get('items', [])|length > 3 %}
+                    <div class="text-center mt-2">
+                        <small class="text-muted">+ {{ sale.get('items', [])|length - 3 }} more item(s)</small>
                     </div>
                     {% endif %}
-                    {% set due = sale.get('due_amount',0) %}
-                    {% set advance = sale.get('advance_amount',0) %}
-                    <div class="summary-row final">
-                        <span>{% if due > 0 %}Due Balance{% elif advance > 0 %}Advance Credit{% else %}Status{% endif %}</span>
-                        <strong style="color: {% if due > 0 %}#dc2626{% elif advance > 0 %}#3b82f6{% else %}#10b981{% endif %};">
-                            {% if due > 0 %}Rs {{ due|round(2) }}{% elif advance > 0 %}Rs {{ advance|round(2) }}{% else %}Fully Paid{% endif %}
-                        </strong>
+
+                    <div class="invoice-summary">
+                        <div class="summary-row">
+                            <span>Total Amount</span>
+                            <strong>Rs {{ "%.2f"|format(sale.get('total_amount', 0)) }}</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Cash Paid</span>
+                            <strong>Rs {{ "%.2f"|format(sale.get('paid_amount', 0)) }}</strong>
+                        </div>
+                        {% if sale.get('advance_used', 0) > 0 %}
+                        <div class="summary-row">
+                            <span>Advance Used</span>
+                            <strong>Rs {{ "%.2f"|format(sale.get('advance_used', 0)) }}</strong>
+                        </div>
+                        {% endif %}
+                        {% set due = sale.get('due_amount', 0) %}
+                        {% set advance = sale.get('advance_amount', 0) %}
+                        <div class="summary-row final">
+                            <span>{% if due > 0 %}Due Balance{% elif advance > 0 %}Advance Credit{% else %}Status{% endif %}</span>
+                            <strong style="color: {% if due > 0 %}#dc2626{% elif advance > 0 %}#3b82f6{% else %}#10b981{% endif %};">
+                                {% if due > 0 %}Rs {{ "%.2f"|format(due) }}{% elif advance > 0 %}Rs {{ "%.2f"|format(advance) }}{% else %}Fully Paid{% endif %}
+                            </strong>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="invoice-footer">
-                <div class="thank-you">
-                    <i class="bi bi-shield-check"></i> Thank you for your business
+                <div class="invoice-footer">
+                    <div class="thank-you">
+                        <i class="bi bi-shield-check"></i> Thank you for your business
+                    </div>
+                    <a href="{{ url_for('customer.view_invoice', sale_id=sale.get('id')) }}" 
+                       class="btn-ui btn-primary-ui" 
+                       target="_blank">
+                        <i class="bi bi-printer"></i> View Invoice
+                    </a>
                 </div>
-                <a href="{{ url_for('customer.view_invoice', sale_id=sale.get('id')) }}" 
-                   class="btn-ui btn-primary-ui" 
-                   target="_blank">
-                    <i class="bi bi-printer"></i> View Invoice
-                </a>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        
+        {% if recent_sales|length < total_sales_count %}
+        <div class="load-more-container" id="loadMoreContainer">
+            <button class="btn-ui btn-outline-ui load-more-btn" id="loadMoreBtn">
+                <i class="bi bi-arrow-down"></i> Load More Invoices
+            </button>
+        </div>
+        {% endif %}
     </div>
-    {% else %}
+    
+    {% if not recent_sales %}
     <div class="empty-state">
         <div class="empty-icon"><i class="bi bi-receipt"></i></div>
         <div class="empty-title">No Purchases Found</div>
@@ -645,5 +803,144 @@
     {% endif %}
 
 </div>
+
+<script>
+let currentPage = 1;
+let isLoading = false;
+let totalPages = {{ total_pages|default(1) }};
+
+// Helper function to format currency
+function formatCurrency(amount) {
+    return 'Rs ' + parseFloat(amount).toFixed(2);
+}
+
+// Update stats on the page
+function updateStats(data) {
+    if (data.total_purchases !== undefined) {
+        document.querySelector('.stat-total-purchases').innerHTML = 'Rs ' + formatCurrency(data.total_purchases);
+    }
+    if (data.total_payments !== undefined) {
+        document.querySelector('.stat-total-payments').innerHTML = 'Rs ' + formatCurrency(data.total_payments);
+    }
+    if (data.pending_due !== undefined) {
+        const dueElement = document.querySelector('.stat-due-balance');
+        if (parseFloat(data.pending_due) > 0) {
+            dueElement.innerHTML = 'Rs ' + formatCurrency(data.pending_due);
+        } else {
+            dueElement.innerHTML = 'Rs 0';
+        }
+    }
+    if (data.advance_balance !== undefined) {
+        const advanceElement = document.querySelector('.stat-advance-balance');
+        if (parseFloat(data.advance_balance) > 0) {
+            advanceElement.innerHTML = 'Rs ' + formatCurrency(data.advance_balance);
+        } else {
+            advanceElement.innerHTML = 'Rs 0';
+        }
+    }
+}
+
+// Refresh all data via AJAX
+async function refreshData() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    refreshBtn.classList.add('loading');
+    refreshBtn.disabled = true;
+    
+    try {
+        const response = await fetch('{{ url_for("customer.dashboard") }}?ajax=1', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update stats
+            updateStats(data);
+            
+            // Update invoice count
+            document.getElementById('invoiceCount').innerHTML = data.sales_count + ' invoices available';
+            
+            // Refresh invoices
+            if (data.html) {
+                document.getElementById('invoiceGrid').innerHTML = data.html;
+            }
+            
+            // Update load more button visibility
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            if (loadMoreContainer) {
+                if (data.has_more) {
+                    loadMoreContainer.style.display = 'block';
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+            }
+            
+            currentPage = 1;
+            totalPages = data.total_pages || 1;
+        }
+    } catch (error) {
+        console.error('Error refreshing data:', error);
+    } finally {
+        refreshBtn.classList.remove('loading');
+        refreshBtn.disabled = false;
+    }
+}
+
+// Load more invoices
+async function loadMoreInvoices() {
+    if (isLoading) return;
+    if (currentPage >= totalPages) {
+        document.getElementById('loadMoreContainer').style.display = 'none';
+        return;
+    }
+    
+    isLoading = true;
+    const nextPage = currentPage + 1;
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const originalText = loadMoreBtn.innerHTML;
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.innerHTML = '<span class="loading-spinner"></span> Loading...';
+    
+    try {
+        const response = await fetch('{{ url_for("customer.dashboard") }}?page=' + nextPage + '&ajax=1', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.html) {
+            // Append new invoices to the grid
+            document.getElementById('invoiceGrid').insertAdjacentHTML('beforeend', data.html);
+            currentPage = nextPage;
+            
+            // Update total pages
+            totalPages = data.total_pages || totalPages;
+            
+            // Hide load more button if no more pages
+            if (currentPage >= totalPages || !data.has_more) {
+                document.getElementById('loadMoreContainer').style.display = 'none';
+            }
+            
+            // Update stats (in case totals changed)
+            updateStats(data);
+        }
+    } catch (error) {
+        console.error('Error loading more invoices:', error);
+    } finally {
+        isLoading = false;
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = originalText;
+    }
+}
+
+// Event listeners
+document.getElementById('refreshBtn')?.addEventListener('click', refreshData);
+document.getElementById('loadMoreBtn')?.addEventListener('click', loadMoreInvoices);
+
+// Auto-refresh every 30 seconds (optional)
+setInterval(refreshData, 30000);
+</script>
 
 {% endblock %}

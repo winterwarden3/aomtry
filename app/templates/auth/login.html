@@ -11,8 +11,38 @@
 {% block content %}
 
 <style>
+/* ============================================
+   PROFESSIONAL UI - CONSISTENT WITH ADMIN PAGES
+   FULLY MOBILE OPTIMIZED
+   ============================================ */
+
+:root {
+    --primary: #0C5B3F;
+    --primary-light: #138A52;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
 body {
-    background: linear-gradient(135deg, #0C5B3F 0%, #138A52 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     min-height: 100vh;
 }
 
@@ -21,139 +51,265 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 80vh;
-    padding: 20px;
+    padding: 1.25rem;
 }
 
 .login-card {
     background: white;
-    border-radius: 20px;
-    padding: 35px;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
     width: 100%;
-    max-width: 420px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .login-card h3 {
-    color: #0C5B3F;
+    color: var(--primary);
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 1.75rem;
     font-weight: 700;
+    font-size: 1.35rem;
 }
 
+/* Toggle Buttons */
 .login-type-toggle {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
 }
 
 .toggle-btn {
     flex: 1;
     text-align: center;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 0.7rem;
+    border-radius: var(--radius-md);
     text-decoration: none;
     font-weight: 600;
-    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
 }
 
 .toggle-btn.customer {
-    background: #f0f0f0;
-    color: #0C5B3F;
-    border: 1px solid #0C5B3F;
+    background: var(--gray-100);
+    color: var(--primary);
+    border: 1px solid var(--gray-200);
 }
 
 .toggle-btn.customer.active {
-    background: #138A52;
+    background: var(--primary-light);
     color: white;
+    border-color: var(--primary-light);
 }
 
 .toggle-btn.admin {
-    background: #f0f0f0;
-    color: #0C5B3F;
-    border: 1px solid #0C5B3F;
+    background: var(--gray-100);
+    color: var(--primary);
+    border: 1px solid var(--gray-200);
 }
 
 .toggle-btn.admin.active {
-    background: #0C5B3F;
+    background: var(--primary);
     color: white;
+    border-color: var(--primary);
 }
 
 .toggle-btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
 .input-group {
-    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.input-group:focus-within {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
 .input-group-text {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-right: none;
+    background: transparent;
+    border: none;
+    padding: 0.75rem 0 0.75rem 1rem;
+    color: var(--gray-400);
+    font-size: 1.1rem;
+    min-width: 45px;
+    text-align: center;
 }
 
 .form-control {
-    border-left: none;
+    border: none;
+    padding: 0.75rem 1rem 0.75rem 0.5rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: transparent;
+    width: 100%;
 }
 
 .form-control:focus {
-    border-color: #0C5B3F;
+    outline: none;
     box-shadow: none;
 }
 
+.form-control::placeholder {
+    color: var(--gray-300);
+    font-size: 0.85rem;
+}
+
+/* Error Message */
+.error-message {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    color: #991b1b;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-message i {
+    font-size: 1rem;
+}
+
+/* Character Counter */
+.char-counter {
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    text-align: right;
+    margin-top: 0.35rem;
+}
+
+.char-counter.warning {
+    color: var(--warning);
+}
+
+.char-counter.danger {
+    color: var(--danger);
+}
+
+/* Login Button */
 .btn-login {
-    background: #0C5B3F;
+    background: var(--primary);
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 12px;
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
     font-weight: 600;
+    font-size: 0.9rem;
     width: 100%;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
 }
 
-.btn-login:hover {
-    background: #138A52;
-    transform: translateY(-2px);
+.btn-login:hover:not(:disabled) {
+    background: var(--primary-light);
+    transform: translateY(-1px);
 }
 
-.back-link {
-    text-align: center;
-    margin-top: 20px;
+.btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.back-link a {
-    color: #666;
-    text-decoration: none;
+/* Spinner */
+.spinner-border-sm {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.6s linear infinite;
+    margin-right: 0.5rem;
 }
 
-.back-link a:hover {
-    color: #0C5B3F;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
+/* Links */
 .forgot-link {
     display: block;
     text-align: center;
-    margin-top: 15px;
-    color: #0C5B3F;
+    margin-top: 1.25rem;
+    color: var(--gray-500);
     text-decoration: none;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
 }
 
 .forgot-link:hover {
+    color: var(--primary);
     text-decoration: underline;
 }
 
-.footer-text {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 12px;
-    color: #888;
+/* Responsive */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 1.5rem;
+    }
+    
+    .login-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .toggle-btn {
+        font-size: 0.75rem;
+        padding: 0.6rem;
+    }
+    
+    .form-label {
+        font-size: 0.7rem;
+    }
+    
+    .form-control {
+        font-size: 0.85rem;
+    }
+    
+    .input-group-text {
+        min-width: 40px;
+        padding: 0.65rem 0 0.65rem 0.75rem;
+    }
+    
+    .form-control {
+        padding: 0.65rem 0.75rem 0.65rem 0.25rem;
+    }
 }
 </style>
 
 <div class="login-container">
     <div class="login-card">
         
+        <!-- Error message container - ONLY for login errors -->
+        <div id="errorContainer"></div>
 
         <!-- Toggle Buttons -->
         <div class="login-type-toggle">
@@ -175,43 +331,148 @@ body {
             {% endif %}
         </h3>
 
-        <form method="POST">
+        <form id="loginForm" method="POST">
             <input type="hidden" name="login_type" value="{{ user_type }}">
             
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-person"></i>
-                </span>
-                <input type="text" class="form-control" name="username" placeholder="Username" required>
+            <div class="form-group">
+                <label class="form-label">USERNAME</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-person"></i>
+                    </span>
+                    <input type="text" class="form-control" name="username" placeholder="Enter your username" 
+                           maxlength="30" required id="username" autocomplete="username">
+                </div>
+                <div class="char-counter" id="usernameCounter">
+                    <span id="usernameCount">0</span>/30 characters
+                </div>
             </div>
 
-            <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-lock"></i>
-                </span>
-                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            <div class="form-group">
+                <label class="form-label">PASSWORD</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="bi bi-lock"></i>
+                    </span>
+                    <input type="password" class="form-control" name="password" placeholder="Enter your password" 
+                           maxlength="20" required id="password" autocomplete="current-password">
+                </div>
+                <div class="char-counter" id="passwordCounter">
+                    <span id="passwordCount">0</span>/20 characters
+                </div>
             </div>
 
-            <button type="submit" class="btn-login">
+            <button type="submit" class="btn-login" id="loginBtn">
                 <i class="bi bi-box-arrow-in-right"></i> Login
             </button>
-
-            {% if remaining_attempts is defined and remaining_attempts > 0 %}
-                <div class="alert alert-warning text-center small">
-                    <i class="bi bi-exclamation-triangle"></i> 
-                    {{ remaining_attempts }} login attempt(s) remaining
-                </div>
-             {% endif %}
         </form>
 
         <a href="{{ url_for('auth.forgot_password', type=user_type) }}" class="forgot-link">
             Forgot Password?
         </a>
-
-
-
-
     </div>
 </div>
+
+<script>
+// Get form elements
+const loginForm = document.getElementById('loginForm');
+const loginBtn = document.getElementById('loginBtn');
+const errorContainer = document.getElementById('errorContainer');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const usernameCount = document.getElementById('usernameCount');
+const passwordCount = document.getElementById('passwordCount');
+
+// Character counter function
+function updateCharCounter(input, counterElement, maxLength) {
+    const length = input.value.length;
+    counterElement.textContent = length;
+    
+    const counterDiv = input.closest('.form-group').querySelector('.char-counter');
+    if (length === maxLength) {
+        counterDiv.classList.add('danger');
+        counterDiv.classList.remove('warning');
+    } else if (length >= maxLength * 0.8) {
+        counterDiv.classList.add('warning');
+        counterDiv.classList.remove('danger');
+    } else {
+        counterDiv.classList.remove('warning', 'danger');
+    }
+}
+
+// Add character counter event listeners
+usernameInput.addEventListener('input', function() {
+    updateCharCounter(this, usernameCount, 30);
+});
+passwordInput.addEventListener('input', function() {
+    updateCharCounter(this, passwordCount, 20);
+});
+
+// Initialize counters
+updateCharCounter(usernameInput, usernameCount, 30);
+updateCharCounter(passwordInput, passwordCount, 20);
+
+// Function to show error message only
+function showError(message) {
+    errorContainer.innerHTML = '';
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> ${message}`;
+    errorContainer.appendChild(errorDiv);
+}
+
+// Handle form submission with AJAX
+loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const originalButtonContent = loginBtn.innerHTML;
+    
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = '<span class="spinner-border-sm"></span> Logging in...';
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        // Parse response as JSON
+        const data = await response.json();
+        
+        if (data.success) {
+            // Login successful - redirect
+            window.location.href = data.redirect;
+            return;
+        } else {
+            // Login failed - show error message
+            showError(data.error || 'Invalid username or password');
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = originalButtonContent;
+            
+            // Clear password field for security
+            document.getElementById('password').value = '';
+        }
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('Network error. Please check your connection and try again.');
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = originalButtonContent;
+    }
+});
+
+// Add enter key support
+passwordInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        loginForm.dispatchEvent(new Event('submit'));
+    }
+});
+</script>
 
 {% endblock %}

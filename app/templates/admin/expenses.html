@@ -11,6 +11,8 @@
 
 :root {
     --primary: #0C5B3F;
+    --primary-light: #138A52;
+    --primary-dark: #09452F;
     --accent: #138A52;
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
@@ -33,21 +35,224 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+/* Modal Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 450px;
+    width: 90%;
+    padding: 28px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-success-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-error-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-error-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-danger-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-danger-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-info-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-info-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--gray-800);
+}
+
+.modal-message {
+    color: var(--gray-600);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.modal-button-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-button-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.modal-button-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.modal-button-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.modal-button-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-button-secondary:hover {
+    background: var(--gray-300);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+}
+
+/* Layout */
 .container-fluid {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 1rem;
 }
 
-/* Header - Matching Sales Page */
+/* Header */
 .page-header {
-    margin-bottom: 28px;
+    margin-bottom: 1.5rem;
 }
 
 .page-header h1 {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--gray-800);
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
 }
 
 .page-header p {
@@ -55,7 +260,7 @@
     color: var(--gray-500);
 }
 
-/* Cards - Matching Sales Page */
+/* Cards */
 .stat-card, .card-ui {
     background: white;
     border: 1px solid var(--gray-200);
@@ -63,7 +268,7 @@
 }
 
 .stat-card {
-    padding: 20px;
+    padding: 1rem;
     transition: all 0.2s ease;
 }
 
@@ -78,39 +283,39 @@
 }
 
 .stat-card h6 {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--gray-500);
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .stat-value {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 700;
     line-height: 1.2;
     color: var(--gray-800);
 }
 
 .stat-footer {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--gray-400);
-    margin-top: 6px;
+    margin-top: 0.375rem;
 }
 
 .icon-box {
-    width: 42px;
-    height: 42px;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 1.2rem;
     flex-shrink: 0;
 }
 
-/* Buttons - Matching Sales Page */
+/* Buttons */
 .btn-ui {
     border: none;
     border-radius: var(--radius-sm);
@@ -119,11 +324,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 0.375rem;
     text-decoration: none;
     cursor: pointer;
     font-size: 0.75rem;
-    padding: 6px 12px;
+    padding: 0.375rem 0.75rem;
 }
 
 .btn-primary-ui {
@@ -132,7 +337,7 @@
 }
 
 .btn-primary-ui:hover {
-    background: var(--accent);
+    background: var(--primary-light);
     transform: translateY(-1px);
 }
 
@@ -156,29 +361,41 @@
     background: #dc2626;
 }
 
-/* Search/Filter - Matching Sales Page */
+.btn-info-ui {
+    background: transparent;
+    border: 1px solid var(--info);
+    color: var(--info);
+}
+
+.btn-info-ui:hover {
+    background: var(--info);
+    color: white;
+}
+
+/* Search/Filter */
 .search-wrapper {
     display: flex;
-    gap: 10px;
+    gap: 0.75rem;
 }
 
-.search-input {
+.search-input, .category-select {
     flex: 1;
-    padding: 10px 14px;
+    padding: 0.6rem 0.875rem;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     transition: all 0.2s ease;
     font-family: inherit;
+    background: white;
 }
 
-.search-input:focus {
+.search-input:focus, .category-select:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--primary-light);
     box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
-/* Table - Matching Sales Page */
+/* Table */
 .expenses-table {
     width: 100%;
     border-collapse: collapse;
@@ -186,7 +403,7 @@
 
 .expenses-table th {
     text-align: left;
-    padding: 14px 12px;
+    padding: 0.875rem 0.75rem;
     background: var(--gray-50);
     font-size: 0.7rem;
     font-weight: 600;
@@ -194,15 +411,13 @@
     letter-spacing: 0.05em;
     color: var(--gray-500);
     border-bottom: 1px solid var(--gray-200);
-    font-family: inherit;
 }
 
 .expenses-table td {
-    padding: 14px 12px;
+    padding: 1rem 0.75rem;
     border-bottom: 1px solid var(--gray-100);
     font-size: 0.85rem;
     vertical-align: middle;
-    font-family: inherit;
 }
 
 .expenses-table tr:last-child td {
@@ -213,22 +428,22 @@
     background: var(--gray-50);
 }
 
-/* Expense ID - Matching Invoice Number */
+/* Expense ID */
 .expense-id {
     font-weight: 600;
     color: var(--primary);
     font-size: 0.85rem;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.375rem;
 }
 
 /* Category Badge */
 .category-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
+    gap: 0.25rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 30px;
     font-size: 0.7rem;
     font-weight: 600;
@@ -236,7 +451,7 @@
     color: var(--gray-600);
 }
 
-/* Amount - Matching Sales Page */
+/* Amount */
 .amount {
     font-weight: 600;
     white-space: nowrap;
@@ -250,19 +465,19 @@
     color: var(--warning);
 }
 
-/* Action Buttons - Matching Sales Page */
+/* Action Buttons */
 .action-group {
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-/* Status Badge - Matching Sales Page */
+/* Status Badge */
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
+    gap: 0.25rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 30px;
     font-size: 0.7rem;
     font-weight: 600;
@@ -278,18 +493,104 @@
     color: #d97706;
 }
 
-/* Pagination - Matching Sales Page */
+/* Detail Modal Styles */
+.detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    animation: fadeIn 0.3s ease;
+}
+
+.detail-modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    max-width: 500px;
+    width: 90%;
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
+}
+
+.detail-modal-header {
+    background: var(--gray-800);
+    color: white;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-modal-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.detail-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.detail-modal-body {
+    padding: 1.5rem;
+}
+
+.detail-row {
+    display: flex;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.detail-label {
+    width: 120px;
+    font-weight: 600;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+}
+
+.detail-value {
+    flex: 1;
+    color: var(--gray-800);
+    font-size: 0.85rem;
+}
+
+.detail-value strong {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.detail-modal-footer {
+    border-top: 1px solid var(--gray-200);
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+/* Pagination */
 .pagination {
     display: flex;
     justify-content: flex-end;
-    gap: 6px;
-    margin-top: 20px;
-    padding: 16px;
+    gap: 0.375rem;
+    margin-top: 1.25rem;
+    padding: 1rem;
     border-top: 1px solid var(--gray-200);
+    flex-wrap: wrap;
 }
 
 .page-link {
-    padding: 6px 12px;
+    padding: 0.375rem 0.75rem;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-sm);
     text-decoration: none;
@@ -305,23 +606,23 @@
     color: white;
 }
 
-/* Empty State - Matching Sales Page */
+/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 3rem 1.5rem;
 }
 
 .empty-icon {
-    font-size: 48px;
+    font-size: 3rem;
     color: var(--gray-300);
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
 }
 
 .empty-title {
     font-size: 1rem;
     font-weight: 500;
     color: var(--gray-600);
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .empty-desc {
@@ -329,7 +630,10 @@
     color: var(--gray-400);
 }
 
-/* Mobile Responsive - Matching Sales Page */
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
 @media (max-width: 1024px) {
     .expenses-table th:nth-child(4),
     .expenses-table td:nth-child(4) {
@@ -338,13 +642,27 @@
 }
 
 @media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.75rem;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .icon-box {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
+    }
+    
     .expenses-table thead {
         display: none;
     }
     
     .expenses-table tbody tr {
         display: block;
-        margin-bottom: 16px;
+        margin-bottom: 1rem;
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-lg);
         background: white;
@@ -354,7 +672,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 16px;
+        padding: 0.7rem 1rem;
         border: none;
         border-bottom: 1px solid #f0f0f0;
     }
@@ -376,18 +694,17 @@
         justify-content: flex-end;
     }
     
-    .stat-value {
-        font-size: 1.3rem;
+    .detail-row {
+        flex-direction: column;
+        gap: 0.25rem;
     }
     
-    .icon-box {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+    .detail-label {
+        width: 100%;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
     .search-wrapper {
         flex-direction: column;
     }
@@ -400,32 +717,55 @@
     .btn-ui {
         width: 100%;
     }
+    
+    .expenses-table td {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .expenses-table td::before {
+        min-width: auto;
+    }
+    
+    .pagination {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 360px) {
+    .stat-value {
+        font-size: 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.25rem;
+    }
 }
 </style>
 
-<div class="container-fluid px-md-3 py-3">
-
-    <!-- Header - Matching Sales Page -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div>
-            <h1 class="fw-bold mb-1" style="font-size: 1.5rem;">
-                <i class="bi bi-receipt"></i> Expenses
-            </h1>
-            <p class="text-muted mb-0" style="font-size: 0.8rem;">Track and manage business expenses</p>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1><i class="bi bi-receipt"></i> Expenses</h1>
+                <p>Track and manage business expenses</p>
+            </div>
+            <a href="{{ url_for('admin.add_expense') }}" class="btn-ui btn-primary-ui">
+                <i class="bi bi-plus-lg"></i> Add Expense
+            </a>
         </div>
-        <a href="{{ url_for('admin.add_expense') }}" class="btn-ui btn-primary-ui">
-            <i class="bi bi-plus-lg"></i> Add Expense
-        </a>
     </div>
 
-    <!-- Stats Cards - Matching Sales Page -->
+    <!-- Stats Cards -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Total Expenses</h6>
-                        <div class="stat-value">{{ total_expenses }}</div>
+                        <div class="stat-value">Rs {{ total_expenses|default(0)|float|round(2) }}</div>
                         <div class="stat-footer">{{ expenses.total }} transactions</div>
                     </div>
                     <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
@@ -434,7 +774,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
@@ -448,12 +788,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Avg per Transaction</h6>
-                        <div class="stat-value">Rs {{ avg_per_transaction }}</div>
+                        <div class="stat-value">Rs {{ avg_per_transaction|default(0)|float|round(2) }}</div>
                         <div class="stat-footer">Average expense</div>
                     </div>
                     <div class="icon-box" style="background: rgba(245,158,11,0.1); color: #f59e0b;">
@@ -462,12 +802,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6">
+        <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Highest Expense</h6>
-                        <div class="stat-value">Rs {{ highest_expense }}</div>
+                        <div class="stat-value">Rs {{ highest_expense|default(0)|float|round(2) }}</div>
                         <div class="stat-footer">Single highest</div>
                     </div>
                     <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
@@ -478,24 +818,26 @@
         </div>
     </div>
 
-    <!-- Search/Filter - Matching Sales Page -->
-    <div class="card-ui mb-4" style="padding: 16px;">
-        <form method="GET" action="{{ url_for('admin.expenses_list') }}">
-            <div class="search-wrapper">
-                <select class="search-input" name="category" onchange="this.form.submit()">
-                    <option value="">All Categories</option>
-                    {% for cat in categories %}
-                        <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn-ui btn-primary-ui" style="padding: 10px 20px;">
-                    <i class="bi bi-search"></i> Filter
-                </button>
-            </div>
-        </form>
+    <!-- Search/Filter -->
+    <div class="card-ui mb-4">
+        <div style="padding: 1rem;">
+            <form method="GET" action="{{ url_for('admin.expenses_list') }}" id="filterForm">
+                <div class="search-wrapper">
+                    <select class="category-select" name="category" id="categorySelect">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn-ui btn-primary-ui">
+                        <i class="bi bi-search"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Expenses Table - Matching Sales Page -->
+    <!-- Expenses Table -->
     <div class="card-ui">
         <div style="overflow-x: auto;">
             <table class="expenses-table">
@@ -510,11 +852,12 @@
                         <th></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="expensesTableBody">
                     {% for expense in expenses.items %}
-                    <tr>
+                    {% set amount = expense.get('amount', 0) %}
+                    <tr data-expense-id="{{ expense.get('id') }}">
                         <td data-label="Expense ID">
-                            <span class="expense-id"><i class="bi bi-receipt"></i> EXP-{{ expense.get('id') }}</span>
+                            <span class="expense-id"><i class="bi bi-receipt"></i> #{{ expense.get('id') }}</span>
                         </td>
                         <td data-label="Date">
                             {{ expense.get('date', '')[:10] if expense.get('date') else '' }}
@@ -523,29 +866,39 @@
                             <span class="category-badge"><i class="bi bi-tag"></i> {{ expense.get('category', 'Uncategorized') }}</span>
                         </td>
                         <td data-label="Description">
-                            {{ expense.get('description', '-') }}
+                            {{ expense.get('description', '-')|truncate(50) }}
                         </td>
-                        <td data-label="Amount" class="amount {% if expense.get('amount', 0) > 10000 %}amount-high{% else %}amount-normal{% endif %}">
-                            Rs {{ "%.2f"|format(expense.get('amount', 0)) }}
+                        <td data-label="Amount" class="amount {% if amount > 10000 %}amount-high{% else %}amount-normal{% endif %}">
+                            Rs {{ "%.2f"|format(amount) }}
                         </td>
                         <td data-label="Status">
-                            {% if expense.get('amount', 0) > 10000 %}
-                                <span class="status-badge status-high">High Value</span>
+                            {% if amount > 10000 %}
+                                <span class="status-badge status-high"><i class="bi bi-exclamation-triangle"></i> High</span>
                             {% else %}
-                                <span class="status-badge status-normal">Normal</span>
+                                <span class="status-badge status-normal"><i class="bi bi-check-circle"></i> Normal</span>
                             {% endif %}
                         </td>
                         <td data-label="Actions">
                             <div class="action-group">
+                                <button type="button" class="btn-ui btn-info-ui view-expense-btn" 
+                                        data-expense-id="{{ expense.get('id') }}"
+                                        data-expense-date="{{ expense.get('date', '')[:10] if expense.get('date') else '' }}"
+                                        data-expense-category="{{ expense.get('category', 'Uncategorized') }}"
+                                        data-expense-description="{{ expense.get('description', '-')|replace("'", "\\'") }}"
+                                        data-expense-amount="{{ amount }}"
+                                        data-expense-notes="{{ expense.get('notes', '')|replace("'", "\\'") }}"
+                                        data-expense-created="{{ expense.get('created_at', '')[:19] if expense.get('created_at') else expense.get('date', '')[:19] if expense.get('date') else '' }}">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
                                 <a href="{{ url_for('admin.edit_expense', expense_id=expense.get('id')) }}" class="btn-ui btn-outline-ui">
                                     <i class="bi bi-pencil"></i> Edit
                                 </a>
-                                <form method="POST" action="{{ url_for('admin.delete_expense', expense_id=expense.get('id')) }}" 
-                                      onsubmit="return confirm('Delete this expense?');" style="display: inline;">
-                                    <button type="submit" class="btn-ui btn-danger-ui">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </button>
-                                </form>
+                                <button type="button" class="btn-ui btn-danger-ui delete-expense-btn" 
+                                        data-expense-id="{{ expense.get('id') }}"
+                                        data-expense-category="{{ expense.get('category', 'Uncategorized')|replace("'", "\\'") }}"
+                                        data-expense-amount="{{ amount }}">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -567,7 +920,7 @@
             </table>
         </div>
         
-        <!-- Pagination - Matching Sales Page -->
+        <!-- Pagination -->
         {% if expenses.pages > 1 %}
         <div class="pagination">
             {% if expenses.has_prev %}
@@ -584,7 +937,218 @@
         </div>
         {% endif %}
     </div>
-
 </div>
+
+<script>
+// Close modal function
+function closeModal(modalId = null) {
+    if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+    } else {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => modal.remove());
+    }
+}
+
+// Show success/error modal
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('modalCloseBtn').onclick = function() {
+        closeModal('resultModal');
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    };
+}
+
+// Show delete confirmation modal
+function showDeleteConfirmation(expenseId, expenseCategory, expenseAmount) {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal-container">
+                <div class="modal-danger-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="modal-title">Delete Expense?</div>
+                <div class="modal-message">
+                    Are you sure you want to delete this expense?<br><br>
+                    <strong>Category:</strong> ${escapeHtml(expenseCategory)}<br>
+                    <strong>Amount:</strong> Rs ${parseFloat(expenseAmount).toFixed(2)}<br><br>
+                    <span style="color: #ef4444;">⚠️ This action cannot be undone!</span>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-danger" id="confirmDeleteBtn">Yes, Delete</button>
+                    <button class="modal-button modal-button-secondary" id="cancelDeleteBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+        performDelete(expenseId);
+    };
+    
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+    };
+}
+
+// Perform delete via AJAX
+async function performDelete(expenseId) {
+    const loadingHtml = `
+        <div class="modal-overlay" id="loadingModal">
+            <div class="modal-container">
+                <div class="modal-info-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="modal-title">Deleting Expense...</div>
+                <div class="modal-message">Please wait while we delete the expense.</div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', loadingHtml);
+    
+    try {
+        const response = await fetch('/admin/expenses/' + expenseId + '/delete', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        closeModal('loadingModal');
+        
+        if (data.success) {
+            showModal('Deleted!', data.message || 'Expense deleted successfully!', 'success', '/admin/expenses');
+        } else {
+            showModal('Error', data.error || 'Failed to delete expense', 'error');
+        }
+    } catch (error) {
+        closeModal('loadingModal');
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+    }
+}
+
+// Show expense details modal
+function showExpenseDetails(id, date, category, description, amount, notes, created_at) {
+    const modalHtml = `
+        <div class="detail-modal" id="detailModal">
+            <div class="detail-modal-content">
+                <div class="detail-modal-header">
+                    <h5><i class="bi bi-receipt"></i> Expense Details</h5>
+                    <button class="detail-modal-close" onclick="closeDetailModal()">&times;</button>
+                </div>
+                <div class="detail-modal-body">
+                    <div class="detail-row">
+                        <div class="detail-label">Expense ID:</div>
+                        <div class="detail-value"><strong>#${id}</strong></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Date:</div>
+                        <div class="detail-value">${date || '-'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Category:</div>
+                        <div class="detail-value"><span class="category-badge">${escapeHtml(category)}</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Amount:</div>
+                        <div class="detail-value"><strong style="color: var(--danger);">Rs ${parseFloat(amount).toFixed(2)}</strong></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Description:</div>
+                        <div class="detail-value">${escapeHtml(description) || '-'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Notes:</div>
+                        <div class="detail-value">${notes && notes.trim() ? escapeHtml(notes) : '<span class="text-muted">No notes</span>'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Created At:</div>
+                        <div class="detail-value">${created_at || '-'}</div>
+                    </div>
+                </div>
+                <div class="detail-modal-footer">
+                    <button class="btn-ui btn-outline-ui" onclick="closeDetailModal()">Close</button>
+                    <a href="/admin/expenses/${id}/edit" class="btn-ui btn-primary-ui">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById('detailModal');
+    if (modal) modal.remove();
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Attach view expense handlers
+document.querySelectorAll('.view-expense-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const id = this.dataset.expenseId;
+        const date = this.dataset.expenseDate || '';
+        const category = this.dataset.expenseCategory || 'Uncategorized';
+        const description = this.dataset.expenseDescription || '-';
+        const amount = this.dataset.expenseAmount || 0;
+        const notes = this.dataset.expenseNotes || '';
+        const created = this.dataset.expenseCreated || '';
+        showExpenseDetails(id, date, category, description, amount, notes, created);
+    });
+});
+
+// Attach delete handlers
+document.querySelectorAll('.delete-expense-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const expenseId = this.dataset.expenseId;
+        const expenseCategory = this.dataset.expenseCategory;
+        const expenseAmount = this.dataset.expenseAmount;
+        showDeleteConfirmation(expenseId, expenseCategory, expenseAmount);
+    });
+});
+
+// Auto-submit filter on category change
+document.getElementById('categorySelect')?.addEventListener('change', function() {
+    document.getElementById('filterForm').submit();
+});
+</script>
 
 {% endblock %}

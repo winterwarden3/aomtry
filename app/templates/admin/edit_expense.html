@@ -4,9 +4,303 @@
 
 {% block content %}
 
+<style>
+:root {
+    --primary: #0C5B3F;
+    --primary-light: #138A52;
+    --primary-dark: #09452F;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Modal Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 450px;
+    width: 90%;
+    padding: 28px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-success-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-error-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-error-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-danger-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-danger-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-info-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-info-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--gray-800);
+}
+
+.modal-message {
+    color: var(--gray-600);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.modal-button-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-button-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.modal-button-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.modal-button-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.modal-button-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-button-secondary:hover {
+    background: var(--gray-300);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Card Styles */
+.card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.card-body {
+    padding: 28px;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--primary);
+    margin-bottom: 6px;
+}
+
+.form-control {
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    font-size: 0.9rem;
+    transition: all var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+.btn {
+    border-radius: var(--radius-md);
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(12,91,63,0.2);
+}
+
+.btn-primary:disabled {
+    background: var(--gray-400);
+    transform: none;
+    cursor: not-allowed;
+}
+
+.btn-danger {
+    background: var(--danger);
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: var(--gray-200);
+    border: none;
+    color: var(--gray-700);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-300);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 20px;
+    }
+}
+</style>
+
 <div class="container-fluid py-4">
 
-    <!-- Header - Using Bootstrap classes -->
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-0">
@@ -14,67 +308,275 @@
             </h2>
             <small class="text-muted">Update expense details</small>
         </div>
-        <a href="{{ url_for('admin.expenses_list') }}" class="btn btn-light">
+        <a href="{{ url_for('admin.expenses_list') }}" class="btn btn-light" id="cancelBtn">
             <i class="bi bi-arrow-left"></i> Back to Expenses
         </a>
     </div>
 
     <!-- Form Card -->
-    <div class="card shadow-sm">
-        <div class="card-body p-4">
-            <form method="POST">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form id="editExpenseForm">
 
-                <div class="row g-4">
+                        <!-- CATEGORY -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Category *</label>
+                            <input type="text"
+                                   name="category"
+                                   id="expenseCategory"
+                                   class="form-control"
+                                   value="{{ expense.category }}"
+                                   required
+                                   placeholder="e.g., Rent, Utilities, Salary">
+                        </div>
 
-                    <!-- CATEGORY -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Category *</label>
-                        <input type="text"
-                               name="category"
-                               class="form-control"
-                               value="{{ expense.category }}"
-                               required
-                               placeholder="e.g., Rent, Utilities, Salary">
-                    </div>
+                        <!-- AMOUNT -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Amount (Rs.) *</label>
+                            <input type="number"
+                                   step="0.01"
+                                   name="amount"
+                                   id="expenseAmount"
+                                   class="form-control"
+                                   value="{{ expense.amount }}"
+                                   required
+                                   placeholder="0.00">
+                        </div>
 
-                    <!-- AMOUNT -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Amount (Rs.) *</label>
-                        <input type="number"
-                               step="0.01"
-                               name="amount"
-                               class="form-control"
-                               value="{{ expense.amount }}"
-                               required
-                               placeholder="0.00">
-                    </div>
+                        <!-- DESCRIPTION -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea name="description"
+                                      id="expenseDescription"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Enter expense description...">{{ expense.description or '' }}</textarea>
+                            <small class="text-muted">Optional - Add any additional notes</small>
+                        </div>
 
-                    <!-- DESCRIPTION -->
-                    <div class="col-md-12">
-                        <label class="form-label fw-bold">Description</label>
-                        <textarea name="description"
-                                  class="form-control"
-                                  rows="4"
-                                  placeholder="Enter expense description...">{{ expense.description or '' }}</textarea>
-                        <small class="text-muted">Optional - Add any additional notes</small>
-                    </div>
+                        <!-- NOTES (Hidden field that might be needed) -->
+                        <input type="hidden" name="notes" id="expenseNotes" value="{{ expense.notes or '' }}">
 
+                        <!-- Submit Buttons -->
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="bi bi-save"></i> Update Expense
+                            </button>
+                            <button type="button" class="btn btn-danger" id="deleteBtn">
+                                <i class="bi bi-trash"></i> Delete Expense
+                            </button>
+                            <a href="{{ url_for('admin.expenses_list') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+
+                    </form>
                 </div>
-
-                <!-- Submit Buttons -->
-                <div class="mt-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Update Expense
-                    </button>
-                    <a href="{{ url_for('admin.expenses_list') }}" class="btn btn-secondary">
-                        <i class="bi bi-x-circle"></i> Cancel
-                    </a>
-                </div>
-
-            </form>
+            </div>
         </div>
     </div>
 
 </div>
+
+<script>
+// Expense data from backend
+const expenseId = {{ expense.id }};
+const expenseCategory = "{{ expense.category }}";
+const expenseAmount = {{ expense.amount }};
+
+// Close modal function
+function closeModal(modalId = null) {
+    if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+    } else {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => modal.remove());
+    }
+}
+
+// Show success/error modal
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('modalCloseBtn').onclick = function() {
+        closeModal('resultModal');
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    };
+}
+
+// Show delete confirmation modal
+function showDeleteConfirmation() {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal-container">
+                <div class="modal-danger-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="modal-title">Delete Expense?</div>
+                <div class="modal-message">
+                    Are you sure you want to delete this expense?<br><br>
+                    <strong>Category:</strong> ${escapeHtml(expenseCategory)}<br>
+                    <strong>Amount:</strong> Rs ${parseFloat(expenseAmount).toFixed(2)}<br><br>
+                    <span style="color: #ef4444;">⚠️ This action cannot be undone!</span>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-danger" id="confirmDeleteBtn">Yes, Delete</button>
+                    <button class="modal-button modal-button-secondary" id="cancelDeleteBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+        performDelete();
+    };
+    
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+    };
+}
+
+// Perform delete via AJAX
+async function performDelete() {
+    const loadingHtml = `
+        <div class="modal-overlay" id="loadingModal">
+            <div class="modal-container">
+                <div class="modal-info-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="modal-title">Deleting Expense...</div>
+                <div class="modal-message">Please wait while we delete the expense.</div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', loadingHtml);
+    
+    try {
+        const response = await fetch('/admin/expenses/' + expenseId + '/delete', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        closeModal('loadingModal');
+        
+        if (data.success) {
+            showModal('Deleted!', data.message || 'Expense deleted successfully!', 'success', '/admin/expenses');
+        } else {
+            showModal('Error', data.error || 'Failed to delete expense', 'error');
+        }
+    } catch (error) {
+        closeModal('loadingModal');
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+    }
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Delete button click handler
+document.getElementById('deleteBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    showDeleteConfirmation();
+});
+
+// AJAX Form Submission
+let isSubmitting = false;
+
+document.getElementById('editExpenseForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (isSubmitting) return false;
+    
+    // Validate required fields
+    const category = document.getElementById('expenseCategory').value.trim();
+    const amount = parseFloat(document.getElementById('expenseAmount').value);
+    
+    if (!category) {
+        showModal('Validation Error', 'Please enter a category', 'error');
+        return false;
+    }
+    
+    if (isNaN(amount) || amount <= 0) {
+        showModal('Validation Error', 'Please enter a valid amount greater than 0', 'error');
+        return false;
+    }
+    
+    // Collect form data
+    const formData = new FormData();
+    formData.append('category', category);
+    formData.append('amount', amount);
+    formData.append('description', document.getElementById('expenseDescription').value);
+    formData.append('notes', document.getElementById('expenseNotes').value);
+    
+    // Mark as submitting
+    isSubmitting = true;
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Updating Expense...';
+    
+    try {
+        const response = await fetch('{{ url_for("admin.edit_expense", expense_id=expense.id) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showModal('Success!', data.message || 'Expense updated successfully!', 'success', data.redirect || '{{ url_for("admin.expenses_list") }}');
+        } else {
+            showModal('Error', data.error || 'Failed to update expense', 'error');
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Expense';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Expense';
+    }
+});
+</script>
 
 {% endblock %}

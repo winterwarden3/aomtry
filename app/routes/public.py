@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
@@ -20,9 +20,7 @@ def index():
 @bp.route('/home')
 def home():
     """Homepage - Public landing page with products from database"""
-    # Fetch products from database
     all_products = Product.get_all()
-   
     featured_products = all_products[:4] if all_products else []
     return render_template('pages/home.html', products=featured_products)
 
@@ -49,19 +47,30 @@ def products():
 @bp.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        phone = request.form.get('phone')
-        message = request.form.get('message')
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        phone = request.form.get('phone', '').strip()
+        message = request.form.get('message', '').strip()
+        
+        # Check if it's an AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         
         # VALIDATION
         if not name or not email or not message:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Please fill all required fields'})
             flash('Please fill all required fields', 'danger')
+            return redirect(url_for('public.contact'))
+        
+        # Email validation
+        if '@' not in email or '.' not in email:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Please enter a valid email address'})
+            flash('Please enter a valid email address', 'danger')
             return redirect(url_for('public.contact'))
         
         # SAVE TO SUPABASE
         from app.supabase_client import supabase
-        from datetime import datetime
         
         try:
             supabase.table("contact_messages").insert({
@@ -74,8 +83,10 @@ def contact():
             print(f"✅ Contact message saved from {email}")
         except Exception as e:
             print(f"❌ Error saving contact message: {e}")
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Failed to save message. Please try again.'})
         
-        # SEND EMAIL NOTIFICATION (your existing code)
+        # SEND EMAIL NOTIFICATION
         business_email = os.getenv('BREVO_TO_EMAIL', 'contact@adarshoilmill.com.np')
         subject = f"New Contact Message from {name}"
         html_body = f"""
@@ -85,15 +96,25 @@ def contact():
         <p><strong>Phone:</strong> {phone if phone else 'Not provided'}</p>
         <p><strong>Message:</strong></p>
         <p>{message}</p>
+        <hr>
+        <p><strong>Date:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
         """
         
         email_sent = send_email_via_brevo(business_email, subject, html_body)
         
-        if email_sent:
-            flash('Thank you! Your message has been sent successfully.', 'success')
-        else:
-            flash('Your message has been received! We will contact you soon.', 'success')
+        # Prepare success message
+        success_msg = 'Thank you! Your message has been sent successfully. We will contact you soon.'
         
+        # Return JSON response for AJAX requests (NO REDIRECT)
+        if is_ajax:
+            return jsonify({
+                'success': True, 
+                'message': success_msg
+            })
+        
+        # Regular form submission (non-AJAX) - fallback
+        flash(success_msg, 'success')
         return redirect(url_for('public.contact'))
     
+    # GET request - show contact page
     return render_template('pages/contact.html')

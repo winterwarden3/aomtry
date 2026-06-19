@@ -7,13 +7,187 @@
 <style>
 :root {
     --primary: #0C5B3F;
-    --accent: #138A52;
+    --primary-light: #138A52;
+    --primary-dark: #09452F;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
     --radius-lg: 16px;
     --radius-md: 12px;
     --radius-sm: 8px;
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     --border: #e5e7eb;
     --transition: 0.25s ease;
+}
+
+/* Modal Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 450px;
+    width: 90%;
+    padding: 28px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-success-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-error-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-error-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-info-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-info-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--gray-800);
+}
+
+.modal-message {
+    color: var(--gray-600);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.modal-button-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-button-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.modal-button-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-button-secondary:hover {
+    background: var(--gray-300);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 .card-ui {
@@ -38,19 +212,25 @@
     padding: 11px 18px;
 }
 
-.btn-ui:hover {
+.btn-ui:hover:not(:disabled) {
     transform: translateY(-2px);
 }
 
 .btn-primary-ui {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: white;
     width: 100%;
 }
 
-.btn-primary-ui:hover {
+.btn-primary-ui:hover:not(:disabled) {
     color: white;
     box-shadow: 0 6px 18px rgba(19,138,82,0.25);
+}
+
+.btn-primary-ui:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-outline-ui {
@@ -76,7 +256,7 @@
 
 .form-control-ui:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--primary-light);
     box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
@@ -142,29 +322,17 @@ textarea.form-control-ui {
             </h1>
             <p class="text-muted mb-0">Register a new customer into your system</p>
         </div>
-        <a href="{{ url_for('admin.customers_list') }}" class="btn-ui btn-outline-ui">
+        <a href="{{ url_for('admin.customers_list') }}" class="btn-ui btn-outline-ui" id="cancelBtn">
             <i class="bi bi-arrow-left"></i>
             Back to Customers
         </a>
     </div>
 
-    <!-- FLASH MESSAGES -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4 shadow-sm mb-3">
-                    <i class="bi bi-info-circle"></i> {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     <!-- FORM CARD -->
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card-ui">
-                <form method="POST">
+                <form id="addCustomerForm" method="POST">
 
                     <!-- NAME -->
                     <div class="mb-3">
@@ -175,6 +343,7 @@ textarea.form-control-ui {
                             <i class="bi bi-person"></i>
                             <input type="text"
                                    name="name"
+                                   id="customerName"
                                    class="form-control-ui"
                                    placeholder="Enter full name"
                                    required>
@@ -190,10 +359,12 @@ textarea.form-control-ui {
                             <i class="bi bi-at"></i>
                             <input type="text"
                                    name="username"
+                                   id="customerUsername"
                                    class="form-control-ui"
                                    placeholder="Unique username"
                                    required>
                         </div>
+                        <small class="text-muted" style="font-size: 0.7rem;">Auto-generated from name</small>
                     </div>
 
                     <!-- EMAIL -->
@@ -205,6 +376,7 @@ textarea.form-control-ui {
                             <i class="bi bi-envelope"></i>
                             <input type="email"
                                    name="email"
+                                   id="customerEmail"
                                    class="form-control-ui"
                                    placeholder="customer@example.com">
                         </div>
@@ -219,6 +391,7 @@ textarea.form-control-ui {
                             <i class="bi bi-telephone"></i>
                             <input type="text"
                                    name="phone"
+                                   id="customerPhone"
                                    class="form-control-ui"
                                    placeholder="Phone number">
                         </div>
@@ -232,6 +405,7 @@ textarea.form-control-ui {
                         <div class="input-icon">
                             <i class="bi bi-geo-alt"></i>
                             <textarea name="address"
+                                      id="customerAddress"
                                       class="form-control-ui"
                                       rows="3"
                                       placeholder="Customer address (optional)"></textarea>
@@ -239,7 +413,7 @@ textarea.form-control-ui {
                     </div>
 
                     <!-- BUTTON -->
-                    <button type="submit" class="btn-ui btn-primary-ui">
+                    <button type="submit" class="btn-ui btn-primary-ui" id="submitBtn">
                         <i class="bi bi-check-circle"></i>
                         Save Customer
                     </button>
@@ -252,9 +426,48 @@ textarea.form-control-ui {
 </div>
 
 <script>
+// Close modal function
+function closeModal(modalId = null) {
+    if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+    } else {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => modal.remove());
+    }
+}
+
+// Show success/error modal
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('modalCloseBtn').onclick = function() {
+        closeModal('resultModal');
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    };
+}
+
+// Auto-generate username from name
 document.addEventListener("DOMContentLoaded", function () {
-    const nameInput = document.querySelector('input[name="name"]');
-    const usernameInput = document.querySelector('input[name="username"]');
+    const nameInput = document.getElementById('customerName');
+    const usernameInput = document.getElementById('customerUsername');
 
     if (nameInput && usernameInput) {
         nameInput.addEventListener("input", function () {
@@ -265,6 +478,70 @@ document.addEventListener("DOMContentLoaded", function () {
                 .replace(/[^a-z0-9_]/g, "");
             usernameInput.value = username;
         });
+    }
+});
+
+// AJAX Form Submission
+let isSubmitting = false;
+
+document.getElementById('addCustomerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (isSubmitting) return false;
+    
+    // Validate required fields
+    const name = document.getElementById('customerName').value.trim();
+    const username = document.getElementById('customerUsername').value.trim();
+    
+    if (!name) {
+        showModal('Validation Error', 'Please enter customer name', 'error');
+        return false;
+    }
+    
+    if (!username) {
+        showModal('Validation Error', 'Username is required', 'error');
+        return false;
+    }
+    
+    // Collect form data
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('username', username);
+    formData.append('email', document.getElementById('customerEmail').value.trim());
+    formData.append('phone', document.getElementById('customerPhone').value.trim());
+    formData.append('address', document.getElementById('customerAddress').value.trim());
+    
+    // Mark as submitting
+    isSubmitting = true;
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving Customer...';
+    
+    try {
+        const response = await fetch('{{ url_for("admin.add_customer") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showModal('Success!', data.message || 'Customer added successfully!', 'success', data.redirect || '{{ url_for("admin.customers_list") }}');
+        } else {
+            showModal('Error', data.error || 'Failed to add customer', 'error');
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Save Customer';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Save Customer';
     }
 });
 </script>
