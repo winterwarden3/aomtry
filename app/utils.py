@@ -319,53 +319,115 @@ def get_nepal_time():
 
 
 # =========================
-# BYPRODUCT EXCHANGE
+# BYPRODUCT EXCHANGE - FIXED
 # =========================
-MUSTARD_CAKE_NOTE = "Mustard Cake exchanged"
-RICE_BRAN_NOTE = "Rice Bran exchanged"
-
 
 def is_mustard_extraction_product(product_name):
-    return 'mustard oil extraction' in (product_name or '').lower()
+    """
+    Check if product is Mustard Oil Extraction OR Aalas Oil Extraction
+    FIXED: Now checks BOTH products
+    """
+    if not product_name:
+        return False
+    name = product_name.lower().strip()
+    return name == 'mustard oil extraction' or name == 'aalas oil extraction'
 
 
 def is_others_product(product_name):
-    name = (product_name or '').lower().strip()
-    return name == 'others' or name == 'mustard cake, others' or name.endswith(', others')
+    """
+    Legacy function - kept for backward compatibility
+    Only checks for 'Others'
+    """
+    if not product_name:
+        return False
+    name = product_name.lower().strip()
+    return name == 'others'
+
+
+def is_others_or_dalbanai_product(product_name):
+    """
+    Check if product is Others OR Dal Banai (for Rice Bran Exchange)
+    FIXED: NEW function - checks both Others AND Dal Banai
+    """
+    if not product_name:
+        return False
+    name = product_name.lower().strip()
+    return name == 'others' or name == 'dal banai'
 
 
 def build_byproduct_note(exchange_mustard_cake=False, exchange_rice_bran=False):
+    """
+    Build sale notes from exchange flags
+    FIXED: Now mentions Aalas Oil and Dal Banai
+    """
     notes = []
     if exchange_mustard_cake:
-        notes.append(f" {MUSTARD_CAKE_NOTE}")
+        notes.append('Mustard Cake Exchange: Mustard Oil + Aalas Oil FREE')
     if exchange_rice_bran:
-        notes.append(f"{RICE_BRAN_NOTE}")
-    return ' | '.join(notes)
+        notes.append('Rice Bran Exchange: Dal Banai + Others FREE')
+    return ' | '.join(notes) if notes else ''
 
 
 def parse_exchange_from_note(note):
-    text = (note or '').lower()
-    return ('mustard cake' in text, 'rice bran' in text)
+    """
+    Parse exchange flags from sale notes
+    FIXED: Now properly parses the new note format
+    """
+    if not note:
+        return False, False
+    
+    note_lower = note.lower()
+    exchange_mustard_cake = 'mustard cake exchange' in note_lower
+    exchange_rice_bran = 'rice bran exchange' in note_lower
+    
+    return exchange_mustard_cake, exchange_rice_bran
 
 
 def apply_byproduct_exchange_to_line_items(items, exchange_mustard_cake=False, exchange_rice_bran=False):
-    """Zero out matching service lines when byproduct was left."""
+    """
+    Apply byproduct exchange rules to line items.
+    
+    FIXED: Now properly handles:
+        - MUSTARD CAKE EXCHANGE (J = YES):
+            - Mustard Oil Extraction → FREE (quantity=10, rate=0)
+            - Aalas Oil Extraction → FREE (quantity=10, rate=0)
+        
+        - RICE BRAN EXCHANGE (K = YES):
+            - Dal Banai → FREE (quantity=10, rate=0)
+            - Others → FREE (quantity=10, rate=0)
+            - Rice Bran → NOT affected (remains normal product)
+    """
+    if not items:
+        return items
+    
     updated = []
     for item in items:
         row = dict(item)
         product = row.get('product_name', '')
         qty = float(row.get('quantity', 0) or 0)
         rate = float(row.get('rate', 0) or 0)
-
+        unit = row.get('unit', 'Kg')
+        
+        # MUSTARD CAKE EXCHANGE: Affects Mustard Oil Extraction AND Aalas Oil Extraction
         if exchange_mustard_cake and is_mustard_extraction_product(product):
+            qty = 10
             rate = 0
-        if exchange_rice_bran and is_others_product(product):
+            unit = 'Kg'  # Both products use Kg
+        
+        # RICE BRAN EXCHANGE: Affects Dal Banai AND Others (NOT Rice Bran)
+        if exchange_rice_bran and is_others_or_dalbanai_product(product):
+            qty = 10
             rate = 0
-
+            unit = 'Kg'
+        
+        row['quantity'] = qty
         row['rate'] = rate
+        row['unit'] = unit
         row['subtotal'] = round(qty * rate, 2)
         updated.append(row)
+    
     return updated
+
 
 # ============================================
 # PAGINATION CLASS (Reusable)
@@ -401,6 +463,11 @@ class Pagination:
     def next_num(self):
         return min(self.pages, self.page + 1)
     
+
+# =========================
+# TIME FORMATTING FUNCTIONS
+# =========================
+
 def format_time_ago(date_val):
     """
     Format UTC datetime to Nepal time relative time string

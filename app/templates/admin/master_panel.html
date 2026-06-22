@@ -727,8 +727,8 @@
 // PRODUCT DATA
 // ============================================
 const PRODUCTS = [
-    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
-    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
+    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize/Rice Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Khursaani", 
     "Turmeric Powder", "Others"
 ];
 
@@ -736,7 +736,7 @@ const PRODUCT_DEFAULTS = {
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
     "Satu Grinding": { rate: 4, unit: "Kg" },
     "Aalas Oil Extraction": { rate: 10, unit: "Kg" },
-    "Maize Grinding": { rate: 4, unit: "Kg" },
+    "Maize/Rice Grinding": { rate: 4, unit: "Kg" },
     "Dal Banai": { rate: 4, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
     "Paddy Grinding": { rate: 4, unit: "Kg" },
@@ -750,7 +750,7 @@ const PRODUCT_DEFAULTS = {
     "Wheat": { rate: 50, unit: "Kg", fluctuates: true },
     "Mustard Oil": { rate: 400, unit: "Liter", fluctuates: true },
     "Paddy": { rate: 40, unit: "Kg", fluctuates: true },
-    "Spices": { rate: 100, unit: "Kg" },
+    "Khursaani": { rate: 50, unit: "Kg" },
     "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
     "Others": { rate: 0, unit: "Kg" }
 };
@@ -781,12 +781,13 @@ function findItem(customer, itemUid) {
 }
 
 function isMustardExtraction(name) {
-    return (name || '').toLowerCase().includes('mustard oil extraction');
+    const n = (name || '').toLowerCase();
+    return n === 'mustard oil extraction' || n === 'aalas oil extraction';
 }
 
-function isOthersProduct(name) {
-    const n = (name || '').toLowerCase().trim();
-    return n === 'others' || n === 'mustard cake, others' || n.endsWith(', others');
+function isOthersOrDalBanai(name) {
+    const n = (name || '').toLowerCase();
+    return n === 'others' || n === 'dal banai';
 }
 
 function escapeHtml(str) {
@@ -884,10 +885,12 @@ function calculateTotals(customer) {
     for (const item of customer.items) {
         let rate = parseFloat(item.rate) || 0;
         
+        // Exchange rule: Mustard Cake Exchange affects Mustard Oil Extraction AND Aalas Oil Extraction
         if (customer.exchangeMustardCake && isMustardExtraction(item.product_name)) {
             rate = 0;
         }
-        if (customer.exchangeRiceBran && isOthersProduct(item.product_name)) {
+        // Exchange rule: Rice Bran Exchange affects Dal Banai AND Others (NOT Rice Bran)
+        if (customer.exchangeRiceBran && isOthersOrDalBanai(item.product_name)) {
             rate = 0;
         }
         
@@ -1471,8 +1474,8 @@ function render() {
     
     container.innerHTML = customers.map((customer, index) => {
         const status = paymentStatusLabel(customer);
-        const hasMustardOil = customer.items.some(item => isMustardExtraction(item.product_name));
-        const hasOthers = customer.items.some(item => isOthersProduct(item.product_name));
+        const hasMustardExtraction = customer.items.some(item => isMustardExtraction(item.product_name));
+        const hasOthersOrDalBanai = customer.items.some(item => isOthersOrDalBanai(item.product_name));
         
         return `
         <div class="form-card" data-customer-uid="${customer.uid}">
@@ -1585,13 +1588,13 @@ function render() {
                 </button>
                 
                 <div class="exchange-options">
-                    ${hasMustardOil ? `
+                    ${hasMustardExtraction ? `
                     <label class="exchange-checkbox">
                         <input type="checkbox" class="exchange-mustard-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeMustardCake ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'mustard', this.checked); markUnsavedChanges()">
                         <span>Customer left <strong>Mustard Cake</strong></span>
                     </label>
                     ` : ''}
-                    ${hasOthers ? `
+                    ${hasOthersOrDalBanai ? `
                     <label class="exchange-checkbox">
                         <input type="checkbox" class="exchange-rice-checkbox" data-customer-uid="${customer.uid}" ${customer.exchangeRiceBran ? 'checked' : ''} onchange="toggleExchange(${customer.uid}, 'rice', this.checked); markUnsavedChanges()">
                         <span>Customer left <strong>Rice Bran</strong></span>
@@ -1742,8 +1745,54 @@ function toggleSendEmail(customerUid, checked) {
 function toggleExchange(customerUid, type, checked) {
     const customer = findCustomer(customerUid);
     if (customer) {
-        if (type === 'mustard') customer.exchangeMustardCake = checked;
-        if (type === 'rice') customer.exchangeRiceBran = checked;
+        if (type === 'mustard') {
+            customer.exchangeMustardCake = checked;
+            // If exchange is enabled, set quantity to 10 for affected products
+            if (checked) {
+                customer.items.forEach(item => {
+                    if (isMustardExtraction(item.product_name)) {
+                        item.quantity = 10;
+                        item.rate = 0;
+                    }
+                });
+                customer.cashPaid = 0;
+                customer.advanceUsed = 0;
+            } else {
+                // Restore defaults
+                customer.items.forEach(item => {
+                    if (isMustardExtraction(item.product_name)) {
+                        const defaults = PRODUCT_DEFAULTS[item.product_name];
+                        if (defaults) {
+                            item.rate = defaults.rate;
+                            if (item.quantity === 10) item.quantity = 0;
+                        }
+                    }
+                });
+            }
+        }
+        if (type === 'rice') {
+            customer.exchangeRiceBran = checked;
+            if (checked) {
+                customer.items.forEach(item => {
+                    if (isOthersOrDalBanai(item.product_name)) {
+                        item.quantity = 10;
+                        item.rate = 0;
+                    }
+                });
+                customer.cashPaid = 0;
+                customer.advanceUsed = 0;
+            } else {
+                customer.items.forEach(item => {
+                    if (isOthersOrDalBanai(item.product_name)) {
+                        const defaults = PRODUCT_DEFAULTS[item.product_name];
+                        if (defaults) {
+                            item.rate = defaults.rate;
+                            if (item.quantity === 10) item.quantity = 0;
+                        }
+                    }
+                });
+            }
+        }
         calculateTotals(customer);
         render();
         markUnsavedChanges();
@@ -1911,7 +1960,7 @@ async function rollbackBatch(batchId, reason) {
 }
 
 // ============================================
-// BATCH HISTORY (FIXED WITH NEPAL TIME)
+// BATCH HISTORY
 // ============================================
 
 async function showBatchHistory() {
@@ -1948,9 +1997,6 @@ async function showBatchHistory() {
                 const statusClass = isActive ? 'status-active' : 'status-rolled_back';
                 const statusLabel = batch.status || 'active';
                 
-                // ============================================================
-                // FIX: Use helper function to convert UTC to Nepal time
-                // ============================================================
                 const displayTime = convertUTCtoNepalTime(batch.created_at);
                 
                 modalHtml += `
@@ -1981,7 +2027,6 @@ async function showBatchHistory() {
                 </div>
             `;
             
-            // Remove existing modal if any
             const existingModal = document.getElementById('historyModal');
             if (existingModal) existingModal.remove();
             

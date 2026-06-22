@@ -740,7 +740,7 @@ input[readonly] {
                 </button>
             </div>
 
-            <!-- Byproduct Exchange - Hidden by default, shows only when relevant product exists -->
+            <!-- Byproduct Exchange - FIXED -->
             <div class="form-section" id="byproductSection" style="display: none;">
                 <div class="section-title">
                     <h3>Byproduct Exchange</h3>
@@ -749,11 +749,11 @@ input[readonly] {
                 <div class="exchange-options">
                     <label class="exchange-checkbox" id="mustardCakeOption" style="display: none;">
                         <input type="checkbox" name="exchange_mustard_cake" id="exchangeMustardCake">
-                        <span>Customer left <strong>Mustard Cake</strong> → Mustard Oil Extraction FREE</span>
+                        <span>Customer left <strong>Mustard Cake</strong> → Mustard Oil & Aalas Oil Extraction FREE</span>
                     </label>
                     <label class="exchange-checkbox" id="riceBranOption" style="display: none;">
                         <input type="checkbox" name="exchange_rice_bran" id="exchangeRiceBran">
-                        <span>Customer left <strong>Rice Bran</strong> → Others service FREE</span>
+                        <span>Customer left <strong>Rice Bran</strong> → Dal Banai & Others FREE</span>
                     </label>
                 </div>
             </div>
@@ -813,8 +813,8 @@ input[readonly] {
 <script>
 // Product list for suggestions
 const PRODUCTS = [
-    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
-    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
+    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize/Rice Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Khursaani", 
     "Turmeric Powder", "Others"
 ];
 
@@ -822,7 +822,7 @@ const PRODUCT_DEFAULTS = {
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
     "Satu Grinding": { rate: 4, unit: "Kg" },
     "Aalas Oil Extraction": { rate: 10, unit: "Kg" },
-    "Maize Grinding": { rate: 4, unit: "Kg" },
+    "Maize/Rice Grinding": { rate: 4, unit: "Kg" },
     "Dal Banai": { rate: 4, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
     "Paddy Grinding": { rate: 4, unit: "Kg" },
@@ -836,87 +836,28 @@ const PRODUCT_DEFAULTS = {
     "Wheat": { rate: 50, unit: "Kg", fluctuates: true },
     "Mustard Oil": { rate: 400, unit: "Liter", fluctuates: true },
     "Paddy": { rate: 40, unit: "Kg", fluctuates: true },
-    "Spices": { rate: 100, unit: "Kg" },
+    "Khursaani": { rate: 50, unit: "Kg" },
     "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
     "Others": { rate: 0, unit: "Kg" }
 };
 
+// ============================================
+// EXCHANGE HELPER FUNCTIONS - FIXED
+// ============================================
 
-// Show modal dialog
-function showModal(title, message, type = 'success', redirectUrl = null) {
-    const modalHtml = `
-        <div class="modal-overlay" id="resultModal">
-            <div class="modal-container">
-                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
-                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
-                </div>
-                <div class="modal-title">${title}</div>
-                <div class="modal-message">${message}</div>
-                <button class="modal-button" onclick="closeModal('${redirectUrl}')">${redirectUrl ? 'View Sales' : 'Continue'}</button>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+function isMustardExtraction(name) {
+    const n = (name || '').toLowerCase();
+    return n === 'mustard oil extraction' || n === 'aalas oil extraction';
 }
 
-function closeModal(redirectUrl) {
-    const modal = document.getElementById('resultModal');
-    if (modal) modal.remove();
-    if (redirectUrl) {
-        window.location.href = redirectUrl;
-    } else {
-        // Reset form for new entry
-        resetForm();
-    }
+function isOthersOrDalBanai(name) {
+    const n = (name || '').toLowerCase();
+    return n === 'others' || n === 'dal banai';
 }
 
-function resetForm() {
-    // Reset customer fields
-    document.getElementById('customer_input').value = '';
-    document.getElementById('customer_id').value = '';
-    document.getElementById('customer_email').value = '';
-    document.getElementById('advanceBalanceSection').style.display = 'none';
-    document.getElementById('useAdvanceCheckbox').checked = false;
-    document.getElementById('advanceAmount').value = '0';
-    document.getElementById('advanceAmountSection').style.display = 'none';
-    currentAdvanceBalance = 0;
-    
-    // Reset payment
-    document.getElementById('paidAmount').value = '0';
-    document.getElementById('paidAmount').removeAttribute('data-manual');
-    document.getElementById('sendInvoiceToggle').checked = false;
-    
-    // Reset exchange checkboxes
-    const mustardCheckbox = document.getElementById('exchangeMustardCake');
-    const riceCheckbox = document.getElementById('exchangeRiceBran');
-    if (mustardCheckbox) mustardCheckbox.checked = false;
-    if (riceCheckbox) riceCheckbox.checked = false;
-    
-    // Clear all items except first row
-    const itemBody = document.getElementById('itemBody');
-    const rows = itemBody.querySelectorAll('tr');
-    for (let i = rows.length - 1; i > 0; i--) {
-        rows[i].remove();
-    }
-    
-    // Reset first row
-    const firstRow = rows[0];
-    if (firstRow) {
-        firstRow.querySelector('.product-input').value = '';
-        firstRow.querySelector('.qty').value = '0';
-        firstRow.querySelector('.rate').value = '';
-        firstRow.querySelector('.subtotal').value = '';
-        const unitSelect = firstRow.querySelector('.unit');
-        if (unitSelect) unitSelect.value = 'Kg';
-    }
-    
-    // Reset totals
-    updateGrandTotal();
-    updateExchangeVisibility();
-    
-    // Focus on customer name
-    document.getElementById('customer_input').focus();
-}
+// ============================================
+// PRODUCT DEFAULTS - FIXED
+// ============================================
 
 function setProductDefaults(productName, row) {
     const defaults = PRODUCT_DEFAULTS[productName];
@@ -951,19 +892,19 @@ function setProductDefaults(productName, row) {
     }
 }
 
-function isMustardExtraction(name) {
-    return (name || '').toLowerCase() === 'mustard oil extraction';
-}
-
-function isOthersProduct(name) {
-    return (name || '').toLowerCase() === 'others';
-}
+// ============================================
+// REMEMBER ORIGINAL RATE
+// ============================================
 
 function rememberOriginalRate(rateInput) {
     if (rateInput && !rateInput.dataset.originalRate) {
         rateInput.dataset.originalRate = rateInput.value || '0';
     }
 }
+
+// ============================================
+// APPLY EXCHANGE TO ROWS - FIXED
+// ============================================
 
 function applyExchangeToRows() {
     const mustardChecked = document.getElementById('exchangeMustardCake')?.checked;
@@ -979,10 +920,12 @@ function applyExchangeToRows() {
         rememberOriginalRate(rateInput);
         let rate = parseFloat(rateInput.dataset.originalRate) || 0;
 
+        // Mustard Cake Exchange affects Mustard Oil Extraction AND Aalas Oil Extraction
         if (mustardChecked && isMustardExtraction(product)) {
             rate = 0;
         }
-        if (riceChecked && isOthersProduct(product)) {
+        // Rice Bran Exchange affects Dal Banai AND Others (NOT Rice Bran)
+        if (riceChecked && isOthersOrDalBanai(product)) {
             rate = 0;
         }
 
@@ -994,18 +937,22 @@ function applyExchangeToRows() {
     updateGrandTotal();
 }
 
+// ============================================
+// UPDATE EXCHANGE VISIBILITY - FIXED
+// ============================================
+
 function updateExchangeVisibility() {
     const products = document.querySelectorAll('.product-input');
-    let hasMustardOil = false;
-    let hasOthers = false;
+    let hasMustardExtraction = false;
+    let hasOthersOrDalBanai = false;
     
     products.forEach(input => {
         const value = input.value.toLowerCase().trim();
-        if (value === 'mustard oil extraction') {
-            hasMustardOil = true;
+        if (isMustardExtraction(value)) {
+            hasMustardExtraction = true;
         }
-        if (value === 'others') {
-            hasOthers = true;
+        if (isOthersOrDalBanai(value)) {
+            hasOthersOrDalBanai = true;
         }
     });
     
@@ -1016,7 +963,7 @@ function updateExchangeVisibility() {
     const riceCheckbox = document.getElementById('exchangeRiceBran');
     
     if (mustardOption) {
-        if (hasMustardOil) {
+        if (hasMustardExtraction) {
             mustardOption.style.display = 'flex';
         } else {
             mustardOption.style.display = 'none';
@@ -1025,7 +972,7 @@ function updateExchangeVisibility() {
     }
     
     if (riceOption) {
-        if (hasOthers) {
+        if (hasOthersOrDalBanai) {
             riceOption.style.display = 'flex';
         } else {
             riceOption.style.display = 'none';
@@ -1034,12 +981,90 @@ function updateExchangeVisibility() {
     }
     
     if (byproductSection) {
-        const anyVisible = (hasMustardOil || hasOthers);
+        const anyVisible = (hasMustardExtraction || hasOthersOrDalBanai);
         byproductSection.style.display = anyVisible ? 'block' : 'none';
     }
     
     applyExchangeToRows();
 }
+
+// ============================================
+// MODAL FUNCTIONS
+// ============================================
+
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <button class="modal-button" onclick="closeModal('${redirectUrl || ''}')">${redirectUrl ? 'View Sales' : 'Continue'}</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeModal(redirectUrl) {
+    const modal = document.getElementById('resultModal');
+    if (modal) modal.remove();
+    if (redirectUrl) {
+        window.location.href = redirectUrl;
+    } else {
+        resetForm();
+    }
+}
+
+// ============================================
+// RESET FORM
+// ============================================
+
+function resetForm() {
+    document.getElementById('customer_input').value = '';
+    document.getElementById('customer_id').value = '';
+    document.getElementById('customer_email').value = '';
+    document.getElementById('advanceBalanceSection').style.display = 'none';
+    document.getElementById('useAdvanceCheckbox').checked = false;
+    document.getElementById('advanceAmount').value = '0';
+    document.getElementById('advanceAmountSection').style.display = 'none';
+    currentAdvanceBalance = 0;
+    
+    document.getElementById('paidAmount').value = '0';
+    document.getElementById('paidAmount').removeAttribute('data-manual');
+    document.getElementById('sendInvoiceToggle').checked = false;
+    
+    const mustardCheckbox = document.getElementById('exchangeMustardCake');
+    const riceCheckbox = document.getElementById('exchangeRiceBran');
+    if (mustardCheckbox) mustardCheckbox.checked = false;
+    if (riceCheckbox) riceCheckbox.checked = false;
+    
+    const itemBody = document.getElementById('itemBody');
+    const rows = itemBody.querySelectorAll('tr');
+    for (let i = rows.length - 1; i > 0; i--) {
+        rows[i].remove();
+    }
+    
+    const firstRow = rows[0];
+    if (firstRow) {
+        firstRow.querySelector('.product-input').value = '';
+        firstRow.querySelector('.qty').value = '0';
+        firstRow.querySelector('.rate').value = '';
+        firstRow.querySelector('.subtotal').value = '';
+        const unitSelect = firstRow.querySelector('.unit');
+        if (unitSelect) unitSelect.value = 'Kg';
+    }
+    
+    updateGrandTotal();
+    updateExchangeVisibility();
+    document.getElementById('customer_input').focus();
+}
+
+// ============================================
+// PRODUCT INPUT HANDLER
+// ============================================
 
 let currentAdvanceBalance = 0;
 let selectedCustomerId = null;
@@ -1079,12 +1104,20 @@ function handleProductInput(e) {
     }
 }
 
+// ============================================
+// ATTACH LISTENERS
+// ============================================
+
 function attachProductListeners() {
     document.querySelectorAll('.product-input').forEach(input => {
         input.removeEventListener('input', handleProductInput);
         input.addEventListener('input', handleProductInput);
     });
 }
+
+// ============================================
+// UPDATE GRAND TOTAL
+// ============================================
 
 function updateGrandTotal() {
     let total = 0;
@@ -1100,6 +1133,10 @@ function updateGrandTotal() {
     
     updatePaymentCalculation();
 }
+
+// ============================================
+// UPDATE PAYMENT CALCULATION
+// ============================================
 
 function updatePaymentCalculation() {
     let total = parseFloat(document.getElementById("grandTotal").value) || 0;
@@ -1130,6 +1167,10 @@ function updatePaymentCalculation() {
         if (maxLabel) maxLabel.innerHTML = `Max available: Rs ${maxAdvance.toFixed(2)}`;
     }
 }
+
+// ============================================
+// ADD / REMOVE ROW
+// ============================================
 
 function addRow() {
     let row = `
@@ -1175,6 +1216,10 @@ function removeRow(btn) {
     }
 }
 
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
 document.addEventListener("input", function(e) {
     if (e.target.classList.contains("qty") || e.target.classList.contains("rate")) {
         let row = e.target.closest("tr");
@@ -1192,6 +1237,10 @@ document.addEventListener("input", function(e) {
 
 document.getElementById('exchangeMustardCake')?.addEventListener('change', applyExchangeToRows);
 document.getElementById('exchangeRiceBran')?.addEventListener('change', applyExchangeToRows);
+
+// ============================================
+// CUSTOMER SEARCH
+// ============================================
 
 const customerInput = document.getElementById("customer_input");
 const suggestionsDiv = document.getElementById("suggestions");
@@ -1293,7 +1342,10 @@ if (itemBodyElement) {
     itemObserver.observe(itemBodyElement, { childList: true, subtree: true });
 }
 
-// ========== AJAX FORM SUBMISSION ==========
+// ============================================
+// FORM SUBMISSION
+// ============================================
+
 document.getElementById('saleForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -1303,14 +1355,12 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
         return false;
     }
     
-    // Validate customer name
     const customerName = document.getElementById('customer_input').value.trim();
     if (!customerName) {
         showModal('Validation Error', 'Please enter customer name', 'error');
         return false;
     }
     
-    // Validate at least one product
     const products = document.querySelectorAll('.product-input');
     let hasProduct = false;
     products.forEach(p => {
@@ -1322,7 +1372,6 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
         return false;
     }
     
-    // Validate at least one item has quantity > 0
     const quantities = document.querySelectorAll('.qty');
     let hasValidQty = false;
     quantities.forEach(q => {
@@ -1334,10 +1383,8 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
         return false;
     }
     
-    // Collect form data
     const formData = new FormData(this);
     
-    // Mark as submitting
     isSubmitting = true;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="loading-spinner"></span> Creating Invoice...';
@@ -1354,16 +1401,13 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
         const data = await response.json();
         
         if (data.success) {
-            // Success - show modal with success message
             let message = data.message || 'Sale created successfully!';
             if (data.invoice_number) {
                 message = `Invoice #${data.invoice_number} created successfully!`;
             }
             showModal('Success!', message, 'success', data.redirect || '{{ url_for("admin.sales_list") }}');
         } else {
-            // Error - show modal with error message
             showModal('Error', data.error || 'Failed to create sale', 'error');
-            // Re-enable button
             isSubmitting = false;
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';
@@ -1376,6 +1420,10 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
         submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';
     }
 });
+
+// ============================================
+// INITIALIZATION
+// ============================================
 
 attachProductListeners();
 updateExchangeVisibility();

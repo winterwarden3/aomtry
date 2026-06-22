@@ -10,7 +10,7 @@ from app.utils import (
     generate_invoice_number, get_customer_summary, format_currency,
     get_weekly_sales_data, get_monthly_sales_data, get_payment_channel_data, get_nepal_time,
     build_byproduct_note, parse_exchange_from_note, apply_byproduct_exchange_to_line_items,
-    is_mustard_extraction_product, is_others_product, Pagination,format_time_ago
+    is_mustard_extraction_product, is_others_product, is_others_or_dalbanai_product, Pagination,format_time_ago
 )
 from datetime import datetime, timedelta
 from app.brevo_service import send_invoice_email
@@ -186,7 +186,7 @@ def dashboard():
             'icon_color': '#dc2626',
             'title': 'New Expense',
             'description': f"{expense.get('category')} - Rs.{expense.get('amount', 0):,.2f}",
-            'time_ago': format_time_ago(expense.get('date'), source='expense'),  # ← FIXED: pass source='expense'
+            'time_ago': format_time_ago(expense.get('date'), source='sale'), 
             'timestamp': expense.get('date')
         })
     
@@ -630,9 +630,10 @@ def edit_sale(sale_id):
                 elif form_rate is not None:
                     rate = float(form_rate or 0)
 
-                if exchange_rice_bran and is_others_product(product):
+                if exchange_rice_bran and is_others_or_dalbanai_product(product):
                     rate = 0
-                elif not exchange_rice_bran and is_others_product(product) and form_rate is not None:
+                    qty = 10
+                elif not exchange_rice_bran and is_others_or_dalbanai_product(product) and form_rate is not None:
                     rate = float(form_rate or 0)
 
                 subtotal = round(qty * rate, 2)
@@ -664,8 +665,10 @@ def edit_sale(sale_id):
                     # Apply exchange logic for new items
                     if exchange_mustard_cake and is_mustard_extraction_product(product_name):
                         rate = 0
-                    if exchange_rice_bran and is_others_product(product_name):
+                        qty = 10
+                    if exchange_rice_bran and is_others_or_dalbanai_product(product_name):
                         rate = 0
+                        qty = 10
                     
                     subtotal = round(qty * rate, 2)
                     new_total += subtotal

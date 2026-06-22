@@ -634,8 +634,13 @@
                                 data-qty="{{ item.get('quantity', 0) }}"
                                 data-unit="{{ item.get('unit', 'Kg') }}"
                                 data-item-id="{{ item.get('id') }}">
-                                <td>{{ item.get('product_name', '') }}</td>
-                                <td>{{ item.get('quantity', 0) }}</td>
+                                <td>
+                                    <input type="text" class="form-control product-autocomplete" placeholder="Search product..." style="min-width:180px;" autocomplete="off" value="{{ item.get('product_name', '') }}">
+                                    <div class="suggestions-dropdown" style="display:none;"></div>
+                                </td>
+                                <td>
+                                    <input type="number" name="item_qty_{{ item.get('id') }}" class="form-control item-qty" step="any" value="{{ item.get('quantity', 0) }}" style="max-width:100px;">
+                                </td>
                                 <td>
                                     <select name="item_unit_{{ item.get('id') }}" class="form-control item-unit-select" style="max-width:100px;">
                                         <option value="Kg" {% if item.get('unit', 'Kg') == 'Kg' %}selected{% endif %}>Kg</option>
@@ -754,8 +759,8 @@
 <script>
 // Product list for suggestions
 const PRODUCTS = [
-    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
-    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
+    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize/Rice Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Khursaani", 
     "Turmeric Powder", "Others"
 ];
 
@@ -763,7 +768,7 @@ const PRODUCT_DEFAULTS = {
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
     "Satu Grinding": { rate: 4, unit: "Kg" },
     "Aalas Oil Extraction": { rate: 10, unit: "Kg" },
-    "Maize Grinding": { rate: 4, unit: "Kg" },
+    "Maize/Rice Grinding": { rate: 4, unit: "Kg" },
     "Dal Banai": { rate: 4, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
     "Paddy Grinding": { rate: 4, unit: "Kg" },
@@ -777,11 +782,10 @@ const PRODUCT_DEFAULTS = {
     "Wheat": { rate: 50, unit: "Kg", fluctuates: true },
     "Mustard Oil": { rate: 400, unit: "Liter", fluctuates: true },
     "Paddy": { rate: 40, unit: "Kg", fluctuates: true },
-    "Spices": { rate: 100, unit: "Kg" },
+    "Khursaani": { rate: 50, unit: "Kg" },
     "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
     "Others": { rate: 0, unit: "Kg" }
 };
-
 
 // Global variables
 let isSubmitting = false;
@@ -793,116 +797,23 @@ const customerAdvanceBalance = {{ customer_advance_balance }};
 const saleId = {{ sale.id }};
 const invoiceNumber = "{{ sale.invoice_number }}";
 
-// Close modal function
-function closeModal(modalId = null) {
-    if (modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.remove();
-    } else {
-        const modals = document.querySelectorAll('.modal-overlay');
-        modals.forEach(modal => modal.remove());
-    }
+// ============================================
+// EXCHANGE HELPER FUNCTIONS - FIXED
+// ============================================
+
+function isMustardExtraction(name) {
+    const n = (name || '').toLowerCase();
+    return n === 'mustard oil extraction' || n === 'aalas oil extraction';
 }
 
-// Show success/error modal
-function showModal(title, message, type = 'success', redirectUrl = null) {
-    closeModal();
-    const modalHtml = `
-        <div class="modal-overlay" id="resultModal">
-            <div class="modal-container">
-                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
-                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
-                </div>
-                <div class="modal-title">${title}</div>
-                <div class="modal-message">${message}</div>
-                <div class="modal-buttons">
-                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    document.getElementById('modalCloseBtn').onclick = function() {
-        closeModal('resultModal');
-        if (redirectUrl) {
-            window.location.href = redirectUrl;
-        }
-    };
+function isOthersOrDalBanai(name) {
+    const n = (name || '').toLowerCase();
+    return n === 'others' || n === 'dal banai';
 }
 
-// Show delete confirmation modal
-function showDeleteConfirmation() {
-    closeModal();
-    const modalHtml = `
-        <div class="modal-overlay" id="deleteModal">
-            <div class="modal-container">
-                <div class="modal-danger-icon">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-                <div class="modal-title">Delete Sale?</div>
-                <div class="modal-message">
-                    Are you sure you want to delete sale <strong>#${invoiceNumber}</strong>?<br><br>
-                    <span style="color: #ef4444;">⚠️ This action cannot be undone!</span><br>
-                    Any advance used will be refunded to the customer.
-                </div>
-                <div class="modal-buttons">
-                    <button class="modal-button modal-button-danger" id="confirmDeleteBtn">Yes, Delete</button>
-                    <button class="modal-button modal-button-secondary" id="cancelDeleteBtn">Cancel</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    document.getElementById('confirmDeleteBtn').onclick = function() {
-        closeModal('deleteModal');
-        performDelete();
-    };
-    
-    document.getElementById('cancelDeleteBtn').onclick = function() {
-        closeModal('deleteModal');
-    };
-}
-
-// Perform delete via AJAX
-async function performDelete() {
-    const loadingHtml = `
-        <div class="modal-overlay" id="loadingModal">
-            <div class="modal-container">
-                <div class="modal-info-icon">
-                    <i class="bi bi-hourglass-split"></i>
-                </div>
-                <div class="modal-title">Deleting Sale...</div>
-                <div class="modal-message">Please wait while we delete the sale.</div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', loadingHtml);
-    
-    try {
-        const response = await fetch('/admin/delete-sale/' + saleId, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        closeModal('loadingModal');
-        
-        if (data.success) {
-            showModal('Deleted!', data.message || 'Sale deleted successfully!', 'success', '/admin/sales');
-        } else {
-            showModal('Error', data.error || 'Failed to delete sale', 'error');
-        }
-    } catch (error) {
-        closeModal('loadingModal');
-        console.error('Error:', error);
-        showModal('Error', 'Network error. Please try again.', 'error');
-    }
-}
+// ============================================
+// PRODUCT DEFAULTS - FIXED
+// ============================================
 
 function setEditProductDefaults(productName, row) {
     const defaults = PRODUCT_DEFAULTS[productName];
@@ -930,6 +841,89 @@ function setEditProductDefaults(productName, row) {
     }
 }
 
+// ============================================
+// EXCHANGE VISIBILITY - FIXED
+// ============================================
+
+function updateExchangeVisibility() {
+    const rows = document.querySelectorAll('.sale-item-row');
+    let hasMustardExtraction = false;
+    let hasOthersOrDalBanai = false;
+    
+    rows.forEach(row => {
+        const productInput = row.querySelector('.product-autocomplete');
+        const product = productInput ? productInput.value : (row.dataset.product || '');
+        if (isMustardExtraction(product)) hasMustardExtraction = true;
+        if (isOthersOrDalBanai(product)) hasOthersOrDalBanai = true;
+    });
+    
+    const mustardOption = document.getElementById('mustardCakeOption');
+    const riceOption = document.getElementById('riceBranOption');
+    const byproductSection = document.getElementById('byproductSection');
+    const mustardCheckbox = document.getElementById('exchangeMustardCake');
+    const riceCheckbox = document.getElementById('exchangeRiceBran');
+    
+    if (mustardOption) {
+        mustardOption.style.display = hasMustardExtraction ? 'flex' : 'none';
+        if (!hasMustardExtraction && mustardCheckbox) mustardCheckbox.checked = false;
+    }
+    
+    if (riceOption) {
+        riceOption.style.display = hasOthersOrDalBanai ? 'flex' : 'none';
+        if (!hasOthersOrDalBanai && riceCheckbox) riceCheckbox.checked = false;
+    }
+    
+    if (byproductSection) {
+        byproductSection.style.display = (hasMustardExtraction || hasOthersOrDalBanai) ? 'block' : 'none';
+    }
+}
+
+// ============================================
+// GET CURRENT TOTAL - FIXED
+// ============================================
+
+function getCurrentTotalAmount() {
+    let total = 0;
+    const mustardChecked = document.getElementById('exchangeMustardCake')?.checked;
+    const riceChecked = document.getElementById('exchangeRiceBran')?.checked;
+    
+    document.querySelectorAll('.sale-item-row').forEach(row => {
+        const productInput = row.querySelector('.product-autocomplete');
+        const product = productInput ? productInput.value : (row.dataset.product || '');
+        const qtyInput = row.querySelector('.item-qty');
+        const qty = qtyInput ? (parseFloat(qtyInput.value) || 0) : (parseFloat(row.dataset.qty) || 0);
+        const rateInput = row.querySelector('.item-rate-input');
+        let rate = rateInput ? (parseFloat(rateInput.value) || 0) : 0;
+
+        // Exchange rules - matching BATCH SALES logic
+        if (mustardChecked && isMustardExtraction(product)) rate = 0;
+        if (riceChecked && isOthersOrDalBanai(product)) rate = 0;
+
+        if (rateInput) {
+            rateInput.value = rate;
+            rateInput.readOnly = (mustardChecked && isMustardExtraction(product)) || (riceChecked && isOthersOrDalBanai(product));
+            if (rateInput.readOnly) {
+                rateInput.style.background = '#f3f4f6';
+            } else {
+                rateInput.style.background = 'white';
+            }
+        }
+
+        const subtotal = qty * rate;
+        const subtotalCell = row.querySelector('.item-subtotal');
+        if (subtotalCell) subtotalCell.textContent = `Rs ${subtotal.toFixed(2)}`;
+        total += subtotal;
+    });
+
+    const totalDisplay = document.getElementById('totalAmountDisplay');
+    if (totalDisplay) totalDisplay.value = `Rs ${total.toFixed(2)}`;
+    return total;
+}
+
+// ============================================
+// ADD ROW FUNCTION - FIXED
+// ============================================
+
 function addEditRow() {
     const newId = 'new_' + Date.now();
     const row = document.createElement('tr');
@@ -939,7 +933,10 @@ function addEditRow() {
     row.setAttribute('data-item-id', newId);
     
     row.innerHTML = `
-        <td><input type="text" class="form-control product-autocomplete" placeholder="Search product..." style="min-width:180px;" autocomplete="off"></td>
+        <td style="position:relative;">
+            <input type="text" class="form-control product-autocomplete" placeholder="Search product..." style="min-width:180px;" autocomplete="off">
+            <div class="suggestions-dropdown" style="display:none;"></div>
+        </td>
         <td><input type="number" name="item_qty_${newId}" class="form-control item-qty" step="any" value="1" style="max-width:100px;"></td>
         <td>
             <select name="item_unit_${newId}" class="form-control item-unit-select" style="max-width:100px;">
@@ -959,12 +956,7 @@ function addEditRow() {
     
     // Setup autocomplete for new row
     const productInput = row.querySelector('.product-autocomplete');
-    const suggestionsBox = document.createElement('div');
-    suggestionsBox.className = 'suggestions-dropdown';
-    suggestionsBox.style.position = 'absolute';
-    suggestionsBox.style.display = 'none';
-    productInput.parentNode.style.position = 'relative';
-    productInput.parentNode.appendChild(suggestionsBox);
+    const suggestionsBox = row.querySelector('.suggestions-dropdown');
     
     productInput.addEventListener('input', function(e) {
         const query = this.value.toLowerCase().trim();
@@ -1006,111 +998,169 @@ function addEditRow() {
     updateCalculationAndValidation();
 }
 
-function isOthersProduct(name) {
-    const n = (name || '').toLowerCase().trim();
-    return n === 'others' || n === 'mustard cake, others' || n.endsWith(', others');
-}
+// ============================================
+// CLOSE MODAL FUNCTION
+// ============================================
 
-function isMustardExtraction(name) {
-    return (name || '').toLowerCase().includes('mustard oil extraction');
-}
-
-function updateExchangeVisibility() {
-    const rows = document.querySelectorAll('.sale-item-row');
-    let hasMustardOil = false;
-    let hasOthers = false;
-    
-    rows.forEach(row => {
-        const productInput = row.querySelector('.product-autocomplete');
-        const product = productInput ? productInput.value : (row.dataset.product || '');
-        if (isMustardExtraction(product)) hasMustardOil = true;
-        if (isOthersProduct(product)) hasOthers = true;
-    });
-    
-    const mustardOption = document.getElementById('mustardCakeOption');
-    const riceOption = document.getElementById('riceBranOption');
-    const byproductSection = document.getElementById('byproductSection');
-    const mustardCheckbox = document.getElementById('exchangeMustardCake');
-    const riceCheckbox = document.getElementById('exchangeRiceBran');
-    
-    if (mustardOption) {
-        mustardOption.style.display = hasMustardOil ? 'flex' : 'none';
-        if (!hasMustardOil && mustardCheckbox) mustardCheckbox.checked = false;
-    }
-    
-    if (riceOption) {
-        riceOption.style.display = hasOthers ? 'flex' : 'none';
-        if (!hasOthers && riceCheckbox) riceCheckbox.checked = false;
-    }
-    
-    if (byproductSection) {
-        byproductSection.style.display = (hasMustardOil || hasOthers) ? 'block' : 'none';
+function closeModal(modalId = null) {
+    if (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+    } else {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => modal.remove());
     }
 }
 
-function getCurrentTotalAmount() {
-    let total = 0;
-    const mustardChecked = document.getElementById('exchangeMustardCake')?.checked;
-    const riceChecked = document.getElementById('exchangeRiceBran')?.checked;
+// ============================================
+// SHOW MODAL
+// ============================================
+
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    closeModal();
+    const iconMap = {
+        'success': 'success',
+        'error': 'error',
+        'danger': 'error',
+        'info': 'info'
+    };
+    const iconType = iconMap[type] || 'info';
+    const iconClass = type === 'success' ? 'check-lg' : type === 'error' ? 'x-lg' : 'info-circle';
     
-    document.querySelectorAll('.sale-item-row').forEach(row => {
-        const productInput = row.querySelector('.product-autocomplete');
-        const product = productInput ? productInput.value : (row.dataset.product || '');
-        const qtyInput = row.querySelector('.item-qty');
-        const qty = qtyInput ? (parseFloat(qtyInput.value) || 0) : (parseFloat(row.dataset.qty) || 0);
-        const rateInput = row.querySelector('.item-rate-input');
-        let rate = rateInput ? (parseFloat(rateInput.value) || 0) : 0;
-
-        if (mustardChecked && isMustardExtraction(product)) rate = 0;
-        if (riceChecked && isOthersProduct(product)) rate = 0;
-
-        if (rateInput) {
-            rateInput.value = rate;
-            rateInput.readOnly = (mustardChecked && isMustardExtraction(product)) || (riceChecked && isOthersProduct(product));
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${iconType}-icon">
+                    <i class="bi bi-${iconClass}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('modalCloseBtn').onclick = function() {
+        closeModal('resultModal');
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
         }
-
-        const subtotal = qty * rate;
-        const subtotalCell = row.querySelector('.item-subtotal');
-        if (subtotalCell) subtotalCell.textContent = `Rs ${subtotal.toFixed(2)}`;
-        total += subtotal;
-    });
-
-    const totalDisplay = document.getElementById('totalAmountDisplay');
-    if (totalDisplay) totalDisplay.value = `Rs ${total.toFixed(2)}`;
-    return total;
+    };
 }
 
-// DOM elements
-const cashInput = document.getElementById('cashPaid');
-const advanceInput = document.getElementById('advanceUsed');
-const submitBtn = document.getElementById('submitBtn');
-const deleteBtn = document.getElementById('deleteBtn');
-const cashValidation = document.getElementById('cashValidation');
-const advanceValidation = document.getElementById('advanceValidation');
-const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
-const balanceChangeDisplay = document.getElementById('balanceChangeDisplay');
+// ============================================
+// SHOW DELETE CONFIRMATION
+// ============================================
+
+function showDeleteConfirmation() {
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal-container">
+                <div class="modal-danger-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="modal-title">Delete Sale?</div>
+                <div class="modal-message">
+                    Are you sure you want to delete sale <strong>#${invoiceNumber}</strong>?<br><br>
+                    <span style="color: #ef4444;">⚠️ This action cannot be undone!</span><br>
+                    Any advance used will be refunded to the customer.
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-danger" id="confirmDeleteBtn">Yes, Delete</button>
+                    <button class="modal-button modal-button-secondary" id="cancelDeleteBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+        performDelete();
+    };
+    
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+    };
+}
+
+// ============================================
+// PERFORM DELETE
+// ============================================
+
+async function performDelete() {
+    const loadingHtml = `
+        <div class="modal-overlay" id="loadingModal">
+            <div class="modal-container">
+                <div class="modal-info-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="modal-title">Deleting Sale...</div>
+                <div class="modal-message">Please wait while we delete the sale.</div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', loadingHtml);
+    
+    try {
+        const response = await fetch('/admin/delete-sale/' + saleId, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        closeModal('loadingModal');
+        
+        if (data.success) {
+            showModal('Deleted!', data.message || 'Sale deleted successfully!', 'success', '/admin/sales');
+        } else {
+            showModal('Error', data.error || 'Failed to delete sale', 'error');
+        }
+    } catch (error) {
+        closeModal('loadingModal');
+        console.error('Error:', error);
+        showModal('Error', 'Network error. Please try again.', 'error');
+    }
+}
+
+// ============================================
+// FORMAT CURRENCY
+// ============================================
 
 function formatCurrency(amount) {
     return `Rs ${amount.toFixed(2)}`;
 }
 
+// ============================================
+// UPDATE CALCULATION AND VALIDATION
+// ============================================
+
 function updateCalculationAndValidation() {
     totalAmount = getCurrentTotalAmount();
-    let cash = parseFloat(cashInput.value) || 0;
-    let advance = parseFloat(advanceInput.value) || 0;
+    let cash = parseFloat(document.getElementById('cashPaid').value) || 0;
+    let advance = parseFloat(document.getElementById('advanceUsed').value) || 0;
     
+    // Auto-adjust if cash >= total
     if (cash >= totalAmount) {
         if (advance !== 0) {
             advance = 0;
-            advanceInput.value = 0;
+            document.getElementById('advanceUsed').value = 0;
         }
     }
     
+    // Cap advance if needed
     if (cash < totalAmount) {
         const maxAdvanceNeeded = totalAmount - cash;
         if (advance > maxAdvanceNeeded) {
             advance = maxAdvanceNeeded;
-            advanceInput.value = maxAdvanceNeeded;
+            document.getElementById('advanceUsed').value = maxAdvanceNeeded;
         }
     }
     
@@ -1123,6 +1173,7 @@ function updateCalculationAndValidation() {
     const balanceChange = newNetEffect - oldNetEffect;
     const newBalance = customerAdvanceBalance + balanceChange;
     
+    // Update displays
     document.getElementById('totalPaymentDisplay').innerHTML = formatCurrency(totalPaid);
     
     if (remainingDue > 0) {
@@ -1142,24 +1193,28 @@ function updateCalculationAndValidation() {
         statusDisplay.innerHTML = `<span style="color: #ef4444;"><i class="bi bi-exclamation-circle"></i> Due: ${formatCurrency(remainingDue)}</span>`;
     }
     
-    currentBalanceDisplay.innerHTML = formatCurrency(newBalance);
+    // Update advance balance display
+    document.getElementById('currentBalanceDisplay').innerHTML = formatCurrency(newBalance);
     if (newBalance < 0) {
-        currentBalanceDisplay.style.color = '#fecaca';
+        document.getElementById('currentBalanceDisplay').style.color = '#fecaca';
     } else {
-        currentBalanceDisplay.style.color = 'white';
+        document.getElementById('currentBalanceDisplay').style.color = 'white';
     }
     
     if (balanceChange !== 0) {
-        balanceChangeDisplay.style.display = 'block';
+        const changeDisplay = document.getElementById('balanceChangeDisplay');
+        changeDisplay.style.display = 'block';
         let changeText = balanceChange > 0 ? `+${formatCurrency(balanceChange)}` : `-${formatCurrency(Math.abs(balanceChange))}`;
-        balanceChangeDisplay.innerHTML = `${changeText} → ${formatCurrency(newBalance)}`;
-        balanceChangeDisplay.style.color = balanceChange > 0 ? '#d1fae5' : '#fed7aa';
+        changeDisplay.innerHTML = `${changeText} → ${formatCurrency(newBalance)}`;
+        changeDisplay.style.color = balanceChange > 0 ? '#d1fae5' : '#fed7aa';
     } else {
-        balanceChangeDisplay.style.display = 'none';
+        document.getElementById('balanceChangeDisplay').style.display = 'none';
     }
     
     // ========== VALIDATION ==========
     let isValid = true;
+    const cashValidation = document.getElementById('cashValidation');
+    const advanceValidation = document.getElementById('advanceValidation');
     
     cashValidation.innerHTML = '';
     cashValidation.className = 'validation-message';
@@ -1210,33 +1265,99 @@ function updateCalculationAndValidation() {
         cashValidation.classList.add('validation-success');
     }
     
-    submitBtn.disabled = !isValid;
+    document.getElementById('submitBtn').disabled = !isValid;
     updateExchangeVisibility();
 }
 
-// Delete button click handler
-if (deleteBtn) {
-    deleteBtn.addEventListener('click', function(e) {
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize existing rows with product defaults and autocomplete
+    document.querySelectorAll('.sale-item-row').forEach(row => {
+        const productInput = row.querySelector('.product-autocomplete');
+        const productName = row.dataset.product || '';
+        
+        // Set default rate and unit
+        if (productName) {
+            setEditProductDefaults(productName, row);
+        }
+        
+        // Setup autocomplete for existing row
+        if (productInput) {
+            const suggestionsBox = row.querySelector('.suggestions-dropdown');
+            
+            productInput.addEventListener('input', function(e) {
+                const query = this.value.toLowerCase().trim();
+                if (!query) {
+                    suggestionsBox.style.display = 'none';
+                    return;
+                }
+                const matches = PRODUCTS.filter(p => p.toLowerCase().includes(query));
+                suggestionsBox.innerHTML = '';
+                if (matches.length > 0) {
+                    suggestionsBox.style.display = 'block';
+                    matches.forEach(p => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.innerText = p;
+                        div.onclick = () => {
+                            productInput.value = p;
+                            row.setAttribute('data-product', p);
+                            suggestionsBox.style.display = 'none';
+                            setEditProductDefaults(p, row);
+                            updateCalculationAndValidation();
+                        };
+                        suggestionsBox.appendChild(div);
+                    });
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+        }
+        
+        // Add event listeners to existing inputs
+        const rateInput = row.querySelector('.item-rate-input');
+        const qtyInput = row.querySelector('.item-qty');
+        const unitSelect = row.querySelector('.item-unit-select');
+        
+        if (rateInput) rateInput.addEventListener('input', updateCalculationAndValidation);
+        if (qtyInput) qtyInput.addEventListener('input', updateCalculationAndValidation);
+        if (unitSelect) unitSelect.addEventListener('change', updateCalculationAndValidation);
+    });
+    
+    // Exchange checkboxes
+    document.getElementById('exchangeMustardCake')?.addEventListener('change', updateCalculationAndValidation);
+    document.getElementById('exchangeRiceBran')?.addEventListener('change', updateCalculationAndValidation);
+    
+    // Payment inputs
+    document.getElementById('cashPaid').addEventListener('input', updateCalculationAndValidation);
+    document.getElementById('advanceUsed').addEventListener('input', updateCalculationAndValidation);
+    
+    // Delete button
+    document.getElementById('deleteBtn').addEventListener('click', function(e) {
         e.preventDefault();
         showDeleteConfirmation();
     });
-}
+    
+    // Initialize
+    updateExchangeVisibility();
+    updateCalculationAndValidation();
+});
 
-// Event listeners
-cashInput.addEventListener('input', updateCalculationAndValidation);
-advanceInput.addEventListener('input', updateCalculationAndValidation);
-document.getElementById('exchangeMustardCake')?.addEventListener('change', updateCalculationAndValidation);
-document.getElementById('exchangeRiceBran')?.addEventListener('change', updateCalculationAndValidation);
+// ============================================
+// FORM SUBMISSION
+// ============================================
 
-// ========== AJAX FORM SUBMISSION ==========
 document.getElementById('editForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     if (isSubmitting) return false;
     
     totalAmount = getCurrentTotalAmount();
-    let cash = parseFloat(cashInput.value) || 0;
-    let advance = parseFloat(advanceInput.value) || 0;
+    let cash = parseFloat(document.getElementById('cashPaid').value) || 0;
+    let advance = parseFloat(document.getElementById('advanceUsed').value) || 0;
     let totalPaid = cash + advance;
     let newAdvanceAmount = totalPaid > totalAmount ? totalPaid - totalAmount : 0;
     
@@ -1269,7 +1390,7 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
     formData.append('exchange_mustard_cake', document.getElementById('exchangeMustardCake')?.checked ? 'on' : 'off');
     formData.append('exchange_rice_bran', document.getElementById('exchangeRiceBran')?.checked ? 'on' : 'off');
     
-    // Collect item rates
+    // Collect item data
     document.querySelectorAll('.sale-item-row').forEach(row => {
         const itemId = row.dataset.itemId;
         const rateInput = row.querySelector('.item-rate-input');
@@ -1293,6 +1414,7 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
     
     // Mark as submitting
     isSubmitting = true;
+    const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="loading-spinner"></span> Updating Sale...';
     
@@ -1323,26 +1445,6 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
         submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Update Sale';
     }
 });
-
-// Initialize existing rows with product defaults
-document.querySelectorAll('.sale-item-row').forEach(row => {
-    const productInput = row.querySelector('.product-autocomplete');
-    if (!productInput) {
-        const productName = row.dataset.product || '';
-        if (productName) {
-            setEditProductDefaults(productName, row);
-        }
-    }
-    // Add event listeners to existing inputs
-    const rateInput = row.querySelector('.item-rate-input');
-    const qtyInput = row.querySelector('.item-qty');
-    if (rateInput) rateInput.addEventListener('input', updateCalculationAndValidation);
-    if (qtyInput) qtyInput.addEventListener('input', updateCalculationAndValidation);
-});
-
-// Initialize
-updateExchangeVisibility();
-updateCalculationAndValidation();
 </script>
 
 {% endblock %}
