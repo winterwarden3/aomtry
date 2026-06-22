@@ -813,19 +813,21 @@ input[readonly] {
 <script>
 // Product list for suggestions
 const PRODUCTS = [
-    "Mustard Oil Extraction", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
-    "Rice Bran", "Mustard Cake","Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
+    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
     "Turmeric Powder", "Others"
 ];
 
-// ========== PRODUCT DEFAULTS ==========
 const PRODUCT_DEFAULTS = {
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
+    "Satu Grinding": { rate: 4, unit: "Kg" },
+    "Aalas Oil Extraction": { rate: 10, unit: "Kg" },
+    "Maize Grinding": { rate: 4, unit: "Kg" },
+    "Dal Banai": { rate: 4, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
     "Paddy Grinding": { rate: 4, unit: "Kg" },
     "Turmeric Grinding": { rate: 40, unit: "Kg" },
     "Spice Grinding": { rate: 40, unit: "Kg" },
-    "Others": { rate: 0, unit: "Kg" },
     "Rice Bran": { rate: 45, unit: "Kg", fluctuates: true },
     "Mustard Cake": { rate: 45, unit: "Kg", fluctuates: true },
     "Wheat Flour": { rate: 80, unit: "Kg", fluctuates: true },
@@ -834,9 +836,11 @@ const PRODUCT_DEFAULTS = {
     "Wheat": { rate: 50, unit: "Kg", fluctuates: true },
     "Mustard Oil": { rate: 400, unit: "Liter", fluctuates: true },
     "Paddy": { rate: 40, unit: "Kg", fluctuates: true },
-    "Spices": { rate: 100, unit: "Kg", fluctuates: true },
+    "Spices": { rate: 100, unit: "Kg" },
     "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
+    "Others": { rate: 0, unit: "Kg" }
 };
+
 
 // Show modal dialog
 function showModal(title, message, type = 'success', redirectUrl = null) {

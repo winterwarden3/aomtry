@@ -754,14 +754,17 @@
 <script>
 // Product list for suggestions
 const PRODUCTS = [
-    "Mustard Oil Extraction", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
-    "Rice Bran", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
+    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
     "Turmeric Powder", "Others"
 ];
 
-// ========== PRODUCT DEFAULTS ==========
 const PRODUCT_DEFAULTS = {
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
+    "Satu Grinding": { rate: 4, unit: "Kg" },
+    "Aalas Oil Extraction": { rate: 10, unit: "Kg" },
+    "Maize Grinding": { rate: 4, unit: "Kg" },
+    "Dal Banai": { rate: 4, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
     "Paddy Grinding": { rate: 4, unit: "Kg" },
     "Turmeric Grinding": { rate: 40, unit: "Kg" },
@@ -778,6 +781,7 @@ const PRODUCT_DEFAULTS = {
     "Turmeric Powder": { rate: 400, unit: "Kg", fluctuates: true },
     "Others": { rate: 0, unit: "Kg" }
 };
+
 
 // Global variables
 let isSubmitting = false;

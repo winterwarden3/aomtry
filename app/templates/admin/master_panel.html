@@ -524,6 +524,49 @@
     display: none;
 }
 
+/* History Modal Styles */
+.history-modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.history-modal-table th {
+    padding: 10px 8px;
+    text-align: left;
+    border-bottom: 2px solid #e5e7eb;
+    background: #f3f4f6;
+    font-weight: 600;
+    color: #374151;
+}
+
+.history-modal-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.history-modal-table tr:hover {
+    background: #f9fafb;
+}
+
+.status-badge {
+    padding: 2px 12px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-rolled_back {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 @keyframes slideInRight {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
@@ -563,6 +606,12 @@
     }
     .advance-info { flex-direction: column; align-items: flex-start; }
     .bulk-edit-bar, .toolbar-card { justify-content: center; }
+    
+    .progress-modal {
+        min-width: unset;
+        width: 90%;
+        padding: 1.5rem;
+    }
 }
 </style>
 {% endblock %}
@@ -581,8 +630,6 @@
             <i class="bi bi-arrow-left"></i> Back to Sales
         </a>
     </div>
-
-   
 
 
     <!-- Batch Summary Panel -->
@@ -622,13 +669,9 @@
         <button type="button" class="btn-ui btn-outline-ui" onclick="bulkSetAllEmails()">
             <i class="bi bi-envelope-check"></i> Enable All Emails
         </button>
-        <button type="button" class="btn-ui btn-outline-ui" onclick="exportBatchToExcel()">
-            <i class="bi bi-file-spreadsheet"></i> Export Batch
-        </button>
         <button type="button" class="btn-ui btn-outline-ui" onclick="printBatchSummary()">
             <i class="bi bi-printer"></i> Print Summary
         </button>
-
     </div>
 
     <!-- Toolbar -->
@@ -653,6 +696,9 @@
         <button type="button" class="btn-ui btn-outline-ui" onclick="showBatchHistory()">
             <i class="bi bi-clock-history"></i> Batch History
         </button>
+        <button type="button" class="btn-ui btn-outline-ui" onclick="clearAll()" style="color: #ef4444;">
+            <i class="bi bi-trash"></i> Clear All
+        </button>
     </div>
 
     <!-- Customers Container -->
@@ -660,13 +706,13 @@
 
     <!-- Add Customer Button -->
     <button type="button" class="btn-add-customer" id="addCustomerBtn">
-        <i class="bi bi-plus-lg"></i> Add Another Customer
+        <i class="bi bi-plus-lg"></i> Add Another Customer <span style="font-size: 0.65rem; color: #9ca3af;">(Ctrl+N)</span>
     </button>
 </div>
 
 <!-- Save Bar -->
 <div class="save-bar">
-    <button type="button" class="btn-ui btn-success-ui" id="saveAllBtn" style="padding: 0.75rem 2rem; min-width: 200px;">
+    <button type="button" class="btn-ui btn-success-ui" id="saveAllBtn" style="padding: 0.75rem 2rem; min-width: 200px; font-size: 1rem;">
         <i class="bi bi-check2-circle"></i> Save All Sales
     </button>
 </div>
@@ -681,13 +727,17 @@
 // PRODUCT DATA
 // ============================================
 const PRODUCTS = [
-    "Mustard Oil Extraction", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
+    "Mustard Oil Extraction", "Aalas Oil Extraction", "Satu Grinding", "Maize Grinding", "Dal Banai", "Wheat Grinding", "Paddy Grinding", "Turmeric Grinding", "Spice Grinding",
     "Rice Bran", "Mustard Cake", "Wheat Flour", "Rice", "Mustard Seed", "Wheat", "Mustard Oil", "Paddy", "Spices", 
     "Turmeric Powder", "Others"
 ];
 
 const PRODUCT_DEFAULTS = {
     "Mustard Oil Extraction": { rate: 10, unit: "Kg" },
+    "Satu Grinding": { rate: 4, unit: "Kg" },
+    "Aalas Oil Extraction": { rate: 10, unit: "Kg" },
+    "Maize Grinding": { rate: 4, unit: "Kg" },
+    "Dal Banai": { rate: 4, unit: "Kg" },
     "Wheat Grinding": { rate: 4, unit: "Kg" },
     "Paddy Grinding": { rate: 4, unit: "Kg" },
     "Turmeric Grinding": { rate: 40, unit: "Kg" },
@@ -715,6 +765,7 @@ let isSaving = false;
 let autoSaveTimer = null;
 let hasUnsavedChanges = false;
 let lastBatchId = null;
+
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
@@ -743,6 +794,34 @@ function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, m => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[m]));
+}
+
+// ============================================
+// NEPAL TIME HELPER FUNCTION
+// ============================================
+
+function convertUTCtoNepalTime(utcDateStr) {
+    try {
+        // Parse the UTC time from Supabase
+        const utcDate = new Date(utcDateStr);
+        
+        // Nepal is UTC+5:45 (345 minutes ahead of UTC)
+        const nepalOffsetMinutes = 345;
+        const nepalTime = new Date(utcDate.getTime() + (nepalOffsetMinutes * 60 * 1000));
+        
+        // Format as readable string
+        return nepalTime.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        }) + ' NPT';
+    } catch (e) {
+        return new Date(utcDateStr).toLocaleString();
+    }
 }
 
 function showToast(message, type, duration = 4000) {
@@ -940,6 +1019,18 @@ function markUnsavedChanges() {
     window.unsavedTimer = setTimeout(() => {
         autoSaveDraft();
     }, 2000);
+}
+
+function clearAll() {
+    if (customers.length === 0) return;
+    if (confirm('⚠️ This will clear ALL customers and items. Are you sure?')) {
+        customers = [];
+        addCustomer();
+        hasUnsavedChanges = false;
+        document.getElementById('unsavedWarning').style.display = 'none';
+        localStorage.removeItem('batch_sales_draft');
+        showToast('All data cleared', 'info');
+    }
 }
 
 // ============================================
@@ -1256,6 +1347,7 @@ function handleCustomerInput(e) {
                                     customer.customerName = s.name;
                                     customer.advanceBalance = advanceData.advance_balance || 0;
                                     
+                                    // Auto-fetch email if available
                                     if (s.email) {
                                         customer.email = s.email;
                                         const emailInput = card.querySelector('.customer-email-input');
@@ -1765,9 +1857,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-
-
-
 // ============================================
 // ROLLBACK FUNCTIONS
 // ============================================
@@ -1805,9 +1894,14 @@ async function rollbackBatch(batchId, reason) {
             }
             lastBatchId = null;
             
-            if (confirm('Rollback complete. Refresh page to see changes?')) {
-                window.location.reload();
-            }
+            // Close history modal if open
+            closeHistoryModal();
+            
+            setTimeout(() => {
+                if (confirm('Rollback complete. Refresh page to see changes?')) {
+                    window.location.reload();
+                }
+            }, 1000);
         } else {
             showToast(result.error || 'Rollback failed', 'error');
         }
@@ -1815,6 +1909,10 @@ async function rollbackBatch(batchId, reason) {
         showToast('Error during rollback: ' + error.message, 'error');
     }
 }
+
+// ============================================
+// BATCH HISTORY (FIXED WITH NEPAL TIME)
+// ============================================
 
 async function showBatchHistory() {
     try {
@@ -1824,57 +1922,75 @@ async function showBatchHistory() {
         if (data.success && data.batches && data.batches.length) {
             let modalHtml = `
                 <div class="progress-overlay" id="historyModal" style="z-index: 100000;">
-                    <div class="progress-modal" style="max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto;">
-                        <h4><i class="bi bi-clock-history"></i> Batch History</h4>
+                    <div class="progress-modal" style="max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: left;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="margin: 0;"><i class="bi bi-clock-history"></i> Batch History</h4>
+                            <button onclick="closeHistoryModal()" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;">&times;</button>
+                        </div>
                         <hr>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: #f3f4f6;">
-                                    <th style="padding: 8px; text-align: left;">Time</th>
-                                    <th style="padding: 8px; text-align: left;">User</th>
-                                    <th style="padding: 8px; text-align: left;">Customers</th>
-                                    <th style="padding: 8px; text-align: left;">Amount</th>
-                                    <th style="padding: 8px; text-align: left;">Status</th>
-                                    <th style="padding: 8px; text-align: left;">Action</th>
-                                 </tr>
-                            </thead>
-                            <tbody>
+                        <div style="overflow-x: auto;">
+                            <table class="history-modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>Time (Nepal)</th>
+                                        <th>User</th>
+                                        <th>Customers</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
             `;
             
             data.batches.forEach(batch => {
                 const isActive = batch.status === 'active';
+                const statusClass = isActive ? 'status-active' : 'status-rolled_back';
+                const statusLabel = batch.status || 'active';
+                
+                // ============================================================
+                // FIX: Use helper function to convert UTC to Nepal time
+                // ============================================================
+                const displayTime = convertUTCtoNepalTime(batch.created_at);
+                
                 modalHtml += `
-                    <tr style="border-bottom: 1px solid #e5e7eb;">
-                        <td style="padding: 8px;">${new Date(batch.created_at).toLocaleString()}</td>
-                        <td style="padding: 8px;">${batch.user_name}</td>
-                        <td style="padding: 8px;">${batch.total_customers}</td>
-                        <td style="padding: 8px;">Rs ${(batch.total_amount || 0).toFixed(2)}</td>
-                        <td style="padding: 8px;">
-                            <span style="padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; ${isActive ? 'background: #d1fae5; color: #065f46;' : 'background: #fee2e2; color: #991b1b;'}">
-                                ${batch.status}
-                            </span>
-                        </td>
-                        <td style="padding: 8px;">
-                            ${isActive ? `<button onclick="rollbackBatch('${batch.batch_id}', 'Rollback from history')" class="btn-ui btn-outline-ui" style="padding: 2px 8px; font-size: 0.7rem;"><i class="bi bi-arrow-undo"></i> Undo</button>` : '-'}
-                        </td>
-                    </tr>
+                                    <tr>
+                                        <td>${displayTime}</td>
+                                        <td>${batch.user_name || 'Unknown'}</td>
+                                        <td style="text-align: center;">${batch.total_customers || 0}</td>
+                                        <td>Rs ${(batch.total_amount || 0).toFixed(2)}</td>
+                                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                                        <td>
+                                            ${isActive ? `<button onclick="rollbackBatch('${batch.batch_id}', 'Rollback from history')" class="btn-ui btn-outline-ui" style="padding: 4px 12px; font-size: 0.7rem; border: 1px solid #e5e7eb; border-radius: 4px; cursor: pointer; background: transparent;"><i class="bi bi-arrow-undo"></i> Undo</button>` : '-'}
+                                        </td>
+                                    </tr>
                 `;
             });
             
             modalHtml += `
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                         <hr>
-                        <button onclick="closeHistoryModal()" class="btn-ui btn-primary-ui" style="margin-top: 1rem;">Close</button>
+                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
+                            <button onclick="closeHistoryModal()" class="btn-ui btn-primary-ui" style="padding: 0.5rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; background: #0C5B3F; color: white;">
+                                <i class="bi bi-x-lg"></i> Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('historyModal');
+            if (existingModal) existingModal.remove();
             
             document.body.insertAdjacentHTML('beforeend', modalHtml);
         } else {
             showToast('No batch history found', 'info');
         }
     } catch (error) {
+        console.error('Error loading batch history:', error);
         showToast('Error loading batch history', 'error');
     }
 }
@@ -1883,8 +1999,6 @@ function closeHistoryModal() {
     const modal = document.getElementById('historyModal');
     if (modal) modal.remove();
 }
-
-
 
 // ============================================
 // PAGE BEFORE UNLOAD WARNING
