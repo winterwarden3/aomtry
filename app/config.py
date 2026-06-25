@@ -35,6 +35,7 @@ class Config:
     BUSINESS_NAME = "Adarsh Oil Mill"
     CURRENCY = "Rs."
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@adarshoilmill.com.np')
+    DEFAULT_CUSTOMER_PASSWORD = os.environ.get('DEFAULT_CUSTOMER_PASSWORD', '1234')
     
     # ============================================
     # OTP & RATE LIMITING CONSTANTS

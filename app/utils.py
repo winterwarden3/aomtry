@@ -30,15 +30,15 @@ def admin_required(f):
 # =========================
 # INVOICE GENERATOR (VERCEL-SAFE - NO THREADING)
 # =========================
-def generate_invoice_number() -> str:
-    """Generate unique invoice number - Vercel safe (no threading)"""
+def generate_invoice_number(offset: int = 0) -> str:
+    """Generate unique invoice number - with batch offset support"""
     from datetime import datetime
     from app.supabase_client import supabase
     
     now = datetime.now(NEPAL_TZ)
     prefix = f"INV{now.strftime('%Y%m%d')}"
     
-    # Retry up to 3 times if we get a duplicate (handles race conditions)
+    # Retry up to 3 times if we get a duplicate
     max_retries = 3
     for attempt in range(max_retries):
         try:
@@ -59,10 +59,11 @@ def generate_invoice_number() -> str:
             else:
                 last_number = 0
             
-            new_number = last_number + 1
+            # Apply offset for batch
+            new_number = last_number + 1 + offset
             invoice_number = f"{prefix}{new_number:04d}"
             
-            # Verify uniqueness (optional but safe)
+            # Verify uniqueness
             check_response = supabase.table("sales")\
                 .select("invoice_number")\
                 .eq("invoice_number", invoice_number)\
@@ -77,7 +78,7 @@ def generate_invoice_number() -> str:
                 
         except Exception as e:
             print(f"Error generating invoice: {e}")
-            # Fallback: use timestamp to ensure uniqueness
+            # Fallback: use timestamp
             import time
             timestamp = int(time.time() * 1000)
             return f"{prefix}{timestamp}"[-12:]
@@ -362,7 +363,7 @@ def build_byproduct_note(exchange_mustard_cake=False, exchange_rice_bran=False):
     """
     notes = []
     if exchange_mustard_cake:
-        notes.append('Mustard Cake Exchange: Mustard Oil + Aalas Oil FREE')
+        notes.append('Mustard Cake Exchange: Mustard Oil Extraction + Aalas Oil Extraction FREE')
     if exchange_rice_bran:
         notes.append('Rice Bran Exchange: Dal Banai + Others FREE')
     return ' | '.join(notes) if notes else ''

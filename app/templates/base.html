@@ -7,6 +7,11 @@
 
     <title>{% block title %}{{ business_name }}{% endblock %}</title>
 
+    <!-- Google Fonts - Inter & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -30,46 +35,168 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --info: #0dcaf0;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-secondary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
+        /* ================= BASE TYPOGRAPHY ================= */
         body {
             background: var(--main-bg);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-primary);
             color: var(--heading);
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* ================= NAVBAR ================= */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-secondary);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        h1 { font-size: 2rem; font-weight: 700; }
+        h2 { font-size: 1.75rem; font-weight: 700; }
+        h3 { font-size: 1.5rem; font-weight: 600; }
+        h4 { font-size: 1.25rem; font-weight: 600; }
+        h5 { font-size: 1.1rem; font-weight: 600; }
+        h6 { font-size: 0.95rem; font-weight: 600; }
+
+        p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--secondary-text);
+        }
+
+        .text-muted {
+            color: var(--secondary-text) !important;
+            font-size: 0.85rem;
+        }
+
+        /* ================= NAVBAR - FIXED ALIGNMENT ================= */
         .navbar {
             background: var(--primary) !important;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 10px 0;
+            min-height: 60px;
+        }
+
+        .navbar .container-fluid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
         }
 
         .navbar-brand {
+            font-family: var(--font-secondary);
             font-weight: 700;
+            font-size: 1.1rem;
             color: white !important;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin: 0;
         }
 
         .navbar-brand i {
-            color: var(--accent);
+            color: #fbbf24;
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        /* Navbar collapse */
+        .navbar-collapse {
+            flex-grow: 0 !important;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
         }
 
         .nav-link {
-            border-radius: 8px;
-            font-size: 14px;
-            padding: 8px 15px;
+            font-family: var(--font-primary);
+            font-weight: 500;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            padding: 8px 16px;
             transition: 0.2s ease;
-            color: rgba(255,255,255,0.9) !important;
+            color: rgba(255,255,255,0.85) !important;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         .nav-link:hover {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
             color: white !important;
-            transform: translateY(-1px);
         }
 
         .nav-link.active {
-            background: var(--accent);
+            background: rgba(255,255,255,0.15);
             color: white !important;
+        }
+
+        .nav-link i {
+            font-size: 0.9rem;
+        }
+
+        /* ================= LOGOUT BUTTON - RED ================= */
+        .nav-link-logout {
+            font-family: var(--font-primary);
+            font-weight: 500;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            padding: 8px 16px;
+            transition: 0.2s ease;
+            color: #fca5a5 !important;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .nav-link-logout:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fecaca !important;
+        }
+
+        .nav-link-logout i {
+            font-size: 0.9rem;
+            color: #fca5a5;
+        }
+
+        .nav-link-logout:hover i {
+            color: #fecaca;
+        }
+
+        /* Navbar toggler */
+        .navbar-toggler {
+            border-color: rgba(255,255,255,0.3);
+            padding: 6px 10px;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
         /* ================= MAIN ================= */
@@ -81,38 +208,53 @@
         /* ================= CARDS ================= */
         .card {
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             transition: 0.25s ease;
+            overflow: hidden;
         }
 
         .card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
         }
 
         .card-header {
             background: white;
             border-bottom: 2px solid var(--secondary-bg);
+            font-family: var(--font-secondary);
             font-weight: 600;
+            font-size: 1rem;
             color: var(--heading);
+            padding: 16px 20px;
+        }
+
+        .card-body {
+            padding: 20px;
         }
 
         /* ================= BUTTONS ================= */
         .btn {
-            border-radius: 8px;
-            padding: 8px 20px;
-            font-weight: 500;
+            font-family: var(--font-primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            padding: 10px 24px;
+            letter-spacing: 0.3px;
+            transition: all 0.2s ease;
         }
 
         .btn-primary {
             background: var(--primary);
             border: none;
+            color: white;
         }
 
         .btn-primary:hover {
             background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(12, 91, 63, 0.3);
         }
 
         .btn-danger {
@@ -120,28 +262,57 @@
             border: none;
         }
 
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+        }
+
         .btn-success {
             background: var(--accent);
             border: none;
         }
 
+        .btn-success:hover {
+            background: #0d7a47;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(19, 138, 82, 0.3);
+        }
+
         .btn-outline-primary {
-            border: 1px solid var(--primary);
+            border: 2px solid var(--primary);
             color: var(--primary);
+            background: transparent;
         }
 
         .btn-outline-primary:hover {
             background: var(--primary);
             color: white;
+            transform: translateY(-2px);
         }
 
         /* ================= TABLE ================= */
+        .table {
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+        }
+
         .table thead th {
             background: var(--secondary-bg);
             border: none;
+            font-family: var(--font-secondary);
             font-weight: 600;
-            font-size: 13px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: var(--heading);
+            padding: 12px 16px;
+        }
+
+        .table tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--secondary-bg);
         }
 
         .table tbody tr:hover {
@@ -152,83 +323,188 @@
         .page-header {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(12, 91, 63, 0.2);
+            padding: 28px 32px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 20px rgba(12, 91, 63, 0.25);
+        }
+
+        .page-header h1,
+        .page-header h2,
+        .page-header h3 {
+            font-family: var(--font-secondary);
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+            margin-bottom: 0;
         }
 
         /* ================= FORM ================= */
         .form-control,
         .form-select {
-            border-radius: 8px;
+            font-family: var(--font-primary);
+            font-size: 0.95rem;
+            border-radius: 10px;
             border: 1px solid #e5e7eb;
-            padding: 10px 12px;
+            padding: 11px 14px;
+            transition: all 0.2s ease;
         }
 
         .form-control:focus,
         .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(12, 91, 63, 0.1);
+            box-shadow: 0 0 0 4px rgba(12, 91, 63, 0.1);
         }
 
         .form-label {
+            font-family: var(--font-secondary);
             font-weight: 600;
+            font-size: 0.85rem;
             color: var(--heading);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+        }
+
+        .form-text {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
         }
 
         /* ================= ALERT ================= */
         .alert {
-            border-radius: 8px;
+            border-radius: 10px;
             border: none;
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+            padding: 14px 18px;
         }
 
         /* ================= FOOTER ================= */
         footer {
             background: white;
             border-top: 1px solid #e5e7eb;
-            font-size: 13px;
+            font-family: var(--font-primary);
+            font-size: 0.8rem;
             color: var(--secondary-text);
+            padding: 20px 0;
         }
 
         /* ================= BADGES ================= */
         .badge {
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-weight: 500;
+            font-family: var(--font-primary);
+            font-weight: 600;
+            font-size: 0.7rem;
+            padding: 5px 12px;
+            border-radius: 8px;
+            letter-spacing: 0.3px;
         }
 
-        .bg-success {
-            background: var(--accent) !important;
+        /* ================= STATS CARDS ================= */
+        .stat-value {
+            font-family: var(--font-secondary);
+            font-weight: 700;
+            font-size: 1.75rem;
+            line-height: 1.2;
+            color: var(--heading);
         }
 
-        /* ================= SIDEBAR MENU ================= */
-        .sidebar-menu {
-            background: white;
-            border-radius: 12px;
-            padding: 10px;
-        }
-
-        .sidebar-menu .nav-link {
-            color: var(--heading) !important;
-            margin-bottom: 5px;
-        }
-
-        .sidebar-menu .nav-link:hover {
-            background: var(--secondary-bg);
-            color: var(--primary) !important;
+        .stat-label {
+            font-family: var(--font-primary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--secondary-text);
         }
 
         /* ================= MOBILE ================= */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                flex-grow: 1 !important;
+                margin-top: 10px;
+            }
+            
+            .navbar-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                gap: 2px;
+            }
+            
+            .nav-item {
+                width: 100%;
+            }
+            
+            .nav-link,
+            .nav-link-logout {
+                width: 100%;
+                padding: 10px 16px;
+            }
+        }
+
         @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
             main {
                 padding-left: 10px;
                 padding-right: 10px;
             }
+            
             .page-header {
-                padding: 15px;
+                padding: 18px 20px;
             }
+            
+            h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.4rem; }
+            h3 { font-size: 1.2rem; }
+            h4 { font-size: 1.05rem; }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                font-size: 0.8rem;
+                padding: 8px 16px;
+            }
+        }
+
+        /* ================= SCROLLBAR ================= */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-bg);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* ================= SELECTION ================= */
+        ::selection {
+            background: var(--primary);
+            color: white;
         }
 
     </style>
@@ -238,11 +514,6 @@
 </head>
 
 <body>
-
-
-
-
-
 
 <!-- Loading Animation for Vercel -->
 <div id="appLoader" style="
@@ -259,7 +530,6 @@
     transition: opacity 0.5s ease;
 ">
     <div style="text-align: center;">
-        <!-- Oil Drop -->
         <div style="
             width: 80px;
             height: 80px;
@@ -281,7 +551,6 @@
             "></div>
         </div>
         
-        <!-- Spinner -->
         <div style="
             width: 45px;
             height: 45px;
@@ -292,9 +561,8 @@
             margin: 15px auto;
         "></div>
         
-        <!-- Text -->
-        <p style="color: white; font-weight: 600; margin-top: 10px;">Adarsh Oil Mill</p>
-        <p style="color: rgba(255,255,255,0.8); font-size: 12px;" id="loadingMsg">Loading Admin Panel...</p>
+        <p style="color: white; font-weight: 600; font-family: 'Inter', sans-serif; margin-top: 10px;">Adarsh Oil Mill</p>
+        <p style="color: rgba(255,255,255,0.8); font-size: 12px; font-family: 'Inter', sans-serif;" id="loadingMsg">Loading...</p>
     </div>
 </div>
 
@@ -314,7 +582,6 @@
 </style>
 
 <script>
-    // Rotating messages
     const messages = ["🛢️ Loading...", "📊 Fetching data...", "⚙️ Almost ready..."];
     let i = 0;
     setInterval(() => {
@@ -322,7 +589,6 @@
         if (el) { i = (i + 1) % messages.length; el.innerHTML = messages[i]; }
     }, 1500);
     
-    // Hide loader when page loads
     window.addEventListener('load', function() {
         const loader = document.getElementById('appLoader');
         if (loader) {
@@ -331,7 +597,6 @@
         }
     });
     
-    // Fallback hide after 4 seconds
     setTimeout(() => {
         const loader = document.getElementById('appLoader');
         if (loader && loader.parentNode) {
@@ -341,71 +606,70 @@
     }, 1000);
 </script>
 
-
-
-
-
-
-
-<!-- ================= NAVBAR ================= -->
+<!-- ================= NAVBAR - PERFECTLY ALIGNED ================= -->
 {% if current_user.is_authenticated %}
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
 
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="{{ url_for('admin.dashboard') }}">
-            <i class="bi bi-droplet"></i> {{ business_name }}
+        <!-- Brand - Left side -->
+        <a class="navbar-brand" href="{% if current_user.role == 'admin' %}{{ url_for('admin.dashboard') }}{% else %}{{ url_for('customer.dashboard') }}{% endif %}">
+            <i class="bi bi-droplet"></i> Adarsh Oil Mill
         </a>
 
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+        <!-- Toggler for mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- Nav items - Right side -->
         <div class="collapse navbar-collapse" id="nav">
-
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav ms-auto">
 
                 {% if current_user.role == 'admin' %}
-
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin.sales_list') }}">
                         <i class="bi bi-cart-check"></i> Sales
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin.expenses_list') }}">
                         <i class="bi bi-cash-stack"></i> Expenses
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin.customers_list') }}">
                         <i class="bi bi-people"></i> Customers
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin_products.product_list') }}">
                         <i class="bi bi-box"></i> Products
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin.reports') }}">
                         <i class="bi bi-graph-up"></i> Reports
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('admin.profit_analysis') }}">
                         <i class="bi bi-currency-rupee"></i> Profit
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.change_password') }}">
+                        <i class="bi bi-key"></i> Change Password
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-logout" href="{{ url_for('auth.logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </li>
 
@@ -413,50 +677,24 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('customer.dashboard') }}">
-                        <i class="bi bi-house"></i> My Dashboard
+                        <i class="bi bi-house"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('customer.profile') }}">
+                        <i class="bi bi-person-circle"></i> Profile
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link-logout" href="{{ url_for('auth.logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </li>
 
                 {% endif %}
 
             </ul>
-
-            <ul class="navbar-nav">
-
-                <li class="nav-item dropdown">
-
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i> {{ current_user.name }}
-                    </a>
-
-                    <ul class="dropdown-menu dropdown-menu-end p-2">
-
-                        <li class="px-3 small text-muted">
-                            Role: {{ current_user.role|title }}
-                        </li>
-
-                        <li><hr class="dropdown-divider"></li>
-
-                        <li>
-                            <a class="dropdown-item" href="{{ url_for('auth.change_password') }}">
-                                <i class="bi bi-key"></i> Change Password
-                            </a>
-                        </li>
-
-                        <li><hr class="dropdown-divider"></li>
-
-                        <li>
-                            <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </li>
-
-            </ul>
-
         </div>
 
     </div>
@@ -465,25 +703,24 @@
 {% endif %}
 
 <!-- ================= FLASH ================= -->
-<!-- TOAST FLASH MESSAGES -->
 <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
 <style>
 .toast-glass {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
-    border-radius: 12px;
-    padding: 15px 20px;
+    border-radius: 14px;
+    padding: 16px 20px;
     margin-bottom: 10px;
     min-width: 280px;
     max-width: 350px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     border-left: 4px solid;
     animation: slideInRight 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-family: 'Poppins', sans-serif;
+    gap: 14px;
 }
 
 @keyframes slideInRight {
@@ -511,21 +748,18 @@
 .toast-glass.success i {
     color: #22c55e;
 }
-
 .toast-glass.danger {
     border-left-color: #ef4444;
 }
 .toast-glass.danger i {
     color: #ef4444;
 }
-
 .toast-glass.warning {
     border-left-color: #f59e0b;
 }
 .toast-glass.warning i {
     color: #f59e0b;
 }
-
 .toast-glass.info {
     border-left-color: #0C5B3F;
 }
@@ -534,21 +768,22 @@
 }
 
 .toast-glass i {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
 }
-
 .toast-content {
     flex: 1;
 }
-
 .toast-title {
-    font-weight: 600;
-    margin-bottom: 3px;
-}
-
-.toast-message {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
     font-size: 0.85rem;
+    margin-bottom: 2px;
+}
+.toast-message {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
     color: #555;
+    line-height: 1.5;
 }
 </style>
 
@@ -587,7 +822,6 @@ function showToast(message, category) {
     
     container.appendChild(toast);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
         if (toast && toast.parentNode) {
             toast.remove();
@@ -595,7 +829,6 @@ function showToast(message, category) {
     }, 5000);
 }
 
-// Show flash messages as toasts
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
@@ -617,7 +850,7 @@ function showToast(message, category) {
 
         <small class="text-muted">
 
-            © {{ current_year }} {{ business_name }}
+            © {{ current_year }} Adarsh Oil Mill
 
             ·
 
@@ -627,7 +860,7 @@ function showToast(message, category) {
 
             {% else %}
 
-                Customer Dashboard.
+                Customer Dashboard
 
             {% endif %}
 

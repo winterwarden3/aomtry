@@ -1053,3 +1053,21 @@ class Payment:
         except Exception as e:
             print(f"Error deleting payment: {e}")
             return False
+        
+        # app/models_supabase.py - Add this method
+
+@staticmethod
+def get_by_email(email):
+    """Get user by email"""
+    try:
+        response = supabase.table("users")\
+            .select("*")\
+            .ilike("email", email)\
+            .execute()
+        
+        if response.data:
+            return response.data[0]
+        return None
+    except Exception as e:
+        print(f"Error getting user by email: {e}")
+        return None

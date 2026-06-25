@@ -76,6 +76,32 @@
     font-size: 0.85rem;
     font-weight: 600;
     color: #0C5B3F;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.customer-badge {
+    font-size: 0.6rem;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.badge-new {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-existing {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-unknown {
+    background: #f3f4f6;
+    color: #6b7280;
 }
 
 .btn-remove-customer {
@@ -640,6 +666,14 @@
                 <strong id="totalCustomers">0</strong>
             </div>
             <div class="summary-card">
+                <small><i class="bi bi-person-plus"></i> New Customers</small>
+                <strong id="newCustomers">0</strong>
+            </div>
+            <div class="summary-card">
+                <small><i class="bi bi-person-check"></i> Existing Customers</small>
+                <strong id="existingCustomers">0</strong>
+            </div>
+            <div class="summary-card">
                 <small><i class="bi bi-calculator"></i> Total Sales</small>
                 <strong id="totalSalesAmount">Rs 0</strong>
             </div>
@@ -683,16 +717,9 @@
             <i class="bi bi-upload"></i> Import to Form
             <input type="file" id="importExcelPreview" accept=".xlsx,.xls" style="display:none" onchange="importSales(this, true)">
         </label>
-        <label class="btn-ui btn-primary-ui" style="cursor: pointer;">
-            <i class="bi bi-lightning"></i> Import & Save
-            <input type="file" id="importExcelSave" accept=".xlsx,.xls" style="display:none" onchange="importSales(this, false)">
-        </label>
-        <button type="button" class="btn-ui btn-outline-ui" onclick="loadDraft()">
-            <i class="bi bi-arrow-counterclockwise"></i> Restore Draft
-        </button>
-        <button type="button" class="btn-ui btn-outline-ui" onclick="showRollbackDialog()" id="rollbackBtn" style="display: none;">
-            <i class="bi bi-arrow-undo"></i> Undo Last Batch
-        </button>
+
+
+
         <button type="button" class="btn-ui btn-outline-ui" onclick="showBatchHistory()">
             <i class="bi bi-clock-history"></i> Batch History
         </button>
@@ -803,14 +830,9 @@ function escapeHtml(str) {
 
 function convertUTCtoNepalTime(utcDateStr) {
     try {
-        // Parse the UTC time from Supabase
         const utcDate = new Date(utcDateStr);
-        
-        // Nepal is UTC+5:45 (345 minutes ahead of UTC)
         const nepalOffsetMinutes = 345;
         const nepalTime = new Date(utcDate.getTime() + (nepalOffsetMinutes * 60 * 1000));
-        
-        // Format as readable string
         return nepalTime.toLocaleString('en-US', {
             year: 'numeric',
             month: '2-digit',
@@ -869,7 +891,8 @@ function createEmptyCustomer() {
         paymentStatus: 'pending',
         exchangeMustardCake: false,
         exchangeRiceBran: false,
-        sendEmail: false
+        sendEmail: false,
+        isNewCustomer: false
     };
 }
 
@@ -885,11 +908,9 @@ function calculateTotals(customer) {
     for (const item of customer.items) {
         let rate = parseFloat(item.rate) || 0;
         
-        // Exchange rule: Mustard Cake Exchange affects Mustard Oil Extraction AND Aalas Oil Extraction
         if (customer.exchangeMustardCake && isMustardExtraction(item.product_name)) {
             rate = 0;
         }
-        // Exchange rule: Rice Bran Exchange affects Dal Banai AND Others (NOT Rice Bran)
         if (customer.exchangeRiceBran && isOthersOrDalBanai(item.product_name)) {
             rate = 0;
         }
@@ -949,12 +970,16 @@ function paymentStatusLabel(customer) {
 // ============================================
 function updateBatchSummary() {
     const totalCustomers = customers.length;
+    const newCustomers = customers.filter(c => c.isNewCustomer).length;
+    const existingCustomers = customers.filter(c => c.customerId && !c.isNewCustomer).length;
     const totalSales = customers.reduce((sum, c) => sum + (c.totalAmount || 0), 0);
     const totalAdvance = customers.reduce((sum, c) => sum + (c.advanceUsed || 0), 0);
     const totalCash = customers.reduce((sum, c) => sum + (c.cashPaid || 0), 0);
     const totalEmails = customers.filter(c => c.sendEmail && c.email).length;
     
     document.getElementById('totalCustomers').textContent = totalCustomers;
+    document.getElementById('newCustomers').textContent = newCustomers;
+    document.getElementById('existingCustomers').textContent = existingCustomers;
     document.getElementById('totalSalesAmount').innerHTML = `Rs ${totalSales.toFixed(2)}`;
     document.getElementById('totalAdvanceUsed').innerHTML = `Rs ${totalAdvance.toFixed(2)}`;
     document.getElementById('totalCashCollected').innerHTML = `Rs ${totalCash.toFixed(2)}`;
@@ -1015,7 +1040,6 @@ function loadDraft() {
 function markUnsavedChanges() {
     if (!hasUnsavedChanges) {
         hasUnsavedChanges = true;
-        document.getElementById('unsavedWarning').style.display = 'block';
     }
     
     clearTimeout(window.unsavedTimer);
@@ -1030,7 +1054,6 @@ function clearAll() {
         customers = [];
         addCustomer();
         hasUnsavedChanges = false;
-        document.getElementById('unsavedWarning').style.display = 'none';
         localStorage.removeItem('batch_sales_draft');
         showToast('All data cleared', 'info');
     }
@@ -1076,30 +1099,6 @@ function bulkSetAllEmails() {
         showToast('Email sending enabled for all customers with email', 'success');
         markUnsavedChanges();
     }
-}
-
-function exportBatchToExcel() {
-    const { salesData } = validateBeforeSave();
-    if (!salesData.length) {
-        showToast('No data to export', 'warning');
-        return;
-    }
-    
-    let csv = 'Customer Name,Email,Product,Quantity,Unit,Rate,Subtotal,Advance Used,Cash Paid\n';
-    salesData.forEach(customer => {
-        customer.items.forEach(item => {
-            csv += `"${customer.customer_name}","${customer.email || ''}","${item.product_name}",${item.quantity},${item.unit},${item.rate},${item.subtotal},${customer.advance_used},${customer.cash_paid}\n`;
-        });
-    });
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `batch_export_${new Date().toISOString().slice(0,19)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Export complete', 'success');
 }
 
 function printBatchSummary() {
@@ -1177,20 +1176,20 @@ function showProgressModal(total, current = 0, message = '') {
         modal.className = 'progress-overlay';
         modal.innerHTML = `
             <div class="progress-modal">
-                <h4><i class="bi bi-hourglass-split"></i> Saving Sales...</h4>
+                <h4><i class="bi bi-hourglass-split"></i> Processing...</h4>
                 <div class="progress-bar-container">
                     <div class="progress-bar-fill"></div>
                 </div>
-                <div class="progress-stats" id="progressStats">0/${total} completed</div>
-                <div class="progress-message" id="progressMessage" style="margin-top: 10px; font-size: 0.85rem;"></div>
+                <div class="progress-stats" id="progressStats">0%</div>
+                <div class="progress-message" id="progressMessage" style="margin-top: 10px; font-size: 0.85rem; color: #6b7280;"></div>
             </div>
         `;
         document.body.appendChild(modal);
     }
     
-    const percent = (current / total) * 100;
-    modal.querySelector('.progress-bar-fill').style.width = `${percent}%`;
-    modal.querySelector('#progressStats').textContent = `${current}/${total} completed`;
+    const percent = total > 0 ? (current / total) * 100 : current;
+    modal.querySelector('.progress-bar-fill').style.width = `${Math.min(percent, 100)}%`;
+    modal.querySelector('#progressStats').textContent = `${Math.round(percent)}%`;
     if (message) modal.querySelector('#progressMessage').textContent = message;
     
     modal.style.display = 'flex';
@@ -1289,7 +1288,6 @@ async function saveAllSales() {
         if (result.success) {
             lastBatchId = result.batch_id;
             
-            // Show rollback button
             const rollbackBtn = document.getElementById('rollbackBtn');
             if (rollbackBtn) {
                 rollbackBtn.style.display = 'inline-flex';
@@ -1301,7 +1299,6 @@ async function saveAllSales() {
             customers = [];
             addCustomer();
             hasUnsavedChanges = false;
-            document.getElementById('unsavedWarning').style.display = 'none';
         } else {
             showToast(result.error || 'Save failed', 'error');
         }
@@ -1315,7 +1312,7 @@ async function saveAllSales() {
 }
 
 // ============================================
-// CUSTOMER INPUT HANDLER (with auto email fetch)
+// CUSTOMER INPUT HANDLER
 // ============================================
 function handleCustomerInput(e) {
     let input = e.target;
@@ -1349,8 +1346,8 @@ function handleCustomerInput(e) {
                                     customer.customerId = s.id;
                                     customer.customerName = s.name;
                                     customer.advanceBalance = advanceData.advance_balance || 0;
+                                    customer.isNewCustomer = false;
                                     
-                                    // Auto-fetch email if available
                                     if (s.email) {
                                         customer.email = s.email;
                                         const emailInput = card.querySelector('.customer-email-input');
@@ -1389,6 +1386,7 @@ function handleCustomerInput(e) {
                                 customer.customerId = data.customer.id;
                                 customer.customerName = data.customer.name;
                                 customer.advanceBalance = 0;
+                                customer.isNewCustomer = false;
                                 calculateTotals(customer);
                                 render();
                                 markUnsavedChanges();
@@ -1477,12 +1475,23 @@ function render() {
         const hasMustardExtraction = customer.items.some(item => isMustardExtraction(item.product_name));
         const hasOthersOrDalBanai = customer.items.some(item => isOthersOrDalBanai(item.product_name));
         
+        // Determine badge
+        let badgeHtml = '';
+        if (customer.isNewCustomer) {
+            badgeHtml = `<span class="customer-badge badge-new"><i class="bi bi-plus-circle"></i> New</span>`;
+        } else if (customer.customerId) {
+            badgeHtml = `<span class="customer-badge badge-existing"><i class="bi bi-check-circle"></i> Existing</span>`;
+        } else {
+            badgeHtml = `<span class="customer-badge badge-unknown"><i class="bi bi-dash-circle"></i> Not Saved</span>`;
+        }
+        
         return `
         <div class="form-card" data-customer-uid="${customer.uid}">
             <div class="form-section">
                 <div class="customer-header">
                     <div class="customer-title">
                         <i class="bi bi-person-badge"></i> Customer ${index + 1}
+                        ${badgeHtml}
                     </div>
                     <button type="button" class="btn-remove-customer" onclick="removeCustomer(${customer.uid})">
                         <i class="bi bi-trash"></i> Remove
@@ -1747,7 +1756,6 @@ function toggleExchange(customerUid, type, checked) {
     if (customer) {
         if (type === 'mustard') {
             customer.exchangeMustardCake = checked;
-            // If exchange is enabled, set quantity to 10 for affected products
             if (checked) {
                 customer.items.forEach(item => {
                     if (isMustardExtraction(item.product_name)) {
@@ -1758,7 +1766,6 @@ function toggleExchange(customerUid, type, checked) {
                 customer.cashPaid = 0;
                 customer.advanceUsed = 0;
             } else {
-                // Restore defaults
                 customer.items.forEach(item => {
                     if (isMustardExtraction(item.product_name)) {
                         const defaults = PRODUCT_DEFAULTS[item.product_name];
@@ -1817,18 +1824,41 @@ function downloadTemplate() {
     window.location.href = '/admin/download-sales-template'; 
 }
 
+// ============================================
+// IMPORT SALES WITH PROGRESS
+// ============================================
 async function importSales(fileInput, previewOnly) {
     if (!fileInput.files || !fileInput.files[0]) return;
     
+    const file = fileInput.files[0];
     const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+    formData.append('file', file);
     if (previewOnly) formData.append('preview', 'true');
     
-    showToast(previewOnly ? 'Loading Excel...' : 'Importing sales...', 'info');
+    // Show progress
+    showProgressModal(100, 0, 'Uploading Excel file...');
     
     try {
-        const response = await fetch('/admin/import-sales-excel', { method: 'POST', body: formData });
+        const response = await fetch('/admin/import-sales-excel', { 
+            method: 'POST', 
+            body: formData 
+        });
+        
+        // Update progress
+        const modal = document.getElementById('progressModal');
+        if (modal) {
+            modal.querySelector('.progress-bar-fill').style.width = '70%';
+            modal.querySelector('#progressStats').textContent = '70%';
+            modal.querySelector('#progressMessage').textContent = 'Processing data from Excel...';
+        }
+        
         const result = await response.json();
+        
+        if (modal) {
+            modal.querySelector('.progress-bar-fill').style.width = '90%';
+            modal.querySelector('#progressStats').textContent = '90%';
+            modal.querySelector('#progressMessage').textContent = 'Loading into form...';
+        }
         
         if (result.success) {
             if (result.preview && result.customers) {
@@ -1846,10 +1876,11 @@ async function importSales(fileInput, previewOnly) {
             showToast(result.error || 'Import failed', 'error');
         }
     } catch (error) {
-        showToast('Error importing file', 'error');
+        showToast('Error importing file: ' + error.message, 'error');
+    } finally {
+        hideProgressModal();
+        fileInput.value = '';
     }
-    
-    fileInput.value = '';
 }
 
 function loadCustomersFromImport(importedCustomers) {
@@ -1879,7 +1910,8 @@ function loadCustomersFromImport(importedCustomers) {
             paymentStatus: 'pending',
             exchangeMustardCake: !!entry.exchange_mustard_cake,
             exchangeRiceBran: !!entry.exchange_rice_bran,
-            sendEmail: false
+            sendEmail: false,
+            isNewCustomer: entry.is_new_customer || false
         };
         if (!customer.items.length) customer.items = [createEmptyItem()];
         calculateTotals(customer);
@@ -1889,6 +1921,12 @@ function loadCustomersFromImport(importedCustomers) {
     if (!customers.length) addCustomer();
     else render();
     markUnsavedChanges();
+    
+    // Show notification for new customers
+    const newCustomers = customers.filter(c => c.isNewCustomer);
+    if (newCustomers.length > 0) {
+        showToast(`${newCustomers.length} new customer(s) will be created on save.`, 'info', 5000);
+    }
 }
 
 // ============================================
@@ -1943,7 +1981,6 @@ async function rollbackBatch(batchId, reason) {
             }
             lastBatchId = null;
             
-            // Close history modal if open
             closeHistoryModal();
             
             setTimeout(() => {

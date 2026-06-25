@@ -1,186 +1,523 @@
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, session
 from flask_login import login_required, current_user
-from app.models_supabase import Sale, User, Payment
-from app.utils import get_customer_summary
+from app.models_supabase import User
+from app.supabase_client import supabase
+from app.brevo_service import send_reset_email
+from app.config import Config
+import random
+from datetime import datetime, timedelta
+import re
 
 bp = Blueprint('customer', __name__, url_prefix='/customer')
-
-
-@bp.route('/dashboard')
-@login_required
-def dashboard():
-    customer_id = current_user.id
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    page = request.args.get('page', 1, type=int)
-    per_page = 10
-    
-    # Get customer data
-    customer = User.get_by_id(customer_id)
-    total_purchases = User.get_total_spending(customer_id)
-    total_payments = Payment.get_total_paid_by_customer(customer_id)
-    pending_due = User.get_total_due(customer_id)
-    advance_balance = User.get_advance_balance(customer_id)
-    
-    # Get paginated sales
-    sales, total_sales = Sale.get_by_customer(customer_id, page=page, per_page=per_page, with_items=True)
-    total_pages = (total_sales + per_page - 1) // per_page if total_sales > 0 else 1
-    
-    if is_ajax:
-        # Return JSON for AJAX requests
-        html = render_template('customer/_invoice_cards.html', recent_sales=sales)
-        return jsonify({
-            'success': True,
-            'html': html,
-            'total_purchases': total_purchases,
-            'total_payments': total_payments,
-            'pending_due': pending_due,
-            'advance_balance': advance_balance,
-            'sales_count': total_sales,
-            'has_more': page < total_pages,
-            'total_pages': total_pages
-        })
-    
-    return render_template('customer/dashboard.html', 
-                         total_purchases=total_purchases,
-                         total_payments=total_payments,
-                         pending_due=pending_due,
-                         advance_balance=advance_balance,
-                         recent_sales=sales,
-                         total_sales_count=total_sales,
-                         total_pages=total_pages)
-
-
-@bp.route('/invoices')
-@login_required
-def invoices():
-    """View all customer invoices"""
-    if current_user.role != 'customer':
-        return redirect(url_for('admin.dashboard'))
-    
-    customer_sales, _ = Sale.get_by_customer(current_user.id, page=1, per_page=100, with_items=True)
-    
-    return render_template(
-        'customer/invoices.html',
-        invoices=customer_sales,
-        business_name='Adarsh Oil Mill'
-    )
-
-
-@bp.route('/invoice/<int:sale_id>')
-@login_required
-def view_invoice(sale_id):
-    """
-    View invoice as HTML (print-friendly)
-    Users can use browser's "Print -> Save as PDF" to download
-    """
-    if current_user.role != 'customer':
-        return redirect(url_for('admin.dashboard'))
-    
-    sale = Sale.get_by_id_with_items(sale_id)
-    
-    if not sale or sale.get('customer_id') != current_user.id:
-        return redirect(url_for('customer.dashboard'))
-    
-    advance_balance = User.get_advance_balance(current_user.id)
-    
-    return render_template(
-        'customer/invoice_pdf.html',
-        sale=sale,
-        business_name='Adarsh Oil Mill',
-        advance_balance=advance_balance,
-        current_user=current_user
-    )
-
-
-@bp.route('/advance-balance')
-@login_required
-def advance_balance():
-    """View advance balance and transaction history"""
-    if current_user.role != 'customer':
-        return redirect(url_for('admin.dashboard'))
-    
-    current_balance = User.get_advance_balance(current_user.id)
-    transactions = User.get_advance_transactions(current_user.id, limit=50)
-    
-    total_deposited = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'deposit')
-    total_redeemed = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'redeem')
-    total_withdrawn = sum(t.get('amount', 0) for t in transactions if t.get('type') == 'withdraw')
-    
-    return render_template(
-        'customer/advance_balance.html',
-        current_balance=current_balance,
-        transactions=transactions,
-        total_deposited=total_deposited,
-        total_redeemed=total_redeemed,
-        total_withdrawn=total_withdrawn
-    )
-
-
-@bp.route('/profile')
-@login_required
-def profile():
-    """View customer profile"""
-    if current_user.role != 'customer':
-        return redirect(url_for('admin.dashboard'))
-    
-    return render_template(
-        'customer/profile.html',
-        customer=current_user
-    )
-
-
-# ============================================
-# API ENDPOINTS FOR CUSTOMER (AJAX)
-# ============================================
-
-@bp.route('/api/advance-balance')
-@login_required
-def api_advance_balance():
-    """Get current advance balance as JSON"""
-    if current_user.role != 'customer':
-        return jsonify({'error': 'Unauthorized'}), 403
-    
-    balance = User.get_advance_balance(current_user.id)
-    return jsonify({
-        'advance_balance': balance,
-        'formatted_balance': f"Rs.{balance:,.2f}"
-    })
-
-
-@bp.route('/api/recent-invoices')
-@login_required
-def api_recent_invoices():
-    """Get recent invoices as JSON"""
-    if current_user.role != 'customer':
-        return jsonify({'error': 'Unauthorized'}), 403
-    
-    sales, _ = Sale.get_by_customer(current_user.id, page=1, per_page=10, with_items=False)
-    
-    recent_invoices = [{
-        'invoice_number': sale.get('invoice_number'),
-        'date': sale.get('date'),
-        'total_amount': sale.get('total_amount'),
-        'payment_status': sale.get('payment_status'),
-        'due_amount': sale.get('due_amount', 0)
-    } for sale in sales]
-    
-    return jsonify(recent_invoices)
 
 
 # ============================================
 # HELPER FUNCTIONS
 # ============================================
 
-def get_customer_dashboard_data(customer_id):
-    """Helper to get all customer dashboard data"""
-    summary = get_customer_summary(customer_id)
-    advance_balance = User.get_advance_balance(customer_id)
-    recent_sales, _ = Sale.get_by_customer(customer_id, page=1, per_page=5, with_items=False)
+def get_customer_summary(customer_id):
+    """
+    Get customer financial summary including:
+    - Total purchases
+    - Total payments
+    - Pending due
+    - Advance balance
+    """
+    try:
+        # Get all sales for this customer
+        sales_response = supabase.table("sales")\
+            .select("total_amount, paid_amount, due_amount, advance_used, advance_amount")\
+            .eq("customer_id", customer_id)\
+            .execute()
+        
+        sales_data = sales_response.data or []
+        
+        # Calculate totals from sales
+        total_purchases = sum(float(s.get('total_amount', 0)) for s in sales_data)
+        total_paid = sum(float(s.get('paid_amount', 0)) for s in sales_data)
+        pending_due = sum(float(s.get('due_amount', 0)) for s in sales_data)
+        advance_balance = sum(float(s.get('advance_amount', 0)) for s in sales_data)
+        
+        # Also get direct payments for better accuracy
+        payments_response = supabase.table("payments")\
+            .select("amount")\
+            .eq("customer_id", customer_id)\
+            .execute()
+        
+        payments_data = payments_response.data or []
+        total_payments = sum(float(p.get('amount', 0)) for p in payments_data)
+        
+        # If no payments found, use paid_amount from sales
+        if total_payments == 0:
+            total_payments = total_paid
+        
+        # Get total number of sales
+        total_sales = len(sales_data)
+        
+        return {
+            'total_purchases': total_purchases,
+            'total_payments': total_payments,
+            'pending_due': pending_due,
+            'advance_balance': advance_balance,
+            'total_sales': total_sales
+        }
+        
+    except Exception as e:
+        print(f"Error getting customer summary: {e}")
+        return {
+            'total_purchases': 0,
+            'total_payments': 0,
+            'pending_due': 0,
+            'advance_balance': 0,
+            'total_sales': 0
+        }
+
+
+def verify_otp(username, otp, purpose):
+    """
+    Reusable OTP verification function
+    """
+    try:
+        response = supabase.table("otp_requests")\
+            .select("*")\
+            .eq("username", username)\
+            .eq("purpose", purpose)\
+            .gte("expires_at", datetime.now().isoformat())\
+            .order("created_at", desc=True)\
+            .limit(1)\
+            .execute()
+        
+        if not response.data:
+            return False, "OTP expired or not found. Please request a new OTP."
+        
+        stored_data = response.data[0]
+        
+        if stored_data.get('attempts', 0) >= 5:
+            supabase.table("otp_requests").delete().eq("id", stored_data['id']).execute()
+            return False, "Too many failed attempts. Please request a new OTP."
+        
+        if stored_data.get('otp') != otp:
+            supabase.table("otp_requests").update({"attempts": stored_data.get('attempts', 0) + 1}).eq("id", stored_data['id']).execute()
+            remaining = 5 - (stored_data.get('attempts', 0) + 1)
+            return False, f"Wrong OTP. {remaining} attempts remaining."
+        
+        # OTP verified - delete it
+        supabase.table("otp_requests").delete().eq("id", stored_data['id']).execute()
+        return True, "OTP verified successfully"
+        
+    except Exception as e:
+        print(f"Error verifying OTP: {e}")
+        return False, "Error verifying OTP. Please try again."
+
+
+# ============================================
+# ROUTES
+# ============================================
+
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    """Customer dashboard with invoices and stats"""
     
-    return {
-        'total_purchases': summary.get('total_purchases', 0),
-        'total_payments': summary.get('total_payments', 0),
-        'pending_due': summary.get('pending_dues', 0),
-        'advance_balance': advance_balance,
-        'recent_sales': recent_sales
-    }
+    if current_user.role != 'customer':
+        flash('Access denied. Customer only.', 'danger')
+        return redirect(url_for('admin.dashboard'))
+    
+    # Get page number for pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = (page - 1) * per_page
+    
+    # Get sales for customer with pagination
+    try:
+        sales_response = supabase.table("sales")\
+            .select("*", count="exact")\
+            .eq("customer_id", current_user.id)\
+            .order("date", desc=True)\
+            .range(offset, offset + per_page - 1)\
+            .execute()
+        
+        sales_data = sales_response.data or []
+        total_count = sales_response.count or 0
+        
+        # Get items for each sale
+        for sale in sales_data:
+            items_response = supabase.table("sale_items")\
+                .select("*")\
+                .eq("sale_id", sale['id'])\
+                .execute()
+            sale['items'] = items_response.data or []
+            
+    except Exception as e:
+        print(f"Error fetching sales: {e}")
+        sales_data = []
+        total_count = 0
+    
+    # Get customer summary
+    summary = get_customer_summary(current_user.id)
+    
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    if is_ajax:
+        # Render only the invoice cards for AJAX requests
+        html = render_template('customer/invoice.html', recent_sales=sales_data)
+        return jsonify({
+            'success': True,
+            'html': html,
+            'sales_count': total_count,
+            'total_purchases': summary['total_purchases'],
+            'total_payments': summary['total_payments'],
+            'pending_due': summary['pending_due'],
+            'advance_balance': summary['advance_balance'],
+            'has_more': len(sales_data) >= per_page and offset + per_page < total_count,
+            'total_pages': (total_count + per_page - 1) // per_page
+        })
+    
+    return render_template('customer/dashboard.html',
+                         recent_sales=sales_data,
+                         total_sales_count=total_count,
+                         total_purchases=summary['total_purchases'],
+                         total_payments=summary['total_payments'],
+                         pending_due=summary['pending_due'],
+                         advance_balance=summary['advance_balance'],
+                         total_pages=(total_count + per_page - 1) // per_page)
+
+
+@bp.route('/invoice/<sale_id>')
+@login_required
+def view_invoice(sale_id):
+    """View a specific invoice"""
+    
+    if current_user.role != 'customer':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('admin.dashboard'))
+    
+    # Get sale with customer ownership check
+    try:
+        sale_response = supabase.table("sales")\
+            .select("*")\
+            .eq("id", sale_id)\
+            .eq("customer_id", current_user.id)\
+            .execute()
+        
+        if not sale_response.data:
+            flash('Invoice not found or access denied.', 'danger')
+            return redirect(url_for('customer.dashboard'))
+        
+        sale = sale_response.data[0]
+        
+        # Get sale items
+        items_response = supabase.table("sale_items")\
+            .select("*")\
+            .eq("sale_id", sale_id)\
+            .execute()
+        items = items_response.data or []
+        
+    except Exception as e:
+        print(f"Error fetching invoice: {e}")
+        flash('Error loading invoice.', 'danger')
+        return redirect(url_for('customer.dashboard'))
+    
+    return render_template('customer/invoice.html', sale=sale, items=items)
+
+
+@bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    """Customer profile management - update email"""
+    
+    # Only allow customers
+    if current_user.role != 'customer':
+        flash('This page is for customers only.', 'warning')
+        return redirect(url_for('admin.dashboard'))
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        if action == 'update_email':
+            new_email = request.form.get('email', '').strip()
+            confirm_email = request.form.get('confirm_email', '').strip()
+            
+            # Validation
+            if not new_email:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Email is required'})
+                flash('Email is required', 'danger')
+                return redirect(url_for('customer.profile'))
+            
+            if new_email != confirm_email:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Emails do not match'})
+                flash('Emails do not match', 'danger')
+                return redirect(url_for('customer.profile'))
+            
+            # Validate email format
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, new_email):
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Invalid email format'})
+                flash('Invalid email format', 'danger')
+                return redirect(url_for('customer.profile'))
+            
+            # Check if email already exists (for other users)
+            try:
+                existing_response = supabase.table("users")\
+                    .select("id")\
+                    .ilike("email", new_email)\
+                    .execute()
+                
+                if existing_response.data:
+                    existing_user = existing_response.data[0]
+                    if existing_user['id'] != current_user.id:
+                        if is_ajax:
+                            return jsonify({'success': False, 'error': 'Email already registered'})
+                        flash('Email already registered', 'danger')
+                        return redirect(url_for('customer.profile'))
+            except Exception as e:
+                print(f"Error checking email: {e}")
+            
+            # Update email in database
+            try:
+                response = supabase.table("users")\
+                    .update({"email": new_email})\
+                    .eq("id", current_user.id)\
+                    .execute()
+                
+                if response.data:
+                    # Update current_user email
+                    current_user.email = new_email
+                    
+                    if is_ajax:
+                        return jsonify({
+                            'success': True, 
+                            'message': 'Email updated successfully!',
+                            'email': new_email
+                        })
+                    
+                    flash('Email updated successfully!', 'success')
+                    return redirect(url_for('customer.profile'))
+                else:
+                    if is_ajax:
+                        return jsonify({'success': False, 'error': 'Failed to update email'})
+                    flash('Failed to update email', 'danger')
+                    return redirect(url_for('customer.profile'))
+                    
+            except Exception as e:
+                print(f"Error updating email: {e}")
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Database error. Please try again.'})
+                flash('Database error. Please try again.', 'danger')
+                return redirect(url_for('customer.profile'))
+    
+    # GET request - show profile page
+    return render_template('customer/customer_profile.html', user=current_user)
+
+
+@bp.route('/profile/send-verification', methods=['POST'])
+@login_required
+def send_email_verification():
+    """Send verification OTP to new email before updating"""
+    
+    if current_user.role != 'customer':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    new_email = data.get('email', '').strip()
+    
+    if not new_email:
+        return jsonify({'success': False, 'error': 'Email is required'})
+    
+    # Validate email format
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, new_email):
+        return jsonify({'success': False, 'error': 'Invalid email format'})
+    
+    # Check if email already exists
+    try:
+        existing_response = supabase.table("users")\
+            .select("id")\
+            .ilike("email", new_email)\
+            .execute()
+        
+        if existing_response.data:
+            existing_user = existing_response.data[0]
+            if existing_user['id'] != current_user.id:
+                return jsonify({'success': False, 'error': 'Email already registered'})
+    except Exception as e:
+        print(f"Error checking email: {e}")
+    
+    # Check if email is same as current
+    if new_email == current_user.email:
+        return jsonify({'success': False, 'error': 'This is already your current email'})
+    
+    # Generate OTP
+    otp = str(random.randint(100000, 999999))
+    expires_at = (datetime.now() + timedelta(minutes=5)).isoformat()
+    
+    # Store OTP
+    try:
+        # Delete any existing OTPs for this purpose
+        supabase.table("otp_requests")\
+            .delete()\
+            .eq("username", current_user.username)\
+            .eq("purpose", "email_verification")\
+            .execute()
+        
+        supabase.table("otp_requests").insert({
+            "username": current_user.username,
+            "otp": otp,
+            "expires_at": expires_at,
+            "attempts": 0,
+            "purpose": "email_verification",
+            "metadata": {"new_email": new_email}
+        }).execute()
+    except Exception as e:
+        print(f"Error storing OTP: {e}")
+        return jsonify({'success': False, 'error': 'Failed to generate OTP'}), 500
+    
+    # Send OTP to new email
+    subject = "Email Verification OTP - Adarsh Oil Mill"
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Email Verification OTP</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px; }}
+            .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #0C5B3F; }}
+            .otp-box {{ background: #f0fdf4; padding: 25px; text-align: center; border-radius: 12px; margin: 25px 0; }}
+            .otp-code {{ font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #0C5B3F; }}
+            .expiry-note {{ color: #dc2626; font-size: 12px; margin-top: 10px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2 style="color: #0C5B3F;">Email Verification</h2>
+            </div>
+            <p>Hello <strong>{current_user.username}</strong>,</p>
+            <p>You requested to update your email address to:</p>
+            <p style="font-weight: 600; color: #0C5B3F;">{new_email}</p>
+            <div class="otp-box">
+                <div class="otp-code">{otp}</div>
+            </div>
+            <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+            <p class="expiry-note">⚠️ Do not share this OTP with anyone.</p>
+            <p>If you didn't request this, please ignore this email.</p>
+            <hr>
+            <p style="font-size: 12px; color: #888;">Adarsh Oil Mill | Mainapokhar, Bardiya, Nepal</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    email_sent = send_reset_email(new_email, subject, html_body)
+    
+    if not email_sent:
+        return jsonify({'success': False, 'error': 'Failed to send verification email'}), 500
+    
+    return jsonify({
+        'success': True,
+        'message': f'Verification OTP sent to {new_email}'
+    })
+
+
+@bp.route('/profile/verify-email', methods=['POST'])
+@login_required
+def verify_email_otp():
+    """Verify OTP and update email"""
+    
+    if current_user.role != 'customer':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    otp = data.get('otp', '').strip()
+    
+    if not otp:
+        return jsonify({'success': False, 'error': 'OTP is required'})
+    
+    # ✅ FIRST: Get the OTP record and metadata BEFORE deleting
+    new_email = None
+    otp_record = None
+    
+    try:
+        # Get the OTP record
+        response = supabase.table("otp_requests")\
+            .select("*")\
+            .eq("username", current_user.username)\
+            .eq("purpose", "email_verification")\
+            .gte("expires_at", datetime.now().isoformat())\
+            .order("created_at", desc=True)\
+            .limit(1)\
+            .execute()
+        
+        print(f"🔍 OTP record found: {response.data}")  # Debug
+        
+        if not response.data:
+            return jsonify({'success': False, 'error': 'OTP expired or not found. Please request a new OTP.'})
+        
+        otp_record = response.data[0]
+        
+        # ✅ Get the new email from metadata BEFORE deleting
+        if otp_record.get('metadata'):
+            metadata = otp_record['metadata']
+            if isinstance(metadata, dict):
+                new_email = metadata.get('new_email')
+                print(f"📧 Email from metadata: {new_email}")
+        
+        if not new_email:
+            return jsonify({'success': False, 'error': 'No pending email change found. Please request a new OTP.'})
+        
+        # ✅ Now check the OTP
+        if otp_record.get('attempts', 0) >= 5:
+            supabase.table("otp_requests").delete().eq("id", otp_record['id']).execute()
+            return jsonify({'success': False, 'error': 'Too many failed attempts. Please request a new OTP.'})
+        
+        if otp_record.get('otp') != otp:
+            # Increment attempts
+            supabase.table("otp_requests").update({
+                "attempts": otp_record.get('attempts', 0) + 1
+            }).eq("id", otp_record['id']).execute()
+            remaining = 5 - (otp_record.get('attempts', 0) + 1)
+            return jsonify({'success': False, 'error': f'Wrong OTP. {remaining} attempts remaining.'})
+        
+        # ✅ OTP is correct! Delete it and update email
+        supabase.table("otp_requests").delete().eq("id", otp_record['id']).execute()
+        
+    except Exception as e:
+        print(f"❌ Error in OTP verification: {e}")
+        return jsonify({'success': False, 'error': 'Error verifying OTP. Please try again.'})
+    
+    # ✅ Now update the email
+    try:
+        response = supabase.table("users")\
+            .update({"email": new_email})\
+            .eq("id", current_user.id)\
+            .execute()
+        
+        if response.data:
+            # Update current_user email
+            current_user.email = new_email
+            
+            # Clean up any remaining OTPs
+            supabase.table("otp_requests")\
+                .delete()\
+                .eq("username", current_user.username)\
+                .eq("purpose", "email_verification")\
+                .execute()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Email updated successfully!',
+                'email': new_email
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to update email'})
+            
+    except Exception as e:
+        print(f"❌ Error updating email: {e}")
+        return jsonify({'success': False, 'error': 'Database error. Please try again.'})

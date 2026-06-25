@@ -521,6 +521,7 @@ body {
     padding: 1rem;
     border-top: 1px solid var(--gray-200);
     flex-wrap: wrap;
+    overflow-x: auto;
 }
 
 .page-link {
@@ -888,24 +889,55 @@ body {
             </table>
         </div>
         
-        <!-- Pagination -->
-        {% if sales.pages > 1 %}
-        <div class="pagination">
-            {% if sales.has_prev %}
-                <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.prev_num, search=search) }}">←</a>
+<!-- Pagination -->
+{% if sales.pages > 1 %}
+<div class="pagination-wrapper">
+    <div class="pagination">
+        {% if sales.has_prev %}
+            <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.prev_num, search=search) }}">←</a>
+        {% endif %}
+        
+        {% set current = sales.page %}
+        {% set total = sales.pages %}
+        
+        {# Always show first page #}
+        <a class="page-link {% if 1 == current %}active{% endif %}" 
+           href="{{ url_for('admin.sales_list', page=1, search=search) }}">1</a>
+        
+        {# Show ellipsis after first page if current is far from start #}
+        {% if current > 4 %}
+            <span class="page-link page-link-ellipsis">…</span>
+        {% endif %}
+        
+        {# Show pages around current #}
+        {% for page_num in range(current - 2, current + 3) %}
+            {% if page_num > 1 and page_num < total %}
+                <a class="page-link {% if page_num == current %}active{% endif %}" 
+                   href="{{ url_for('admin.sales_list', page=page_num, search=search) }}">
+                    {{ page_num }}
+                </a>
             {% endif %}
-            {% for page_num in sales.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
-                {% if page_num %}
-                    <a class="page-link {% if page_num == sales.page %}active{% endif %}" href="{{ url_for('admin.sales_list', page=page_num, search=search) }}">{{ page_num }}</a>
-                {% endif %}
-            {% endfor %}
-            {% if sales.has_next %}
-                <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.next_num, search=search) }}">→</a>
-            {% endif %}
-        </div>
+        {% endfor %}
+        
+        {# Show ellipsis before last page if current is far from end #}
+        {% if current < total - 3 %}
+            <span class="page-link page-link-ellipsis">…</span>
+        {% endif %}
+        
+        {# Always show last page if more than 1 page #}
+        {% if total > 1 %}
+            <a class="page-link {% if total == current %}active{% endif %}" 
+               href="{{ url_for('admin.sales_list', page=total, search=search) }}">
+                {{ total }}
+            </a>
+        {% endif %}
+        
+        {% if sales.has_next %}
+            <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.next_num, search=search) }}">→</a>
         {% endif %}
     </div>
 </div>
+{% endif %}
 
 <script>
 // Close modal function
