@@ -12,7 +12,8 @@ BREVO_SENDER_NAME = os.getenv('BREVO_SENDER_NAME', 'Adarsh Oil Mill')
 def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
     """
     Send password reset email - called from auth.py
-    Matches your existing function signature exactly
+    
+    ALWAYS uses the RESET sender email for password-related emails
     
     Args:
         to_email: Recipient email (admin or customer)
@@ -33,14 +34,9 @@ def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
         return False
     
     try:
-        
-        # Customer emails go to customer - use invoice sender
-        if to_email == 'contact@adarshoilmill.com.np' or 'admin' in to_email.lower():
-            sender_email = BREVO_SENDER_EMAIL_RESET
-            sender_name = f"{BREVO_SENDER_NAME} - Password Reset"
-        else:
-            sender_email = BREVO_SENDER_EMAIL_INVOICE
-            sender_name = f"{BREVO_SENDER_NAME} - Invoice"
+        # ✅ FIX: Always use RESET sender for password reset emails
+        sender_email = BREVO_SENDER_EMAIL_RESET
+        sender_name = f"{BREVO_SENDER_NAME} - Password Reset"
         
         url = "https://api.brevo.com/v3/smtp/email"
         
@@ -58,7 +54,7 @@ def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
             "to": [
                 {
                     "email": to_email,
-                    "name": "Customer"
+                    "name": "Customer"  # You could customize this
                 }
             ],
             "subject": subject,
@@ -69,24 +65,23 @@ def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
         response = requests.post(url, headers=headers, json=data, timeout=10)
         
         if response.status_code == 201:
-            print(f"✅ Reset email sent to {to_email}")
+            print(f"✅ Password reset email sent to {to_email} from {sender_email}")
             return True
         else:
-            print(f"❌ Reset email failed: {response.status_code} - {response.text[:200]}")
+            print(f"❌ Password reset email failed: {response.status_code} - {response.text[:200]}")
             return False
             
     except requests.Timeout:
-        print(f"❌ Reset email timeout for {to_email}")
+        print(f"❌ Password reset email timeout for {to_email}")
         return False
     except Exception as e:
-        print(f"❌ Reset email error: {str(e)}")
+        print(f"❌ Password reset email error: {str(e)}")
         return False
 
 
 def send_invoice_email(to_email: str, subject: str, html_body: str) -> bool:
     """
-    Send invoice email - for future use
-    Matches pattern of send_reset_email
+    Send invoice email - uses INVOICE sender
     
     Args:
         to_email: Customer email address
@@ -142,7 +137,7 @@ def send_invoice_email(to_email: str, subject: str, html_body: str) -> bool:
         return False
 
 
-# For backward compatibility with any other files that might use this
+# Backward compatibility
 def send_email_via_brevo(to_email: str, subject: str, html_body: str, email_type: str = "invoice", sender_name: str = "Adarsh Oil Mill") -> bool:
     """
     Generic email sender - maintains compatibility
@@ -153,7 +148,7 @@ def send_email_via_brevo(to_email: str, subject: str, html_body: str, email_type
         return send_invoice_email(to_email, subject, html_body)
 
 
-# Deprecated but kept for compatibility - NO THREADING on Vercel
+# Deprecated but kept for compatibility
 def send_email_in_background(to_email: str, subject: str, html_body: str, email_type: str = "invoice") -> bool:
     """
     NOTE: This function is now synchronous on Vercel

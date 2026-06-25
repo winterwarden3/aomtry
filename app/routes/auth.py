@@ -542,7 +542,7 @@ def forgot_password():
             # Send email
             email_sent = False
             if user_role == 'admin':
-                recipient_email = 'admin@adarshoilmill.com.np'
+                recipient_email = Config.ADMIN_EMAIL
             else:
                 recipient_email = user_data.get('email')
                 if not recipient_email:
