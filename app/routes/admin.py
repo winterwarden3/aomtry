@@ -891,6 +891,89 @@ def delete_sale(sale_id):
     return jsonify({'success': True})
 
 
+
+@bp.route('/bulk-delete-sales', methods=['POST'])
+@login_required
+@admin_required
+def bulk_delete_sales():
+    """Delete multiple sales and refund any advances used - AJAX ready"""
+    from app.models_supabase import User
+    
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        sale_ids = data.get('sale_ids', [])
+        if not sale_ids:
+            return jsonify({'success': False, 'error': 'No sales selected'}), 400
+        
+        deleted_count = 0
+        errors = []
+        refunded_advances = []
+        
+        for sale_id in sale_ids:
+            try:
+                sale = Sale.get_by_id(sale_id)
+                if not sale:
+                    errors.append(f"Sale ID {sale_id} not found")
+                    continue
+                
+                customer_id = sale.get('customer_id')
+                advance_used = sale.get('advance_used', 0)
+                invoice_number = sale.get('invoice_number', '')
+                
+                # Refund advance if any was used
+                if customer_id and advance_used > 0:
+                    result = User.update_advance_balance(customer_id, advance_used, "add")
+                    if result:
+                        transaction_data = {
+                            'customer_id': customer_id,
+                            'sale_id': sale_id,
+                            'amount': advance_used,
+                            'type': 'refund_on_bulk_delete',
+                            'notes': f'Refunded due to bulk deletion of sale #{invoice_number}',
+                            'date': get_nepal_time().isoformat()
+                        }
+                        supabase.table("advance_transactions").insert(transaction_data).execute()
+                        refunded_advances.append({
+                            'customer_id': customer_id,
+                            'amount': advance_used,
+                            'invoice': invoice_number
+                        })
+                
+                # Delete sale items then sale
+                supabase.table("sale_items").delete().eq("sale_id", sale_id).execute()
+                result = Sale.delete(sale_id)
+                
+                if result:
+                    deleted_count += 1
+                else:
+                    errors.append(f"Sale #{invoice_number}")
+                    
+            except Exception as e:
+                errors.append(str(e))
+        
+        if deleted_count == 0 and errors:
+            return jsonify({'success': False, 'error': ', '.join(errors[:3])}), 500
+        
+        success_msg = f'Successfully deleted {deleted_count} sale(s)'
+        if refunded_advances:
+            total_refunded = sum(r['amount'] for r in refunded_advances)
+            success_msg += f'. Refunded Rs {total_refunded:,.2f} in advance balances.'
+        
+        return jsonify({
+            'success': True,
+            'message': success_msg,
+            'deleted_count': deleted_count
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @bp.route('/sales/<int:sale_id>/invoice')
 @login_required
 @admin_required

@@ -363,6 +363,58 @@ body {
     color: white;
 }
 
+.btn-danger-solid {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger-solid:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-danger-solid:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Selection Bar */
+.selection-bar {
+    background: #f0f7f4;
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    border-left: 4px solid var(--primary);
+}
+
+.selection-bar.show {
+    display: flex;
+}
+
+.selection-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.selection-count {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.selection-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
 /* Search */
 .search-wrapper {
     display: flex;
@@ -416,6 +468,28 @@ body {
 
 .sales-table tbody tr:hover {
     background: var(--gray-50);
+}
+
+.sales-table tbody tr.selected {
+    background: #e8f5e9;
+}
+
+/* Checkbox Styles */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-custom {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.checkbox-custom:hover {
+    transform: scale(1.1);
 }
 
 /* Invoice Number */
@@ -565,14 +639,77 @@ body {
     color: var(--gray-400);
 }
 
+/* Toast Notification */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background: white;
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+    animation: slideIn 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.toast-success {
+    border-left-color: var(--success);
+}
+
+.toast-error {
+    border-left-color: var(--danger);
+}
+
+.toast-icon {
+    font-size: 20px;
+}
+
+.toast-success .toast-icon {
+    color: var(--success);
+}
+
+.toast-error .toast-icon {
+    color: var(--danger);
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray-400);
+    font-size: 18px;
+    padding: 0 4px;
+}
+
+.toast-close:hover {
+    color: var(--gray-600);
+}
+
 /* ============================================
    MOBILE RESPONSIVE (FULLY OPTIMIZED)
    ============================================ */
 
 /* Tablet */
 @media (max-width: 1024px) {
-    .sales-table th:nth-child(4),
-    .sales-table td:nth-child(4) {
+    .sales-table th:nth-child(5),
+    .sales-table td:nth-child(5) {
         display: none;
     }
 }
@@ -595,6 +732,19 @@ body {
     
     .page-header h1 {
         font-size: 1.25rem;
+    }
+    
+    .selection-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .selection-info {
+        justify-content: center;
+    }
+    
+    .selection-actions {
+        justify-content: center;
     }
     
     /* Stack stats on mobile */
@@ -635,6 +785,10 @@ body {
         text-transform: uppercase;
         color: var(--gray-500);
         min-width: 100px;
+    }
+    
+    .sales-table td:first-child::before {
+        display: none;
     }
     
     .action-group {
@@ -683,6 +837,11 @@ body {
     
     .stat-card {
         padding: 0.75rem;
+    }
+    
+    .selection-actions .btn-ui {
+        width: auto;
+        flex: 1;
     }
 }
 
@@ -766,6 +925,22 @@ body {
         </div>
     </div>
 
+    <!-- Selection Bar -->
+    <div class="selection-bar" id="selectionBar">
+        <div class="selection-info">
+            <i class="bi bi-check-circle-fill" style="color: var(--primary);"></i>
+            <span class="selection-count" id="selectionCount">0 selected</span>
+        </div>
+        <div class="selection-actions">
+            <button class="btn-ui btn-danger-solid" id="bulkDeleteBtn" onclick="bulkDelete()">
+                <i class="bi bi-trash"></i> Delete Selected
+            </button>
+            <button class="btn-ui btn-outline-ui" onclick="deselectAll()">
+                <i class="bi bi-x-circle"></i> Deselect All
+            </button>
+        </div>
+    </div>
+
     <!-- Search -->
     <div class="card-ui mb-4">
         <div style="padding: 1rem;">
@@ -786,6 +961,9 @@ body {
             <table class="sales-table">
                 <thead>
                     <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" class="checkbox-custom" id="selectAll" onchange="toggleAllCheckboxes()">
+                        </th>
                         <th>Invoice</th>
                         <th>Date</th>
                         <th>Customer</th>
@@ -807,6 +985,13 @@ body {
                     {% set status = sale.get('payment_status', 'credit') %}
                     {% set items = sale.get('items', []) %}
                     <tr data-sale-id="{{ sale.get('id') }}" data-invoice="{{ sale.get('invoice_number') }}">
+                        <td data-label="Select">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" class="checkbox-custom row-checkbox" 
+                                       data-sale-id="{{ sale.get('id') }}" 
+                                       onchange="updateSelection()">
+                            </div>
+                        </td>
                         <td data-label="Invoice">
                             <span class="invoice-num">#{{ sale.get('invoice_number', '') }}</span>
                         </td>
@@ -873,7 +1058,7 @@ body {
                      </tr>
                     {% else %}
                     <tr>
-                        <td colspan="10">
+                        <td colspan="11">
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="bi bi-receipt"></i></div>
                                 <div class="empty-title">No sales found</div>
@@ -889,57 +1074,126 @@ body {
             </table>
         </div>
         
-<!-- Pagination -->
-{% if sales.pages > 1 %}
-<div class="pagination-wrapper">
-    <div class="pagination">
-        {% if sales.has_prev %}
-            <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.prev_num, search=search) }}">←</a>
-        {% endif %}
-        
-        {% set current = sales.page %}
-        {% set total = sales.pages %}
-        
-        {# Always show first page #}
-        <a class="page-link {% if 1 == current %}active{% endif %}" 
-           href="{{ url_for('admin.sales_list', page=1, search=search) }}">1</a>
-        
-        {# Show ellipsis after first page if current is far from start #}
-        {% if current > 4 %}
-            <span class="page-link page-link-ellipsis">…</span>
-        {% endif %}
-        
-        {# Show pages around current #}
-        {% for page_num in range(current - 2, current + 3) %}
-            {% if page_num > 1 and page_num < total %}
-                <a class="page-link {% if page_num == current %}active{% endif %}" 
-                   href="{{ url_for('admin.sales_list', page=page_num, search=search) }}">
-                    {{ page_num }}
-                </a>
-            {% endif %}
-        {% endfor %}
-        
-        {# Show ellipsis before last page if current is far from end #}
-        {% if current < total - 3 %}
-            <span class="page-link page-link-ellipsis">…</span>
-        {% endif %}
-        
-        {# Always show last page if more than 1 page #}
-        {% if total > 1 %}
-            <a class="page-link {% if total == current %}active{% endif %}" 
-               href="{{ url_for('admin.sales_list', page=total, search=search) }}">
-                {{ total }}
-            </a>
-        {% endif %}
-        
-        {% if sales.has_next %}
-            <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.next_num, search=search) }}">→</a>
+        <!-- Pagination -->
+        {% if sales.pages > 1 %}
+        <div class="pagination-wrapper">
+            <div class="pagination">
+                {% if sales.has_prev %}
+                    <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.prev_num, search=search) }}">←</a>
+                {% endif %}
+                
+                {% set current = sales.page %}
+                {% set total = sales.pages %}
+                
+                {# Always show first page #}
+                <a class="page-link {% if 1 == current %}active{% endif %}" 
+                   href="{{ url_for('admin.sales_list', page=1, search=search) }}">1</a>
+                
+                {# Show ellipsis after first page if current is far from start #}
+                {% if current > 4 %}
+                    <span class="page-link page-link-ellipsis">…</span>
+                {% endif %}
+                
+                {# Show pages around current #}
+                {% for page_num in range(current - 2, current + 3) %}
+                    {% if page_num > 1 and page_num < total %}
+                        <a class="page-link {% if page_num == current %}active{% endif %}" 
+                           href="{{ url_for('admin.sales_list', page=page_num, search=search) }}">
+                            {{ page_num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                
+                {# Show ellipsis before last page if current is far from end #}
+                {% if current < total - 3 %}
+                    <span class="page-link page-link-ellipsis">…</span>
+                {% endif %}
+                
+                {# Always show last page if more than 1 page #}
+                {% if total > 1 %}
+                    <a class="page-link {% if total == current %}active{% endif %}" 
+                       href="{{ url_for('admin.sales_list', page=total, search=search) }}">
+                        {{ total }}
+                    </a>
+                {% endif %}
+                
+                {% if sales.has_next %}
+                    <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.next_num, search=search) }}">→</a>
+                {% endif %}
+            </div>
+        </div>
         {% endif %}
     </div>
 </div>
-{% endif %}
 
 <script>
+// ============================================
+// SELECT & DELETE FUNCTIONALITY
+// ============================================
+
+// Track selected items
+let selectedSaleIds = new Set();
+
+// Update selection UI
+function updateSelection() {
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    
+    // Update selected IDs
+    selectedSaleIds.clear();
+    selectedCheckboxes.forEach(cb => {
+        selectedSaleIds.add(cb.dataset.saleId);
+    });
+    
+    // Update row highlighting
+    document.querySelectorAll('.sales-table tbody tr').forEach(row => {
+        const checkbox = row.querySelector('.row-checkbox');
+        if (checkbox && checkbox.checked) {
+            row.classList.add('selected');
+        } else {
+            row.classList.remove('selected');
+        }
+    });
+    
+    // Update selection bar
+    const selectionBar = document.getElementById('selectionBar');
+    const selectionCount = document.getElementById('selectionCount');
+    const count = selectedSaleIds.size;
+    
+    if (count > 0) {
+        selectionBar.classList.add('show');
+        selectionCount.textContent = `${count} selected`;
+    } else {
+        selectionBar.classList.remove('show');
+    }
+    
+    // Update select all checkbox state
+    if (checkboxes.length > 0) {
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        selectAllCheckbox.checked = allChecked;
+        selectAllCheckbox.indeterminate = !allChecked && selectedCheckboxes.length > 0;
+    }
+}
+
+// Toggle all checkboxes
+function toggleAllCheckboxes() {
+    const isChecked = document.getElementById('selectAll').checked;
+    document.querySelectorAll('.row-checkbox').forEach(cb => {
+        cb.checked = isChecked;
+    });
+    updateSelection();
+}
+
+// Deselect all
+function deselectAll() {
+    document.querySelectorAll('.row-checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+    document.getElementById('selectAll').checked = false;
+    updateSelection();
+}
+
 // Close modal function
 function closeModal(modalId = null) {
     if (modalId) {
@@ -949,6 +1203,34 @@ function closeModal(modalId = null) {
         const modals = document.querySelectorAll('.modal-overlay');
         modals.forEach(modal => modal.remove());
     }
+}
+
+// Show toast notification
+function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toastContainer') || (() => {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+        return container;
+    })();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-x-circle-fill';
+    toast.innerHTML = `
+        <i class="bi ${icon} toast-icon"></i>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
 }
 
 // Show success/error modal
@@ -978,7 +1260,94 @@ function showModal(title, message, type = 'success', redirectUrl = null) {
     };
 }
 
-// Show delete confirmation modal
+// Bulk delete function
+function bulkDelete() {
+    const count = selectedSaleIds.size;
+    if (count === 0) {
+        showToast('No sales selected', 'error');
+        return;
+    }
+    
+    closeModal();
+    const modalHtml = `
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal-container">
+                <div class="modal-danger-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="modal-title">Delete ${count} Sale${count > 1 ? 's' : ''}?</div>
+                <div class="modal-message">
+                    Are you sure you want to delete <strong>${count}</strong> selected sale${count > 1 ? 's' : ''}?<br><br>
+                    <span style="color: #ef4444;">⚠️ This action cannot be undone!</span><br>
+                    Any advances used will be refunded to the customers.
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-danger" id="confirmBulkDeleteBtn">Yes, Delete All</button>
+                    <button class="modal-button modal-button-secondary" id="cancelDeleteBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('confirmBulkDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+        performBulkDelete();
+    };
+    
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+        closeModal('deleteModal');
+    };
+}
+
+// Perform bulk delete via AJAX
+async function performBulkDelete() {
+    const saleIds = Array.from(selectedSaleIds);
+    
+    // Show loading modal
+    const loadingHtml = `
+        <div class="modal-overlay" id="loadingModal">
+            <div class="modal-container">
+                <div class="modal-info-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="modal-title">Deleting Sales...</div>
+                <div class="modal-message">Please wait while we delete ${saleIds.length} sale${saleIds.length > 1 ? 's' : ''}.</div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', loadingHtml);
+    
+    try {
+        const response = await fetch('/admin/bulk-delete-sales', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ sale_ids: saleIds })
+        });
+        
+        const data = await response.json();
+        closeModal('loadingModal');
+        
+        if (data.success) {
+            showToast(`Successfully deleted ${data.deleted_count} sale${data.deleted_count > 1 ? 's' : ''}`, 'success');
+            // Reload page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showToast(data.error || 'Failed to delete sales', 'error');
+        }
+    } catch (error) {
+        closeModal('loadingModal');
+        console.error('Error:', error);
+        showToast('Network error. Please try again.', 'error');
+    }
+}
+
+// Individual delete confirmation
 function showDeleteConfirmation(saleId, invoiceNumber) {
     closeModal();
     const modalHtml = `
@@ -1012,7 +1381,7 @@ function showDeleteConfirmation(saleId, invoiceNumber) {
     };
 }
 
-// Perform delete via AJAX
+// Perform individual delete
 async function performDelete(saleId, invoiceNumber) {
     const loadingHtml = `
         <div class="modal-overlay" id="loadingModal">
@@ -1021,7 +1390,7 @@ async function performDelete(saleId, invoiceNumber) {
                     <i class="bi bi-hourglass-split"></i>
                 </div>
                 <div class="modal-title">Deleting Sale...</div>
-                <div class="modal-message">Please wait while we delete the sale and restore advance balance.</div>
+                <div class="modal-message">Please wait while we delete the sale.</div>
             </div>
         </div>
     `;
@@ -1040,51 +1409,56 @@ async function performDelete(saleId, invoiceNumber) {
         closeModal('loadingModal');
         
         if (data.success) {
-            showModal('Deleted!', data.message || `Sale #${invoiceNumber} deleted successfully!`, 'success', '/admin/sales');
+            showToast(`Sale #${invoiceNumber} deleted successfully!`, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } else {
-            showModal('Error', data.error || 'Failed to delete sale', 'error');
+            showToast(data.error || 'Failed to delete sale', 'error');
         }
     } catch (error) {
         closeModal('loadingModal');
         console.error('Error:', error);
-        showModal('Error', 'Network error. Please try again.', 'error');
+        showToast('Network error. Please try again.', 'error');
     }
 }
 
-// Escape HTML to prevent XSS
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
+// Attach delete handlers to individual delete buttons
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-sale-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const saleId = this.dataset.saleId;
+            const invoiceNumber = this.dataset.invoice;
+            showDeleteConfirmation(saleId, invoiceNumber);
+        });
     });
-}
-
-// Attach delete handlers
-document.querySelectorAll('.delete-sale-btn').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const saleId = this.dataset.saleId;
-        const invoiceNumber = this.dataset.invoice;
-        showDeleteConfirmation(saleId, invoiceNumber);
+    
+    // Auto-submit search on Enter key
+    document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('searchForm').submit();
+        }
+    });
+    
+    // Initialize selection state
+    updateSelection();
+    
+    // Keyboard shortcut: Escape to deselect all
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && selectedSaleIds.size > 0) {
+            deselectAll();
+        }
     });
 });
 
-// Auto-submit search on Enter key
-document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById('searchForm').submit();
-    }
-});
-
-// Show flashed messages as modals
+// Show flashed messages as toasts
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
-            showModal('{{ category|capitalize }}', '{{ message|safe }}', '{{ category }}');
+            showToast('{{ message|safe }}', '{{ category }}');
         {% endfor %}
     {% endif %}
 {% endwith %}
