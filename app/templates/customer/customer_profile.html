@@ -1197,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!email) { showToast('Missing Email', 'Please enter your new email address', 'error'); newEmailInput.focus(); return; }
         if (email !== confirm) { showToast('Mismatch', 'Emails do not match!', 'error'); confirmEmailInput.focus(); return; }
         
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailPattern.test(email)) { showToast('Invalid Email', 'Please enter a valid email address', 'error'); newEmailInput.focus(); return; }
         if (email === '{{ current_user.email }}') { showToast('Same Email', 'This is already your current email', 'error'); return; }
 
@@ -1235,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function verifyOTP() {
         const otp = otpInput.value.trim();
         if (!otp) { showToast('Missing OTP', 'Please enter the verification code', 'error'); otpInput.focus(); return; }
-        if (otp.length !== 6 || !/^\\d+$/.test(otp)) {
+        if (otp.length !== 6 || !/^\d+$/.test(otp)) {
             showToast('Invalid OTP', 'Please enter a valid 6-digit code', 'error');
             otpInput.value = '';
             otpInput.focus();

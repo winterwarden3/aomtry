@@ -7,7 +7,7 @@ from app.config import Config
 import random
 from datetime import datetime, timedelta
 import re
-
+from app.brevo_service import send_reset_email, BREVO_API_KEY
 bp = Blueprint('customer', __name__, url_prefix='/customer')
 
 
@@ -320,22 +320,33 @@ def profile():
 def send_email_verification():
     """Send verification OTP to new email before updating"""
     
+    print("=" * 60)
+    print("🔍 SEND VERIFICATION EMAIL DEBUG START")
+    print("=" * 60)
+    
     if current_user.role != 'customer':
+        print("❌ User is not customer")
         return jsonify({'success': False, 'error': 'Unauthorized'}), 403
     
     data = request.get_json()
     new_email = data.get('email', '').strip()
     
+    print(f"📧 Request received for email: {new_email}")
+    print(f"👤 Current user: {current_user.username} (ID: {current_user.id})")
+    
     if not new_email:
+        print("❌ No email provided")
         return jsonify({'success': False, 'error': 'Email is required'})
     
     # Validate email format
     email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_pattern, new_email):
+        print(f"❌ Invalid email format: {new_email}")
         return jsonify({'success': False, 'error': 'Invalid email format'})
     
     # Check if email already exists
     try:
+        print("🔍 Checking if email already exists...")
         existing_response = supabase.table("users")\
             .select("id")\
             .ilike("email", new_email)\
@@ -344,20 +355,27 @@ def send_email_verification():
         if existing_response.data:
             existing_user = existing_response.data[0]
             if existing_user['id'] != current_user.id:
+                print(f"❌ Email already registered to another user: {existing_user['id']}")
                 return jsonify({'success': False, 'error': 'Email already registered'})
     except Exception as e:
-        print(f"Error checking email: {e}")
+        print(f"❌ Error checking email: {e}")
+        return jsonify({'success': False, 'error': 'Database error'}), 500
     
     # Check if email is same as current
     if new_email == current_user.email:
+        print(f"❌ Email is same as current: {new_email}")
         return jsonify({'success': False, 'error': 'This is already your current email'})
     
     # Generate OTP
     otp = str(random.randint(100000, 999999))
     expires_at = (datetime.now() + timedelta(minutes=5)).isoformat()
     
+    print(f"🔑 Generated OTP: {otp}")
+    print(f"⏰ Expires at: {expires_at}")
+    
     # Store OTP
     try:
+        print("💾 Storing OTP in database...")
         # Delete any existing OTPs for this purpose
         supabase.table("otp_requests")\
             .delete()\
@@ -365,7 +383,7 @@ def send_email_verification():
             .eq("purpose", "email_verification")\
             .execute()
         
-        supabase.table("otp_requests").insert({
+        insert_result = supabase.table("otp_requests").insert({
             "username": current_user.username,
             "otp": otp,
             "expires_at": expires_at,
@@ -373,9 +391,12 @@ def send_email_verification():
             "purpose": "email_verification",
             "metadata": {"new_email": new_email}
         }).execute()
+        
+        print(f"✅ OTP stored: {insert_result.data}")
+        
     except Exception as e:
-        print(f"Error storing OTP: {e}")
-        return jsonify({'success': False, 'error': 'Failed to generate OTP'}), 500
+        print(f"❌ Error storing OTP: {e}")
+        return jsonify({'success': False, 'error': f'Failed to generate OTP: {str(e)}'}), 500
     
     # Send OTP to new email
     subject = "Email Verification OTP - Adarsh Oil Mill"
@@ -415,16 +436,41 @@ def send_email_verification():
     </html>
     """
     
-    email_sent = send_reset_email(new_email, subject, html_body)
+    print(f"📤 Attempting to send email to: {new_email}")
+    print(f"📝 Email subject: {subject}")
     
-    if not email_sent:
-        return jsonify({'success': False, 'error': 'Failed to send verification email'}), 500
+    # Import BREVO_API_KEY to check
+    from app.brevo_service import BREVO_API_KEY
+    print(f"🔑 BREVO_API_KEY is set: {bool(BREVO_API_KEY)}")
     
-    return jsonify({
-        'success': True,
-        'message': f'Verification OTP sent to {new_email}'
-    })
-
+    try:
+        from app.brevo_service import send_reset_email
+        
+        email_sent = send_reset_email(new_email, subject, html_body, email_type='verification')
+        
+        print(f"📧 Email send result: {email_sent}")
+        
+        if email_sent:
+            print(f"✅ Email sent successfully to {new_email}")
+            return jsonify({
+                'success': True,
+                'message': f'Verification OTP sent to {new_email}'
+            })
+        else:
+            print(f"❌ Email sending failed for {new_email}")
+            
+            if not BREVO_API_KEY:
+                error_msg = "Email service not configured. Please contact support."
+            else:
+                error_msg = "Failed to send verification email. Please try again later."
+            
+            return jsonify({'success': False, 'error': error_msg}), 500
+            
+    except Exception as e:
+        print(f"❌ Exception sending email: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': f'Email error: {str(e)}'}), 500
 
 @bp.route('/profile/verify-email', methods=['POST'])
 @login_required

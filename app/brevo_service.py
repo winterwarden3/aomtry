@@ -6,22 +6,22 @@ from typing import Optional
 BREVO_API_KEY = os.getenv('BREVO_API_KEY')
 BREVO_SENDER_EMAIL_INVOICE = os.getenv('BREVO_SENDER_EMAIL_INVOICE', 'invoice@adarshoilmill.com.np')
 BREVO_SENDER_EMAIL_RESET = os.getenv('BREVO_SENDER_EMAIL_RESET', 'reset@adarshoilmill.com.np')
+BREVO_SENDER_EMAIL_VERIFICATION = os.getenv('BREVO_SENDER_EMAIL_VERIFICATION', 'verify@adarshoilmill.com.np')
 BREVO_SENDER_NAME = os.getenv('BREVO_SENDER_NAME', 'Adarsh Oil Mill')
 
 
-def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
+def send_reset_email(to_email: str, subject: str, html_body: str, email_type: str = "reset") -> bool:
     """
-    Send password reset email - called from auth.py
-    
-    ALWAYS uses the RESET sender email for password-related emails
+    Send email via Brevo - supports reset, verification, and invoice emails
     
     Args:
-        to_email: Recipient email (admin or customer)
+        to_email: Recipient email
         subject: Email subject
-        html_body: HTML content with OTP
+        html_body: HTML content
+        email_type: 'reset', 'verification', or 'invoice'
     
     Returns:
-        bool: True if sent successfully, False otherwise
+        bool: True if sent successfully
     """
     # Validate API key
     if not BREVO_API_KEY:
@@ -34,9 +34,18 @@ def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
         return False
     
     try:
-        # ✅ FIX: Always use RESET sender for password reset emails
-        sender_email = BREVO_SENDER_EMAIL_RESET
-        sender_name = f"{BREVO_SENDER_NAME} - Password Reset"
+        # Select sender based on email type
+        if email_type == "verification":
+            sender_email = BREVO_SENDER_EMAIL_VERIFICATION
+            sender_name = f"{BREVO_SENDER_NAME} - Verification"
+        elif email_type == "reset":
+            sender_email = BREVO_SENDER_EMAIL_RESET
+            sender_name = f"{BREVO_SENDER_NAME} - Password Reset"
+        else:
+            sender_email = BREVO_SENDER_EMAIL_INVOICE
+            sender_name = f"{BREVO_SENDER_NAME} - Invoice"
+        
+        print(f"📧 Sending {email_type} email from {sender_email} to {to_email}")
         
         url = "https://api.brevo.com/v3/smtp/email"
         
@@ -54,68 +63,6 @@ def send_reset_email(to_email: str, subject: str, html_body: str) -> bool:
             "to": [
                 {
                     "email": to_email,
-                    "name": "Customer"  # You could customize this
-                }
-            ],
-            "subject": subject,
-            "htmlContent": html_body
-        }
-        
-        # Send email with timeout (Vercel max is 10-60 seconds)
-        response = requests.post(url, headers=headers, json=data, timeout=10)
-        
-        if response.status_code == 201:
-            print(f"✅ Password reset email sent to {to_email} from {sender_email}")
-            return True
-        else:
-            print(f"❌ Password reset email failed: {response.status_code} - {response.text[:200]}")
-            return False
-            
-    except requests.Timeout:
-        print(f"❌ Password reset email timeout for {to_email}")
-        return False
-    except Exception as e:
-        print(f"❌ Password reset email error: {str(e)}")
-        return False
-
-
-def send_invoice_email(to_email: str, subject: str, html_body: str) -> bool:
-    """
-    Send invoice email - uses INVOICE sender
-    
-    Args:
-        to_email: Customer email address
-        subject: Email subject
-        html_body: HTML content of invoice
-    
-    Returns:
-        bool: True if sent successfully
-    """
-    if not BREVO_API_KEY:
-        print("❌ BREVO_API_KEY not configured")
-        return False
-    
-    if not to_email:
-        print("❌ No recipient email")
-        return False
-    
-    try:
-        url = "https://api.brevo.com/v3/smtp/email"
-        
-        headers = {
-            "accept": "application/json",
-            "api-key": BREVO_API_KEY,
-            "content-type": "application/json"
-        }
-        
-        data = {
-            "sender": {
-                "name": f"{BREVO_SENDER_NAME} - Invoice",
-                "email": BREVO_SENDER_EMAIL_INVOICE
-            },
-            "to": [
-                {
-                    "email": to_email,
                     "name": "Customer"
                 }
             ],
@@ -123,18 +70,29 @@ def send_invoice_email(to_email: str, subject: str, html_body: str) -> bool:
             "htmlContent": html_body
         }
         
+        # Send email with timeout
         response = requests.post(url, headers=headers, json=data, timeout=10)
         
         if response.status_code == 201:
-            print(f"✅ Invoice email sent to {to_email}")
+            print(f"✅ Email sent successfully to {to_email} from {sender_email}")
             return True
         else:
-            print(f"❌ Invoice email failed: {response.status_code}")
+            print(f"❌ Email failed: {response.status_code} - {response.text[:200]}")
             return False
             
-    except Exception as e:
-        print(f"❌ Invoice email error: {str(e)}")
+    except requests.Timeout:
+        print(f"❌ Email timeout for {to_email}")
         return False
+    except Exception as e:
+        print(f"❌ Email error: {str(e)}")
+        return False
+
+
+def send_invoice_email(to_email: str, subject: str, html_body: str) -> bool:
+    """
+    Send invoice email - uses INVOICE sender
+    """
+    return send_reset_email(to_email, subject, html_body, "invoice")
 
 
 # Backward compatibility
@@ -143,7 +101,9 @@ def send_email_via_brevo(to_email: str, subject: str, html_body: str, email_type
     Generic email sender - maintains compatibility
     """
     if email_type == "reset":
-        return send_reset_email(to_email, subject, html_body)
+        return send_reset_email(to_email, subject, html_body, "reset")
+    elif email_type == "verification":
+        return send_reset_email(to_email, subject, html_body, "verification")
     else:
         return send_invoice_email(to_email, subject, html_body)
 
