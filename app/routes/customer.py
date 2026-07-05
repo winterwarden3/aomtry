@@ -183,7 +183,6 @@ def dashboard():
                          advance_balance=summary['advance_balance'],
                          total_pages=(total_count + per_page - 1) // per_page)
 
-
 @bp.route('/invoice/<sale_id>')
 @login_required
 def view_invoice(sale_id):
@@ -212,14 +211,23 @@ def view_invoice(sale_id):
             .select("*")\
             .eq("sale_id", sale_id)\
             .execute()
-        items = items_response.data or []
+        
+        # ✅ Attach items to sale
+        sale['items'] = items_response.data or []
         
     except Exception as e:
-        print(f"Error fetching invoice: {e}")
+        print(f"❌ Error fetching invoice: {e}")
         flash('Error loading invoice.', 'danger')
         return redirect(url_for('customer.dashboard'))
     
-    return render_template('customer/invoice.html', sale=sale, items=items)
+    # Calculate advance balance
+    advance_balance = sale.get('advance_amount', 0)
+    
+    return render_template('customer/invoice.html', 
+                         sale=sale,
+                         business_name="Adarsh Oil Mill",
+                         current_user=current_user,
+                         advance_balance=advance_balance)
 
 
 @bp.route('/profile', methods=['GET', 'POST'])
@@ -320,9 +328,7 @@ def profile():
 def send_email_verification():
     """Send verification OTP to new email before updating"""
     
-    print("=" * 60)
-    print("🔍 SEND VERIFICATION EMAIL DEBUG START")
-    print("=" * 60)
+
     
     if current_user.role != 'customer':
         print("❌ User is not customer")
