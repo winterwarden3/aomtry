@@ -612,14 +612,40 @@ input[readonly] {
     margin-bottom: 24px;
 }
 
+.modal-button-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 .modal-button {
     padding: 12px 24px;
-    background: var(--primary);
-    color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s;
+    min-width: 140px;
+}
+
+.modal-button-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-button-primary:hover {
+    background: #0a4a32;
+}
+
+.modal-button-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-button-secondary:hover {
+    background: var(--gray-300);
 }
 </style>
 
@@ -989,10 +1015,34 @@ function updateExchangeVisibility() {
 }
 
 // ============================================
-// MODAL FUNCTIONS
+// MODAL FUNCTIONS - UPDATED with two buttons (Fixed)
 // ============================================
 
-function showModal(title, message, type = 'success', redirectUrl = null) {
+function showModal(title, message, type = 'success') {
+    const salesListUrl = "{{ url_for('admin.sales_list') }}";
+    
+    let buttonsHtml = '';
+    if (type === 'success') {
+        buttonsHtml = `
+            <div class="modal-button-group">
+                <button class="modal-button modal-button-primary" onclick="closeModalAndReset()">
+                    <i class="bi bi-plus-lg"></i> Add Another Sale
+                </button>
+                <button class="modal-button modal-button-secondary" onclick="closeModalAndRedirect('${salesListUrl}')">
+                    <i class="bi bi-list-ul"></i> View Sales
+                </button>
+            </div>
+        `;
+    } else {
+        buttonsHtml = `
+            <div class="modal-button-group">
+                <button class="modal-button modal-button-primary" onclick="closeModalAndReset()">
+                    <i class="bi bi-arrow-repeat"></i> Try Again
+                </button>
+            </div>
+        `;
+    }
+    
     const modalHtml = `
         <div class="modal-overlay" id="resultModal">
             <div class="modal-container">
@@ -1001,28 +1051,68 @@ function showModal(title, message, type = 'success', redirectUrl = null) {
                 </div>
                 <div class="modal-title">${title}</div>
                 <div class="modal-message">${message}</div>
-                <button class="modal-button" onclick="closeModal('${redirectUrl || ''}')">${redirectUrl ? 'View Sales' : 'Continue'}</button>
+                ${buttonsHtml}
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-function closeModal(redirectUrl) {
+function closeModalAndReset() {
     const modal = document.getElementById('resultModal');
     if (modal) modal.remove();
-    if (redirectUrl) {
-        window.location.href = redirectUrl;
-    } else {
-        resetForm();
-    }
+    resetForm();
+    document.getElementById('customer_input').focus();
+    showToast('Ready for next entry!', 'success');
+}
+
+function closeModalAndRedirect(url) {
+    const modal = document.getElementById('resultModal');
+    if (modal) modal.remove();
+    window.location.href = url;
 }
 
 // ============================================
-// RESET FORM
+// TOAST NOTIFICATION
+// ============================================
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#10b981' : '#ef4444'};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 99999;
+        animation: slideIn 0.3s ease;
+        max-width: 400px;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// ============================================
+// RESET FORM - UPDATED to clear rates
 // ============================================
 
 function resetForm() {
+    // Reset submit button state
+    const submitBtn = document.getElementById('submitBtn');
+    isSubmitting = false;
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';
+    
     document.getElementById('customer_input').value = '';
     document.getElementById('customer_id').value = '';
     document.getElementById('customer_email').value = '';
@@ -1051,11 +1141,20 @@ function resetForm() {
     if (firstRow) {
         firstRow.querySelector('.product-input').value = '';
         firstRow.querySelector('.qty').value = '0';
-        firstRow.querySelector('.rate').value = '';
+        // Clear rate and reset to default based on product selection
+        const rateInput = firstRow.querySelector('.rate');
+        rateInput.value = '';
+        rateInput.dataset.originalRate = '0';
+        rateInput.removeAttribute('data-fluctuating');
+        rateInput.title = '';
         firstRow.querySelector('.subtotal').value = '';
         const unitSelect = firstRow.querySelector('.unit');
         if (unitSelect) unitSelect.value = 'Kg';
     }
+    
+    // Reset payment mode to default
+    const paymentMode = document.querySelector('select[name="payment_mode"]');
+    if (paymentMode) paymentMode.value = 'Cash';
     
     updateGrandTotal();
     updateExchangeVisibility();
@@ -1343,7 +1442,7 @@ if (itemBodyElement) {
 }
 
 // ============================================
-// FORM SUBMISSION
+// FORM SUBMISSION - UPDATED (Fixed)
 // ============================================
 
 document.getElementById('saleForm').addEventListener('submit', async function(e) {
@@ -1405,9 +1504,11 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
             if (data.invoice_number) {
                 message = `Invoice #${data.invoice_number} created successfully!`;
             }
-            showModal('Success!', message, 'success', data.redirect || '{{ url_for("admin.sales_list") }}');
+            // Show modal without invoice_id since view_invoice doesn't exist
+            showModal('Success!', message, 'success');
         } else {
             showModal('Error', data.error || 'Failed to create sale', 'error');
+            // Reset button state on error
             isSubmitting = false;
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';
@@ -1415,6 +1516,7 @@ document.getElementById('saleForm').addEventListener('submit', async function(e)
     } catch (error) {
         console.error('Error:', error);
         showModal('Error', 'Network error. Please try again.', 'error');
+        // Reset button state on error
         isSubmitting = false;
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Create Invoice';

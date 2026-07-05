@@ -379,6 +379,34 @@ body {
     transform: none;
 }
 
+.btn-success-ui {
+    background: #16a34a;
+    color: white;
+}
+
+.btn-success-ui:hover {
+    background: #15803d;
+    transform: translateY(-1px);
+}
+
+/* Per Page Dropdown */
+.per-page-select {
+    padding: 0.6rem 0.875rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-family: inherit;
+    background-color: white;
+    cursor: pointer;
+    min-width: 140px;
+}
+
+.per-page-select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
 /* Selection Bar */
 .selection-bar {
     background: #f0f7f4;
@@ -586,15 +614,16 @@ body {
     flex-wrap: wrap;
 }
 
-/* Pagination */
+/* Pagination - SMART PAGINATION */
 .pagination {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 0.375rem;
     margin-top: 1.25rem;
     padding: 1rem;
     border-top: 1px solid var(--gray-200);
     flex-wrap: wrap;
+    align-items: center;
     overflow-x: auto;
 }
 
@@ -613,6 +642,27 @@ body {
     background: var(--primary);
     border-color: var(--primary);
     color: white;
+}
+
+.page-link.disabled {
+    color: var(--gray-400);
+    cursor: default;
+    background: transparent;
+}
+
+.page-link.disabled:hover {
+    background: transparent;
+    border-color: var(--gray-200);
+    color: var(--gray-400);
+}
+
+.page-info {
+    padding: 0.375rem 0.75rem;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: none;
+    background: transparent;
 }
 
 /* Empty State */
@@ -747,12 +797,10 @@ body {
         justify-content: center;
     }
     
-    /* Stack stats on mobile */
     .row.g-3 {
         --bs-gutter-y: 0.75rem;
     }
     
-    /* Make table card-like on mobile */
     .sales-table thead {
         display: none;
     }
@@ -799,6 +847,10 @@ body {
     .btn-ui {
         padding: 0.4rem 0.75rem;
         font-size: 0.75rem;
+    }
+
+    .per-page-select {
+        width: 100%;
     }
 }
 
@@ -860,9 +912,14 @@ body {
             <h1><i class="bi bi-cart-check"></i> Sales</h1>
             <p>Manage all sales transactions</p>
         </div>
-        <a href="{{ url_for('admin.add_sale') }}" class="btn-ui btn-primary-ui">
-            <i class="bi bi-plus-lg"></i> New Sale
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.export_sales_excel') }}" class="btn-ui btn-success-ui">
+                <i class="bi bi-file-excel"></i> Export Sales Data
+            </a>
+            <a href="{{ url_for('admin.add_sale') }}" class="btn-ui btn-primary-ui">
+                <i class="bi bi-plus-lg"></i> New Sale
+            </a>
+        </div>
     </div>
 
     <!-- Stats Row -->
@@ -941,15 +998,34 @@ body {
         </div>
     </div>
 
-    <!-- Search -->
+    <!-- Search and Per Page Controls -->
     <div class="card-ui mb-4">
         <div style="padding: 1rem;">
             <form method="GET" action="{{ url_for('admin.sales_list') }}" id="searchForm">
-                <div class="search-wrapper">
-                    <input type="text" class="search-input" name="search" placeholder="Search by invoice number or customer..." value="{{ search }}" id="searchInput">
-                    <button type="submit" class="btn-ui btn-primary-ui">
-                        <i class="bi bi-search"></i> Search
-                    </button>
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="search-wrapper">
+                            <input type="text" class="search-input" name="search" 
+                                   placeholder="Search by invoice or customer..." 
+                                   value="{{ search }}" id="searchInput">
+                            <button type="submit" class="btn-ui btn-primary-ui">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="per_page" class="per-page-select" onchange="this.form.submit()">
+                            <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
+                            <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                            <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
+                            <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <span class="text-muted" style="font-size: 0.85rem;">
+                            Showing {{ sales.items|length }} of {{ sales.total }} sales
+                        </span>
+                    </div>
                 </div>
             </form>
         </div>
@@ -1074,53 +1150,94 @@ body {
             </table>
         </div>
         
-        <!-- Pagination -->
+        <!-- SMART PAGINATION -->
         {% if sales.pages > 1 %}
-        <div class="pagination-wrapper">
-            <div class="pagination">
-                {% if sales.has_prev %}
-                    <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.prev_num, search=search) }}">←</a>
+        <div class="pagination">
+            <!-- First Page -->
+            {% if sales.page > 1 %}
+                <a class="page-link" href="{{ url_for('admin.sales_list', page=1, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            {% endif %}
+            
+            <!-- Previous -->
+            {% if sales.has_prev %}
+                <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.prev_num, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            {% endif %}
+            
+            <!-- Smart Pagination Logic -->
+            {% set total_pages = sales.pages %}
+            {% set current_page = sales.page %}
+            
+            {% if total_pages <= 7 %}
+                {# Show all pages if total is small #}
+                {% for page_num in range(1, total_pages + 1) %}
+                    <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                       href="{{ url_for('admin.sales_list', page=page_num, per_page=per_page, search=search) }}">
+                        {{ page_num }}
+                    </a>
+                {% endfor %}
+            {% else %}
+                {# First 3 pages #}
+                {% for page_num in range(1, 4) %}
+                    <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                       href="{{ url_for('admin.sales_list', page=page_num, per_page=per_page, search=search) }}">
+                        {{ page_num }}
+                    </a>
+                {% endfor %}
+                
+                {# Ellipsis if current page is far from start #}
+                {% if current_page > 5 %}
+                    <span class="page-link disabled">…</span>
                 {% endif %}
                 
-                {% set current = sales.page %}
-                {% set total = sales.pages %}
+                {# Pages around current page #}
+                {% set start = [current_page - 1, 4]|max %}
+                {% set end = [current_page + 1, total_pages - 3]|min %}
                 
-                {# Always show first page #}
-                <a class="page-link {% if 1 == current %}active{% endif %}" 
-                   href="{{ url_for('admin.sales_list', page=1, search=search) }}">1</a>
-                
-                {# Show ellipsis after first page if current is far from start #}
-                {% if current > 4 %}
-                    <span class="page-link page-link-ellipsis">…</span>
-                {% endif %}
-                
-                {# Show pages around current #}
-                {% for page_num in range(current - 2, current + 3) %}
-                    {% if page_num > 1 and page_num < total %}
-                        <a class="page-link {% if page_num == current %}active{% endif %}" 
-                           href="{{ url_for('admin.sales_list', page=page_num, search=search) }}">
+                {% for page_num in range(start, end + 1) %}
+                    {% if page_num > 3 and page_num < total_pages - 2 %}
+                        <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                           href="{{ url_for('admin.sales_list', page=page_num, per_page=per_page, search=search) }}">
                             {{ page_num }}
                         </a>
                     {% endif %}
                 {% endfor %}
                 
-                {# Show ellipsis before last page if current is far from end #}
-                {% if current < total - 3 %}
-                    <span class="page-link page-link-ellipsis">…</span>
+                {# Ellipsis if current page is far from end #}
+                {% if current_page < total_pages - 4 %}
+                    <span class="page-link disabled">…</span>
                 {% endif %}
                 
-                {# Always show last page if more than 1 page #}
-                {% if total > 1 %}
-                    <a class="page-link {% if total == current %}active{% endif %}" 
-                       href="{{ url_for('admin.sales_list', page=total, search=search) }}">
-                        {{ total }}
+                {# Last 3 pages #}
+                {% for page_num in range(total_pages - 2, total_pages + 1) %}
+                    <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                       href="{{ url_for('admin.sales_list', page=page_num, per_page=per_page, search=search) }}">
+                        {{ page_num }}
                     </a>
-                {% endif %}
-                
-                {% if sales.has_next %}
-                    <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.next_num, search=search) }}">→</a>
-                {% endif %}
-            </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Next -->
+            {% if sales.has_next %}
+                <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.next_num, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            {% endif %}
+            
+            <!-- Last Page -->
+            {% if sales.page < sales.pages %}
+                <a class="page-link" href="{{ url_for('admin.sales_list', page=sales.pages, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            {% endif %}
+            
+            <!-- Page Info -->
+            <span class="page-info">
+                Page {{ sales.page }} of {{ sales.pages }}
+            </span>
         </div>
         {% endif %}
     </div>
@@ -1333,7 +1450,6 @@ async function performBulkDelete() {
         
         if (data.success) {
             showToast(`Successfully deleted ${data.deleted_count} sale${data.deleted_count > 1 ? 's' : ''}`, 'success');
-            // Reload page after a short delay
             setTimeout(() => {
                 window.location.reload();
             }, 1500);

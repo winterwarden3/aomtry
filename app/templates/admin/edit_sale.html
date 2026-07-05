@@ -20,17 +20,13 @@
     --gray-800: #1f2937;
     --gray-900: #111827;
     --success: #10b981;
-    --success-light: #d1fae5;
     --danger: #ef4444;
-    --danger-light: #fee2e2;
     --warning: #f59e0b;
-    --warning-light: #fed7aa;
     --info: #3b82f6;
-    --info-light: #dbeafe;
-    --radius-lg: 12px;
-    --radius-md: 8px;
-    --radius-sm: 6px;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
@@ -80,22 +76,6 @@
     animation: slideIn 0.3s ease;
 }
 
-.modal-danger-icon {
-    width: 80px;
-    height: 80px;
-    background: #ef4444;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-}
-
-.modal-danger-icon i {
-    font-size: 48px;
-    color: white;
-}
-
 .modal-success-icon {
     width: 80px;
     height: 80px;
@@ -106,7 +86,6 @@
     justify-content: center;
     margin: 0 auto 20px;
 }
-
 .modal-success-icon i {
     font-size: 48px;
     color: white;
@@ -122,8 +101,22 @@
     justify-content: center;
     margin: 0 auto 20px;
 }
-
 .modal-error-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-danger-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+.modal-danger-icon i {
     font-size: 48px;
     color: white;
 }
@@ -138,7 +131,6 @@
     justify-content: center;
     margin: 0 auto 20px;
 }
-
 .modal-info-icon i {
     font-size: 48px;
     color: white;
@@ -177,27 +169,22 @@
     background: var(--primary);
     color: white;
 }
-
 .modal-button-primary:hover {
     background: var(--primary-dark);
-    transform: translateY(-1px);
 }
 
 .modal-button-danger {
     background: #ef4444;
     color: white;
 }
-
 .modal-button-danger:hover {
     background: #dc2626;
-    transform: translateY(-1px);
 }
 
 .modal-button-secondary {
     background: var(--gray-200);
     color: var(--gray-700);
 }
-
 .modal-button-secondary:hover {
     background: var(--gray-300);
 }
@@ -217,96 +204,43 @@
     to { transform: rotate(360deg); }
 }
 
-.container-fluid {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.page-header {
-    margin-bottom: 28px;
-}
-
-.page-header h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 4px;
-}
-
-.page-header p {
-    font-size: 0.85rem;
-    color: var(--gray-500);
-}
-
-.form-card {
-    background: white;
+/* Card Styles */
+.card {
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
-    overflow: hidden;
     box-shadow: var(--shadow-sm);
 }
 
-.form-section {
-    padding: 24px;
-    border-bottom: 1px solid var(--gray-100);
+.card-body {
+    padding: 28px;
 }
 
-.form-section:last-child {
-    border-bottom: none;
+@media (max-width: 768px) {
+    .card-body {
+        padding: 20px;
+    }
 }
 
-.section-title {
-    margin-bottom: 20px;
-}
-
-.section-title h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 4px;
-}
-
-.section-title p {
-    font-size: 0.75rem;
-    color: var(--gray-400);
-    margin: 0;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
+/* Form Elements */
 .form-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--primary);
     margin-bottom: 6px;
 }
 
-.form-label i {
-    margin-right: 4px;
-}
-
 .form-control {
-    padding: 10px 12px;
-    border: 1px solid var(--gray-200);
+    padding: 10px 14px;
     border-radius: var(--radius-md);
-    font-size: 0.85rem;
+    border: 1px solid var(--gray-200);
+    font-size: 0.9rem;
     transition: all 0.2s;
-    background: white;
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--primary-light);
-    box-shadow: 0 0 0 3px rgba(19, 138, 82, 0.1);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
 .form-control[readonly] {
@@ -315,27 +249,143 @@
     cursor: not-allowed;
 }
 
+/* Buttons */
+.btn {
+    border-radius: var(--radius-md);
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    border: none;
+}
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(12,91,63,0.2);
+}
+.btn-primary:disabled {
+    background: var(--gray-400);
+    transform: none;
+    cursor: not-allowed;
+}
+
+.btn-danger {
+    background: var(--danger);
+    border: none;
+}
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-light {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+}
+.btn-light:hover {
+    background: var(--gray-200);
+}
+
+/* Items Table */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.items-table th {
+    text-align: left;
+    padding: 8px 6px;
+    background: var(--gray-50);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.items-table td {
+    padding: 6px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+}
+
+/* Product Autocomplete */
+.product-autocomplete-wrapper {
+    position: relative;
+}
+
+.product-autocomplete {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    font-size: 0.85rem;
+}
+
+.suggestions-dropdown {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    max-height: 150px;
+    overflow-y: auto;
+    width: 100%;
+    margin-top: 2px;
+    box-shadow: var(--shadow-md);
+    display: none;
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+.suggestion-item:hover {
+    background: var(--gray-50);
+}
+
+/* Item Inputs */
+.item-qty,
+.item-rate-input {
+    max-width: 70px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    font-size: 0.85rem;
+}
+
+.item-unit-select {
+    max-width: 70px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    font-size: 0.85rem;
+    background: white;
+}
+
+/* Advance Card */
 .advance-card {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     padding: 20px;
     color: white;
     margin-bottom: 20px;
 }
 
 .advance-card-label {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     opacity: 0.9;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    margin-bottom: 6px;
 }
 
 .advance-card-value {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 4px;
 }
 
 .advance-card-change {
@@ -346,6 +396,7 @@
     border-top: 1px solid rgba(255,255,255,0.2);
 }
 
+/* Result Box */
 .result-box {
     background: var(--gray-50);
     border-radius: var(--radius-md);
@@ -358,19 +409,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 8px 0;
 }
 
 .result-row:first-child {
     padding-top: 0;
 }
-
 .result-row:last-child {
     padding-bottom: 0;
 }
 
 .result-label {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--gray-600);
 }
@@ -381,378 +431,285 @@
     color: var(--gray-800);
 }
 
+/* Validation Messages */
 .validation-message {
-    font-size: 0.7rem;
-    margin-top: 6px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    font-size: 0.75rem;
+    margin-top: 4px;
 }
 
 .validation-error {
     color: var(--danger);
 }
-
 .validation-success {
     color: var(--success);
 }
 
-.validation-warning {
-    color: var(--warning);
-}
-
-.btn-ui {
-    border: none;
-    border-radius: var(--radius-md);
-    font-weight: 500;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    padding: 10px 16px;
-}
-
-.btn-primary-ui {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-primary-ui:hover:not(:disabled) {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-primary-ui:disabled {
-    background: var(--gray-400);
-    cursor: not-allowed;
-}
-
-.btn-danger-ui {
-    background: white;
-    color: var(--danger);
-    border: 1px solid var(--danger);
-}
-
-.btn-danger-ui:hover {
-    background: var(--danger);
-    color: white;
-}
-
-.btn-outline-ui {
-    background: transparent;
-    border: 1px solid var(--gray-200);
-    color: var(--gray-600);
-}
-
-.btn-outline-ui:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--gray-50);
-}
-
-.button-group {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-}
-
-.exchange-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+/* Exchange Checkboxes */
 .exchange-checkbox {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
-    padding: 14px 16px;
+    padding: 12px 16px;
     background: #f0fdf4;
     border: 1px solid #bbf7d0;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--gray-700);
 }
 
-.exchange-checkbox input {
+.exchange-checkbox input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    margin-top: 2px;
     accent-color: var(--primary);
-}
-
-/* Fluctuating rate indicator */
-.item-rate-input[data-fluctuating="true"] {
-    border-right: 3px solid #f59e0b;
-    background: #fffbeb;
-}
-
-.item-rate-input[data-fluctuating="true"]:focus {
-    border-color: var(--primary-light);
-    border-right: 3px solid var(--primary-light);
-}
-
-.items-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 8px;
-}
-
-.items-table th,
-.items-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--gray-100);
-    font-size: 0.85rem;
-    text-align: left;
-}
-
-.items-table th {
-    background: var(--gray-50);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--gray-500);
-}
-
-.suggestions-dropdown {
-    position: absolute;
-    z-index: 1000;
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    max-height: 200px;
-    overflow-y: auto;
-    width: calc(100% - 24px);
-    margin-top: 2px;
-    box-shadow: var(--shadow-md);
-}
-
-.suggestion-item {
-    padding: 8px 12px;
     cursor: pointer;
-    font-size: 0.8rem;
 }
 
-.suggestion-item:hover {
-    background: var(--gray-50);
-}
-
+/* Mobile Optimizations */
 @media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+    .container-fluid {
+        padding: 0.5rem;
     }
     
-    .button-group {
-        flex-direction: column;
+    .items-table {
+        font-size: 0.8rem;
+        min-width: 500px;
     }
     
-    .button-group .btn-ui {
-        width: 100%;
+    .items-table th,
+    .items-table td {
+        padding: 4px;
     }
     
-    .form-section {
-        padding: 20px;
+    .item-qty,
+    .item-rate-input,
+    .item-unit-select {
+        max-width: 55px;
+        font-size: 0.75rem;
+        padding: 4px 6px;
     }
     
     .advance-card-value {
         font-size: 1.5rem;
     }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-body {
+        padding: 16px;
+    }
+    
+    .advance-card {
+        padding: 16px;
+    }
+    
+    .advance-card-value {
+        font-size: 1.25rem;
+    }
+    
+    .result-box {
+        padding: 12px;
+    }
 }
 </style>
 
-<div class="container-fluid px-md-3 py-3">
+<div class="container-fluid py-4">
 
-    <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <div>
-                <h1><i class="bi bi-pencil-square"></i> Edit Sale</h1>
-                <p>Update payment details - advance balance adjusts automatically</p>
-            </div>
-            <a href="{{ url_for('admin.sales_list') }}" class="btn-ui btn-outline-ui" id="cancelBtn">
-                <i class="bi bi-arrow-left"></i> Back to Sales
-            </a>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">
+                <i class="bi bi-pencil-square"></i> Edit Sale
+            </h2>
+            <small class="text-muted">Update payment details</small>
         </div>
+        <a href="{{ url_for('admin.sales_list') }}" class="btn btn-light">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
     </div>
 
-    <form id="editForm">
-        <div class="form-card">
+    <!-- Form Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-9">
+            <div class="card">
+                <div class="card-body">
 
-            <!-- Invoice Info Section -->
-            <div class="form-section">
-                <div class="section-title">
-                    <h3><i class="bi bi-receipt"></i> Invoice Information</h3>
-                    <p>Sale details (read-only)</p>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label"><i class="bi bi-hash"></i> Invoice Number</label>
-                        <input type="text" class="form-control" value="{{ sale.invoice_number }}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="bi bi-person"></i> Customer</label>
-                        <input type="text" class="form-control" value="{{ sale.customer_name }}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="bi bi-calculator"></i> Total Amount</label>
-                        <input type="text" id="totalAmountDisplay" class="form-control" value="Rs {{ "%.2f"|format(sale.total_amount) }}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="bi bi-calendar"></i> Date</label>
-                        <input type="text" class="form-control" value="{{ sale.get('date', '')[:10] if sale.get('date') else '' }}" readonly>
-                    </div>
+                    <form id="editForm">
+
+                        <!-- Invoice Info -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Invoice Number</label>
+                                    <input type="text" class="form-control" value="{{ sale.invoice_number }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Customer</label>
+                                    <input type="text" class="form-control" value="{{ sale.customer_name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Total Amount</label>
+                                    <input type="text" id="totalAmountDisplay" class="form-control" value="Rs {{ "%.2f"|format(sale.total_amount) }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Date</label>
+                                    <input type="text" class="form-control" value="{{ sale.get('date', '')[:10] if sale.get('date') else '' }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Order Items -->
+                        <div class="mb-3">
+                            <label class="form-label">Order Items</label>
+                            <div style="overflow-x: auto;">
+                                <table class="items-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="min-width:120px;">Product</th>
+                                            <th style="width:60px;">Qty</th>
+                                            <th style="width:70px;">Unit</th>
+                                            <th style="width:80px;">Rate</th>
+                                            <th style="width:80px;">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsTableBody">
+                                        {% for item in sale.get('items', []) %}
+                                        <tr class="sale-item-row"
+                                            data-product="{{ item.get('product_name', '') }}"
+                                            data-qty="{{ item.get('quantity', 0) }}"
+                                            data-unit="{{ item.get('unit', 'Kg') }}"
+                                            data-item-id="{{ item.get('id') }}">
+                                            <td>
+                                                <div class="product-autocomplete-wrapper">
+                                                    <input type="text" class="product-autocomplete" placeholder="Search..." autocomplete="off" value="{{ item.get('product_name', '') }}">
+                                                    <div class="suggestions-dropdown"></div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="item_qty_{{ item.get('id') }}" class="item-qty" step="any" value="{{ item.get('quantity', 0) }}">
+                                            </td>
+                                            <td>
+                                                <select name="item_unit_{{ item.get('id') }}" class="item-unit-select">
+                                                    <option value="Kg" {% if item.get('unit', 'Kg') == 'Kg' %}selected{% endif %}>Kg</option>
+                                                    <option value="Liter" {% if item.get('unit') == 'Liter' %}selected{% endif %}>Liter</option>
+                                                    <option value="Piece" {% if item.get('unit') == 'Piece' %}selected{% endif %}>Piece</option>
+                                                    <option value="Quintal" {% if item.get('unit') == 'Quintal' %}selected{% endif %}>Quintal</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number"
+                                                       name="item_rate_{{ item.get('id') }}"
+                                                       class="item-rate-input"
+                                                       step="0.01"
+                                                       min="0"
+                                                       value="{{ item.get('rate', 0) }}">
+                                            </td>
+                                            <td class="item-subtotal">Rs {{ "%.2f"|format(item.get('subtotal', 0)) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-light mt-2" onclick="addEditRow()">
+                                <i class="bi bi-plus"></i> Add Item
+                            </button>
+                        </div>
+
+                        <hr>
+
+                        <!-- Byproduct Exchange -->
+                        <div id="byproductSection" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Byproduct Exchange</label>
+                                <div>
+                                    <label class="exchange-checkbox" id="mustardCakeOption" style="display: none;">
+                                        <input type="checkbox" name="exchange_mustard_cake" id="exchangeMustardCake" {% if exchange_mustard_cake %}checked{% endif %}>
+                                        <span>Customer left <strong>Mustard Cake</strong></span>
+                                    </label>
+                                    <label class="exchange-checkbox" id="riceBranOption" style="display: none;">
+                                        <input type="checkbox" name="exchange_rice_bran" id="exchangeRiceBran" {% if exchange_rice_bran %}checked{% endif %}>
+                                        <span>Customer left <strong>Rice Bran</strong></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+
+                        <!-- Advance Balance -->
+                        <div class="advance-card">
+                            <div class="advance-card-label">
+                                <i class="bi bi-wallet2"></i> Available Advance Balance
+                            </div>
+                            <div class="advance-card-value" id="currentBalanceDisplay">
+                                Rs {{ "%.2f"|format(customer_advance_balance) }}
+                            </div>
+                            <div class="advance-card-change" id="balanceChangeDisplay" style="display: none;"></div>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Cash Paid</label>
+                                    <input type="number" name="paid_amount" id="cashPaid" class="form-control" step="0.01" min="0" value="{{ sale.paid_amount }}">
+                                    <div id="cashValidation" class="validation-message"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Advance Used</label>
+                                    <input type="number" name="advance_used" id="advanceUsed" class="form-control" step="0.01" min="0" value="{{ sale.get('advance_used', 0) }}">
+                                    <div id="advanceValidation" class="validation-message"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Box -->
+                        <div class="result-box">
+                            <div class="result-row">
+                                <span class="result-label">Total Payment</span>
+                                <span class="result-value" id="totalPaymentDisplay">Rs 0.00</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Remaining Due</span>
+                                <span class="result-value" id="dueDisplay" style="color: #ef4444;">Rs 0.00</span>
+                            </div>
+                            <div class="result-row">
+                                <span class="result-label">Status</span>
+                                <span class="result-value" id="statusDisplay">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="mt-4 d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="bi bi-save"></i> Update Sale
+                            </button>
+                            <button type="button" class="btn btn-danger" id="deleteBtn">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                            <a href="{{ url_for('admin.sales_list') }}" class="btn btn-light">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
-
-            <!-- Order Items -->
-            <div class="form-section">
-                <div class="section-title">
-                    <h3><i class="bi bi-box-seam"></i> Order Items</h3>
-                    <p>Line items for this invoice</p>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Qty</th>
-                                <th>Unit</th>
-                                <th>Rate (Rs)</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsTableBody">
-                            {% for item in sale.get('items', []) %}
-                            <tr class="sale-item-row"
-                                data-product="{{ item.get('product_name', '') }}"
-                                data-qty="{{ item.get('quantity', 0) }}"
-                                data-unit="{{ item.get('unit', 'Kg') }}"
-                                data-item-id="{{ item.get('id') }}">
-                                <td>
-                                    <input type="text" class="form-control product-autocomplete" placeholder="Search product..." style="min-width:180px;" autocomplete="off" value="{{ item.get('product_name', '') }}">
-                                    <div class="suggestions-dropdown" style="display:none;"></div>
-                                </td>
-                                <td>
-                                    <input type="number" name="item_qty_{{ item.get('id') }}" class="form-control item-qty" step="any" value="{{ item.get('quantity', 0) }}" style="max-width:100px;">
-                                </td>
-                                <td>
-                                    <select name="item_unit_{{ item.get('id') }}" class="form-control item-unit-select" style="max-width:100px;">
-                                        <option value="Kg" {% if item.get('unit', 'Kg') == 'Kg' %}selected{% endif %}>Kg</option>
-                                        <option value="Liter" {% if item.get('unit') == 'Liter' %}selected{% endif %}>Liter</option>
-                                        <option value="Piece" {% if item.get('unit') == 'Piece' %}selected{% endif %}>Piece</option>
-                                        <option value="Quintal" {% if item.get('unit') == 'Quintal' %}selected{% endif %}>Quintal</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="number"
-                                           name="item_rate_{{ item.get('id') }}"
-                                           class="form-control item-rate-input"
-                                           step="0.01"
-                                           min="0"
-                                           value="{{ item.get('rate', 0) }}"
-                                           data-item-id="{{ item.get('id') }}"
-                                           style="max-width:120px;">
-                                </td>
-                                <td class="item-subtotal">Rs {{ "%.2f"|format(item.get('subtotal', 0)) }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <button type="button" class="btn-ui btn-outline-ui" style="margin-top: 15px;" onclick="addEditRow()">
-                    <i class="bi bi-plus"></i> Add Another Item
-                </button>
-            </div>
-
-            <!-- Byproduct Exchange Section -->
-            <div class="form-section" id="byproductSection" style="display: none;">
-                <div class="section-title">
-                    <h3><i class="bi bi-arrow-left-right"></i> Byproduct Exchange</h3>
-                    <p>Update if customer left byproduct — matching service becomes FREE</p>
-                </div>
-                <div class="exchange-options">
-                    <label class="exchange-checkbox" id="mustardCakeOption" style="display: none;">
-                        <input type="checkbox" name="exchange_mustard_cake" id="exchangeMustardCake" {% if exchange_mustard_cake %}checked{% endif %}>
-                        <span>Customer left <strong>Mustard Cake</strong></span>
-                    </label>
-                    <label class="exchange-checkbox" id="riceBranOption" style="display: none;">
-                        <input type="checkbox" name="exchange_rice_bran" id="exchangeRiceBran" {% if exchange_rice_bran %}checked{% endif %}>
-                        <span>Customer left <strong>Rice Bran</strong></span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Advance Balance Card -->
-            <div class="form-section">
-                <div class="advance-card">
-                    <div class="advance-card-label">
-                        <i class="bi bi-wallet2"></i> Customer's Available Advance Balance
-                    </div>
-                    <div class="advance-card-value" id="currentBalanceDisplay">
-                        Rs {{ "%.2f"|format(customer_advance_balance) }}
-                    </div>
-                    <div class="advance-card-change" id="balanceChangeDisplay" style="display: none;">
-                        
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Section -->
-            <div class="form-section">
-                <div class="section-title">
-                    <h3><i class="bi bi-credit-card"></i> Payment Details</h3>
-                    <p>Update payment amounts - advance balance updates in real time</p>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label"><i class="bi bi-cash-stack"></i> Cash Paid</label>
-                        <input type="number" name="paid_amount" id="cashPaid" class="form-control" step="0.01" min="0" value="{{ sale.paid_amount }}">
-                        <div id="cashValidation" class="validation-message"></div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label"><i class="bi bi-wallet2"></i> Advance Used</label>
-                        <input type="number" name="advance_used" id="advanceUsed" class="form-control" step="0.01" min="0" value="{{ sale.get('advance_used', 0) }}">
-                        <div id="advanceValidation" class="validation-message"></div>
-                    </div>
-                </div>
-
-                <!-- Result Box -->
-                <div class="result-box">
-                    <div class="result-row">
-                        <span class="result-label"><i class="bi bi-calculator"></i> Total Payment</span>
-                        <span class="result-value" id="totalPaymentDisplay">Rs 0.00</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label"><i class="bi bi-clock-history"></i> Remaining Due</span>
-                        <span class="result-value" id="dueDisplay" style="color: #ef4444;">Rs 0.00</span>
-                    </div>
-                    <div class="result-row">
-                        <span class="result-label"><i class="bi bi-info-circle"></i> Status</span>
-                        <span class="result-value" id="statusDisplay">-</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submit Buttons -->
-            <div class="form-section" style="background: var(--gray-50);">
-                <div class="button-group">
-                    <button type="button" class="btn-ui btn-danger-ui" id="deleteBtn">
-                        <i class="bi bi-trash"></i> Delete Sale
-                    </button>
-                    <button type="submit" class="btn-ui btn-primary-ui" id="submitBtn">
-                        <i class="bi bi-check-lg"></i> Update Sale
-                    </button>
-                </div>
-            </div>
-
         </div>
-    </form>
+    </div>
 
 </div>
 
@@ -787,7 +744,6 @@ const PRODUCT_DEFAULTS = {
     "Others": { rate: 0, unit: "Kg" }
 };
 
-// Global variables
 let isSubmitting = false;
 let totalAmount = {{ sale.total_amount }};
 const oldCashPaid = {{ sale.paid_amount }};
@@ -796,10 +752,6 @@ const oldAdvanceAmount = {{ sale.get('advance_amount', 0) }};
 const customerAdvanceBalance = {{ customer_advance_balance }};
 const saleId = {{ sale.id }};
 const invoiceNumber = "{{ sale.invoice_number }}";
-
-// ============================================
-// EXCHANGE HELPER FUNCTIONS - FIXED
-// ============================================
 
 function isMustardExtraction(name) {
     const n = (name || '').toLowerCase();
@@ -811,20 +763,14 @@ function isOthersOrDalBanai(name) {
     return n === 'others' || n === 'dal banai';
 }
 
-// ============================================
-// PRODUCT DEFAULTS - FIXED
-// ============================================
-
 function setEditProductDefaults(productName, row) {
     const defaults = PRODUCT_DEFAULTS[productName];
     if (defaults) {
         const rateInput = row.querySelector('.item-rate-input');
         const unitSelect = row.querySelector('.item-unit-select');
-        
         if (rateInput && (!rateInput.value || parseFloat(rateInput.value) === 0)) {
             rateInput.value = defaults.rate;
         }
-        
         if (unitSelect && defaults.unit) {
             for (let i = 0; i < unitSelect.options.length; i++) {
                 if (unitSelect.options[i].value === defaults.unit) {
@@ -833,17 +779,8 @@ function setEditProductDefaults(productName, row) {
                 }
             }
         }
-        
-        if (defaults.fluctuates && rateInput && !rateInput.hasAttribute('data-fluctuating')) {
-            rateInput.setAttribute('data-fluctuating', 'true');
-            rateInput.title = 'Rate fluctuates - can be changed';
-        }
     }
 }
-
-// ============================================
-// EXCHANGE VISIBILITY - FIXED
-// ============================================
 
 function updateExchangeVisibility() {
     const rows = document.querySelectorAll('.sale-item-row');
@@ -860,27 +797,19 @@ function updateExchangeVisibility() {
     const mustardOption = document.getElementById('mustardCakeOption');
     const riceOption = document.getElementById('riceBranOption');
     const byproductSection = document.getElementById('byproductSection');
-    const mustardCheckbox = document.getElementById('exchangeMustardCake');
-    const riceCheckbox = document.getElementById('exchangeRiceBran');
     
     if (mustardOption) {
         mustardOption.style.display = hasMustardExtraction ? 'flex' : 'none';
-        if (!hasMustardExtraction && mustardCheckbox) mustardCheckbox.checked = false;
+        if (!hasMustardExtraction) document.getElementById('exchangeMustardCake').checked = false;
     }
-    
     if (riceOption) {
         riceOption.style.display = hasOthersOrDalBanai ? 'flex' : 'none';
-        if (!hasOthersOrDalBanai && riceCheckbox) riceCheckbox.checked = false;
+        if (!hasOthersOrDalBanai) document.getElementById('exchangeRiceBran').checked = false;
     }
-    
     if (byproductSection) {
         byproductSection.style.display = (hasMustardExtraction || hasOthersOrDalBanai) ? 'block' : 'none';
     }
 }
-
-// ============================================
-// GET CURRENT TOTAL - FIXED
-// ============================================
 
 function getCurrentTotalAmount() {
     let total = 0;
@@ -895,18 +824,13 @@ function getCurrentTotalAmount() {
         const rateInput = row.querySelector('.item-rate-input');
         let rate = rateInput ? (parseFloat(rateInput.value) || 0) : 0;
 
-        // Exchange rules - matching BATCH SALES logic
         if (mustardChecked && isMustardExtraction(product)) rate = 0;
         if (riceChecked && isOthersOrDalBanai(product)) rate = 0;
 
         if (rateInput) {
             rateInput.value = rate;
             rateInput.readOnly = (mustardChecked && isMustardExtraction(product)) || (riceChecked && isOthersOrDalBanai(product));
-            if (rateInput.readOnly) {
-                rateInput.style.background = '#f3f4f6';
-            } else {
-                rateInput.style.background = 'white';
-            }
+            rateInput.style.background = rateInput.readOnly ? '#f3f4f6' : 'white';
         }
 
         const subtotal = qty * rate;
@@ -915,14 +839,9 @@ function getCurrentTotalAmount() {
         total += subtotal;
     });
 
-    const totalDisplay = document.getElementById('totalAmountDisplay');
-    if (totalDisplay) totalDisplay.value = `Rs ${total.toFixed(2)}`;
+    document.getElementById('totalAmountDisplay').value = `Rs ${total.toFixed(2)}`;
     return total;
 }
-
-// ============================================
-// ADD ROW FUNCTION - FIXED
-// ============================================
 
 function addEditRow() {
     const newId = 'new_' + Date.now();
@@ -933,13 +852,15 @@ function addEditRow() {
     row.setAttribute('data-item-id', newId);
     
     row.innerHTML = `
-        <td style="position:relative;">
-            <input type="text" class="form-control product-autocomplete" placeholder="Search product..." style="min-width:180px;" autocomplete="off">
-            <div class="suggestions-dropdown" style="display:none;"></div>
-        </td>
-        <td><input type="number" name="item_qty_${newId}" class="form-control item-qty" step="any" value="1" style="max-width:100px;"></td>
         <td>
-            <select name="item_unit_${newId}" class="form-control item-unit-select" style="max-width:100px;">
+            <div class="product-autocomplete-wrapper">
+                <input type="text" class="product-autocomplete" placeholder="Search..." autocomplete="off">
+                <div class="suggestions-dropdown"></div>
+            </div>
+        </td>
+        <td><input type="number" name="item_qty_${newId}" class="item-qty" step="any" value="1"></td>
+        <td>
+            <select name="item_unit_${newId}" class="item-unit-select">
                 <option value="Kg">Kg</option>
                 <option value="Liter">Liter</option>
                 <option value="Piece">Piece</option>
@@ -947,18 +868,32 @@ function addEditRow() {
             </select>
         </td>
         <td>
-            <input type="number" name="item_rate_${newId}" class="form-control item-rate-input" step="0.01" min="0" value="0" style="max-width:120px;">
+            <input type="number" name="item_rate_${newId}" class="item-rate-input" step="0.01" min="0" value="0">
         </td>
         <td class="item-subtotal">Rs 0.00</td>
     `;
     
     document.getElementById('itemsTableBody').appendChild(row);
+    setupAutocomplete(row);
     
-    // Setup autocomplete for new row
+    const qtyInput = row.querySelector('.item-qty');
+    const rateInput = row.querySelector('.item-rate-input');
+    const unitSelect = row.querySelector('.item-unit-select');
+    
+    if (qtyInput) qtyInput.addEventListener('input', updateCalculationAndValidation);
+    if (rateInput) rateInput.addEventListener('input', updateCalculationAndValidation);
+    if (unitSelect) unitSelect.addEventListener('change', updateCalculationAndValidation);
+    
+    updateCalculationAndValidation();
+}
+
+function setupAutocomplete(row) {
     const productInput = row.querySelector('.product-autocomplete');
     const suggestionsBox = row.querySelector('.suggestions-dropdown');
     
-    productInput.addEventListener('input', function(e) {
+    if (!productInput || !suggestionsBox) return;
+    
+    productInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
         if (!query) {
             suggestionsBox.style.display = 'none';
@@ -986,46 +921,25 @@ function addEditRow() {
         }
     });
     
-    // Add event listeners for new inputs
-    const qtyInput = row.querySelector('.item-qty');
-    const rateInput = row.querySelector('.item-rate-input');
-    const unitSelect = row.querySelector('.item-unit-select');
-    
-    if (qtyInput) qtyInput.addEventListener('input', updateCalculationAndValidation);
-    if (rateInput) rateInput.addEventListener('input', updateCalculationAndValidation);
-    if (unitSelect) unitSelect.addEventListener('change', updateCalculationAndValidation);
-    
-    updateCalculationAndValidation();
+    productInput.addEventListener('blur', function() {
+        setTimeout(() => { suggestionsBox.style.display = 'none'; }, 200);
+    });
 }
-
-// ============================================
-// CLOSE MODAL FUNCTION
-// ============================================
 
 function closeModal(modalId = null) {
     if (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) modal.remove();
     } else {
-        const modals = document.querySelectorAll('.modal-overlay');
-        modals.forEach(modal => modal.remove());
+        document.querySelectorAll('.modal-overlay').forEach(modal => modal.remove());
     }
 }
 
-// ============================================
-// SHOW MODAL
-// ============================================
-
 function showModal(title, message, type = 'success', redirectUrl = null) {
     closeModal();
-    const iconMap = {
-        'success': 'success',
-        'error': 'error',
-        'danger': 'error',
-        'info': 'info'
-    };
+    const iconMap = { 'success': 'success', 'error': 'error', 'danger': 'error', 'info': 'info' };
     const iconType = iconMap[type] || 'info';
-    const iconClass = type === 'success' ? 'check-lg' : type === 'error' ? 'x-lg' : 'info-circle';
+    const iconClass = type === 'success' ? 'check-lg' : 'x-lg';
     
     const modalHtml = `
         <div class="modal-overlay" id="resultModal">
@@ -1042,18 +956,11 @@ function showModal(title, message, type = 'success', redirectUrl = null) {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
     document.getElementById('modalCloseBtn').onclick = function() {
         closeModal('resultModal');
-        if (redirectUrl) {
-            window.location.href = redirectUrl;
-        }
+        if (redirectUrl) window.location.href = redirectUrl;
     };
 }
-
-// ============================================
-// SHOW DELETE CONFIRMATION
-// ============================================
 
 function showDeleteConfirmation() {
     closeModal();
@@ -1066,8 +973,7 @@ function showDeleteConfirmation() {
                 <div class="modal-title">Delete Sale?</div>
                 <div class="modal-message">
                     Are you sure you want to delete sale <strong>#${invoiceNumber}</strong>?<br><br>
-                    <span style="color: #ef4444;">⚠️ This action cannot be undone!</span><br>
-                    Any advance used will be refunded to the customer.
+                    <span style="color: #ef4444;">⚠️ This action cannot be undone!</span>
                 </div>
                 <div class="modal-buttons">
                     <button class="modal-button modal-button-danger" id="confirmDeleteBtn">Yes, Delete</button>
@@ -1077,20 +983,14 @@ function showDeleteConfirmation() {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
     document.getElementById('confirmDeleteBtn').onclick = function() {
         closeModal('deleteModal');
         performDelete();
     };
-    
     document.getElementById('cancelDeleteBtn').onclick = function() {
         closeModal('deleteModal');
     };
 }
-
-// ============================================
-// PERFORM DELETE
-// ============================================
 
 async function performDelete() {
     const loadingHtml = `
@@ -1099,8 +999,8 @@ async function performDelete() {
                 <div class="modal-info-icon">
                     <i class="bi bi-hourglass-split"></i>
                 </div>
-                <div class="modal-title">Deleting Sale...</div>
-                <div class="modal-message">Please wait while we delete the sale.</div>
+                <div class="modal-title">Deleting...</div>
+                <div class="modal-message">Please wait...</div>
             </div>
         </div>
     `;
@@ -1109,15 +1009,10 @@ async function performDelete() {
     try {
         const response = await fetch('/admin/delete-sale/' + saleId, {
             method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json'
-            }
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/json' }
         });
-        
         const data = await response.json();
         closeModal('loadingModal');
-        
         if (data.success) {
             showModal('Deleted!', data.message || 'Sale deleted successfully!', 'success', '/admin/sales');
         } else {
@@ -1125,37 +1020,24 @@ async function performDelete() {
         }
     } catch (error) {
         closeModal('loadingModal');
-        console.error('Error:', error);
         showModal('Error', 'Network error. Please try again.', 'error');
     }
 }
 
-// ============================================
-// FORMAT CURRENCY
-// ============================================
-
 function formatCurrency(amount) {
     return `Rs ${amount.toFixed(2)}`;
 }
-
-// ============================================
-// UPDATE CALCULATION AND VALIDATION
-// ============================================
 
 function updateCalculationAndValidation() {
     totalAmount = getCurrentTotalAmount();
     let cash = parseFloat(document.getElementById('cashPaid').value) || 0;
     let advance = parseFloat(document.getElementById('advanceUsed').value) || 0;
     
-    // Auto-adjust if cash >= total
-    if (cash >= totalAmount) {
-        if (advance !== 0) {
-            advance = 0;
-            document.getElementById('advanceUsed').value = 0;
-        }
+    if (cash >= totalAmount && advance !== 0) {
+        advance = 0;
+        document.getElementById('advanceUsed').value = 0;
     }
     
-    // Cap advance if needed
     if (cash < totalAmount) {
         const maxAdvanceNeeded = totalAmount - cash;
         if (advance > maxAdvanceNeeded) {
@@ -1173,7 +1055,6 @@ function updateCalculationAndValidation() {
     const balanceChange = newNetEffect - oldNetEffect;
     const newBalance = customerAdvanceBalance + balanceChange;
     
-    // Update displays
     document.getElementById('totalPaymentDisplay').innerHTML = formatCurrency(totalPaid);
     
     if (remainingDue > 0) {
@@ -1186,14 +1067,13 @@ function updateCalculationAndValidation() {
     
     let statusDisplay = document.getElementById('statusDisplay');
     if (remainingDue < 0) {
-        statusDisplay.innerHTML = `<span style="color: #3b82f6;"><i class="bi bi-arrow-up-circle"></i> Advance Credit: ${formatCurrency(Math.abs(remainingDue))}</span>`;
+        statusDisplay.innerHTML = `<span style="color: #3b82f6;">Advance Credit: ${formatCurrency(Math.abs(remainingDue))}</span>`;
     } else if (remainingDue === 0) {
-        statusDisplay.innerHTML = `<span style="color: #10b981;"><i class="bi bi-check-circle"></i> Fully Paid</span>`;
+        statusDisplay.innerHTML = `<span style="color: #10b981;">Fully Paid</span>`;
     } else {
-        statusDisplay.innerHTML = `<span style="color: #ef4444;"><i class="bi bi-exclamation-circle"></i> Due: ${formatCurrency(remainingDue)}</span>`;
+        statusDisplay.innerHTML = `<span style="color: #ef4444;">Due: ${formatCurrency(remainingDue)}</span>`;
     }
     
-    // Update advance balance display
     document.getElementById('currentBalanceDisplay').innerHTML = formatCurrency(newBalance);
     if (newBalance < 0) {
         document.getElementById('currentBalanceDisplay').style.color = '#fecaca';
@@ -1211,7 +1091,6 @@ function updateCalculationAndValidation() {
         document.getElementById('balanceChangeDisplay').style.display = 'none';
     }
     
-    // ========== VALIDATION ==========
     let isValid = true;
     const cashValidation = document.getElementById('cashValidation');
     const advanceValidation = document.getElementById('advanceValidation');
@@ -1222,46 +1101,46 @@ function updateCalculationAndValidation() {
     advanceValidation.className = 'validation-message';
     
     if (cash < 0) {
-        cashValidation.innerHTML = '<i class="bi bi-x-circle"></i> Cash cannot be negative';
+        cashValidation.innerHTML = 'Cash cannot be negative';
         cashValidation.classList.add('validation-error');
         isValid = false;
     }
     
     if (advance < 0) {
-        advanceValidation.innerHTML = '<i class="bi bi-x-circle"></i> Advance cannot be negative';
+        advanceValidation.innerHTML = 'Advance cannot be negative';
         advanceValidation.classList.add('validation-error');
         isValid = false;
     }
     
     if (advance > totalAmount) {
-        advanceValidation.innerHTML = `<i class="bi bi-x-circle"></i> Advance cannot exceed total (${formatCurrency(totalAmount)})`;
+        advanceValidation.innerHTML = `Advance cannot exceed total (${formatCurrency(totalAmount)})`;
         advanceValidation.classList.add('validation-error');
         isValid = false;
     }
     
     if (newBalance < 0) {
-        advanceValidation.innerHTML = `<i class="bi bi-x-circle"></i> Would create negative advance balance (${formatCurrency(newBalance)})`;
+        advanceValidation.innerHTML = `Would create negative advance balance (${formatCurrency(newBalance)})`;
         advanceValidation.classList.add('validation-error');
         isValid = false;
     }
     
     const advanceIncrease = advance - oldAdvanceUsed;
     if (advanceIncrease > 0 && advanceIncrease > customerAdvanceBalance) {
-        advanceValidation.innerHTML = `<i class="bi bi-x-circle"></i> Cannot use ${formatCurrency(advanceIncrease)} advance. Customer only has ${formatCurrency(customerAdvanceBalance)} available!`;
+        advanceValidation.innerHTML = `Cannot use ${formatCurrency(advanceIncrease)} advance. Available: ${formatCurrency(customerAdvanceBalance)}`;
         advanceValidation.classList.add('validation-error');
         isValid = false;
     }
     
     if (advanceIncrease > 0 && isValid && newBalance >= 0 && advanceIncrease <= customerAdvanceBalance) {
-        advanceValidation.innerHTML = `<i class="bi bi-check-circle"></i> Will deduct ${formatCurrency(advanceIncrease)} from advance balance`;
+        advanceValidation.innerHTML = `Will deduct ${formatCurrency(advanceIncrease)} from advance balance`;
         advanceValidation.classList.add('validation-success');
     } else if (advanceIncrease < 0 && isValid) {
-        advanceValidation.innerHTML = `<i class="bi bi-check-circle"></i> Will refund ${formatCurrency(Math.abs(advanceIncrease))} to advance balance`;
+        advanceValidation.innerHTML = `Will refund ${formatCurrency(Math.abs(advanceIncrease))} to advance balance`;
         advanceValidation.classList.add('validation-success');
     }
     
     if (cash > totalAmount && isValid) {
-        cashValidation.innerHTML = `<i class="bi bi-info-circle"></i> Overpayment of ${formatCurrency(cash - totalAmount)} becomes advance credit`;
+        cashValidation.innerHTML = `Overpayment of ${formatCurrency(cash - totalAmount)} becomes advance credit`;
         cashValidation.classList.add('validation-success');
     }
     
@@ -1269,55 +1148,12 @@ function updateCalculationAndValidation() {
     updateExchangeVisibility();
 }
 
-// ============================================
-// EVENT LISTENERS
-// ============================================
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize existing rows with product defaults and autocomplete
     document.querySelectorAll('.sale-item-row').forEach(row => {
-        const productInput = row.querySelector('.product-autocomplete');
         const productName = row.dataset.product || '';
+        if (productName) setEditProductDefaults(productName, row);
+        setupAutocomplete(row);
         
-        // Set default rate and unit
-        if (productName) {
-            setEditProductDefaults(productName, row);
-        }
-        
-        // Setup autocomplete for existing row
-        if (productInput) {
-            const suggestionsBox = row.querySelector('.suggestions-dropdown');
-            
-            productInput.addEventListener('input', function(e) {
-                const query = this.value.toLowerCase().trim();
-                if (!query) {
-                    suggestionsBox.style.display = 'none';
-                    return;
-                }
-                const matches = PRODUCTS.filter(p => p.toLowerCase().includes(query));
-                suggestionsBox.innerHTML = '';
-                if (matches.length > 0) {
-                    suggestionsBox.style.display = 'block';
-                    matches.forEach(p => {
-                        const div = document.createElement('div');
-                        div.className = 'suggestion-item';
-                        div.innerText = p;
-                        div.onclick = () => {
-                            productInput.value = p;
-                            row.setAttribute('data-product', p);
-                            suggestionsBox.style.display = 'none';
-                            setEditProductDefaults(p, row);
-                            updateCalculationAndValidation();
-                        };
-                        suggestionsBox.appendChild(div);
-                    });
-                } else {
-                    suggestionsBox.style.display = 'none';
-                }
-            });
-        }
-        
-        // Add event listeners to existing inputs
         const rateInput = row.querySelector('.item-rate-input');
         const qtyInput = row.querySelector('.item-qty');
         const unitSelect = row.querySelector('.item-unit-select');
@@ -1327,70 +1163,38 @@ document.addEventListener('DOMContentLoaded', function() {
         if (unitSelect) unitSelect.addEventListener('change', updateCalculationAndValidation);
     });
     
-    // Exchange checkboxes
     document.getElementById('exchangeMustardCake')?.addEventListener('change', updateCalculationAndValidation);
     document.getElementById('exchangeRiceBran')?.addEventListener('change', updateCalculationAndValidation);
-    
-    // Payment inputs
     document.getElementById('cashPaid').addEventListener('input', updateCalculationAndValidation);
     document.getElementById('advanceUsed').addEventListener('input', updateCalculationAndValidation);
-    
-    // Delete button
     document.getElementById('deleteBtn').addEventListener('click', function(e) {
         e.preventDefault();
         showDeleteConfirmation();
     });
     
-    // Initialize
     updateExchangeVisibility();
     updateCalculationAndValidation();
 });
 
-// ============================================
-// FORM SUBMISSION
-// ============================================
-
 document.getElementById('editForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
     if (isSubmitting) return false;
     
     totalAmount = getCurrentTotalAmount();
     let cash = parseFloat(document.getElementById('cashPaid').value) || 0;
     let advance = parseFloat(document.getElementById('advanceUsed').value) || 0;
-    let totalPaid = cash + advance;
-    let newAdvanceAmount = totalPaid > totalAmount ? totalPaid - totalAmount : 0;
     
-    const oldNetEffect = oldAdvanceAmount - oldAdvanceUsed;
-    const newNetEffect = newAdvanceAmount - advance;
-    const balanceChange = newNetEffect - oldNetEffect;
-    const newBalance = customerAdvanceBalance + balanceChange;
-    const advanceIncrease = advance - oldAdvanceUsed;
-    
-    // Validation
     if (cash < 0 || advance < 0) {
         showModal('Validation Error', 'Amounts cannot be negative.', 'error');
         return false;
     }
     
-    if (newBalance < 0) {
-        showModal('Validation Error', `Cannot update: Would make advance balance negative (${formatCurrency(newBalance)})`, 'error');
-        return false;
-    }
-    
-    if (advanceIncrease > 0 && advanceIncrease > customerAdvanceBalance) {
-        showModal('Validation Error', `Cannot use ${formatCurrency(advanceIncrease)} advance. Customer only has ${formatCurrency(customerAdvanceBalance)} available!`, 'error');
-        return false;
-    }
-    
-    // Collect form data
     const formData = new FormData();
     formData.append('paid_amount', cash);
     formData.append('advance_used', advance);
     formData.append('exchange_mustard_cake', document.getElementById('exchangeMustardCake')?.checked ? 'on' : 'off');
     formData.append('exchange_rice_bran', document.getElementById('exchangeRiceBran')?.checked ? 'on' : 'off');
     
-    // Collect item data
     document.querySelectorAll('.sale-item-row').forEach(row => {
         const itemId = row.dataset.itemId;
         const rateInput = row.querySelector('.item-rate-input');
@@ -1401,32 +1205,24 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
         if (rateInput && !isNaN(parseFloat(rateInput.value))) {
             formData.append(`item_rate_${itemId}`, rateInput.value);
         }
-        if (unitSelect) {
-            formData.append(`item_unit_${itemId}`, unitSelect.value);
-        }
-        if (qtyInput) {
-            formData.append(`item_qty_${itemId}`, qtyInput.value);
-        }
+        if (unitSelect) formData.append(`item_unit_${itemId}`, unitSelect.value);
+        if (qtyInput) formData.append(`item_qty_${itemId}`, qtyInput.value);
         if (productInput && productInput.value) {
             formData.append(`product_name_${itemId}`, productInput.value);
         }
     });
     
-    // Mark as submitting
     isSubmitting = true;
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="loading-spinner"></span> Updating Sale...';
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Updating...';
     
     try {
         const response = await fetch('{{ url_for("admin.edit_sale", sale_id=sale.id) }}', {
             method: 'POST',
             body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
-        
         const data = await response.json();
         
         if (data.success) {
@@ -1435,14 +1231,13 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
             showModal('Error', data.error || 'Failed to update sale', 'error');
             isSubmitting = false;
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Update Sale';
+            submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Sale';
         }
     } catch (error) {
-        console.error('Error:', error);
         showModal('Error', 'Network error. Please try again.', 'error');
         isSubmitting = false;
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Update Sale';
+        submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Sale';
     }
 });
 </script>

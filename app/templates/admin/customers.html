@@ -363,6 +363,34 @@ body {
     color: white;
 }
 
+.btn-success-ui {
+    background: #16a34a;
+    color: white;
+}
+
+.btn-success-ui:hover {
+    background: #15803d;
+    transform: translateY(-1px);
+}
+
+/* Per Page Dropdown */
+.per-page-select {
+    padding: 0.6rem 0.875rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-family: inherit;
+    background-color: white;
+    cursor: pointer;
+    min-width: 140px;
+}
+
+.per-page-select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
 /* Search */
 .search-wrapper {
     display: flex;
@@ -385,7 +413,7 @@ body {
     box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
-/* Customers Table - Matching sales table exactly */
+/* Customers Table */
 .customers-table {
     width: 100%;
     border-collapse: collapse;
@@ -468,7 +496,7 @@ body {
     font-weight: 600;
 }
 
-/* Status Badges - Matching sales page exactly */
+/* Status Badges */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -490,22 +518,23 @@ body {
     color: var(--gray-600);
 }
 
-/* Action Buttons Group - Matching sales page exactly */
+/* Action Buttons Group */
 .action-group {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-/* Pagination - Matching sales page exactly */
+/* Pagination - SMART PAGINATION */
 .pagination {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 0.375rem;
     margin-top: 1.25rem;
     padding: 1rem;
     border-top: 1px solid var(--gray-200);
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .page-link {
@@ -525,7 +554,28 @@ body {
     color: white;
 }
 
-/* Empty State - Matching sales page exactly */
+.page-link.disabled {
+    color: var(--gray-400);
+    cursor: default;
+    background: transparent;
+}
+
+.page-link.disabled:hover {
+    background: transparent;
+    border-color: var(--gray-200);
+    color: var(--gray-400);
+}
+
+.page-info {
+    padding: 0.375rem 0.75rem;
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+}
+
+/* Empty State */
 .empty-state {
     text-align: center;
     padding: 3rem 1.5rem;
@@ -608,8 +658,45 @@ body {
     animation: spin 0.6s linear infinite;
 }
 
+/* Toast Notification for better error handling */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    max-width: 400px;
+}
+
+.toast-message {
+    padding: 16px 20px;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 10px;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-success {
+    background: #16a34a;
+}
+
+.toast-error {
+    background: #dc2626;
+}
+
+.toast-warning {
+    background: #f59e0b;
+}
+
+.toast-info {
+    background: #3b82f6;
+}
+
 /* ============================================
-   MOBILE RESPONSIVE (FULLY OPTIMIZED - MATCHES SALES PAGE)
+   MOBILE RESPONSIVE
    ============================================ */
 
 /* Tablet */
@@ -640,12 +727,10 @@ body {
         font-size: 1.25rem;
     }
     
-    /* Stack stats on mobile */
     .row.g-3 {
         --bs-gutter-y: 0.75rem;
     }
     
-    /* Make table card-like on mobile - matching sales page */
     .customers-table thead {
         display: none;
     }
@@ -689,14 +774,18 @@ body {
         padding: 0.4rem 0.75rem;
         font-size: 0.75rem;
     }
-}
-
-/* Small mobile */
-@media (max-width: 480px) {
+    
     .search-wrapper {
         flex-direction: column;
     }
     
+    .per-page-select {
+        width: 100%;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
     .action-group {
         flex-direction: column;
         width: 100%;
@@ -738,18 +827,23 @@ body {
 </style>
 
 <div class="container-fluid">
-    <!-- Header - Exactly matching sales page -->
+    <!-- Header -->
     <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h1><i class="bi bi-people"></i> Customers</h1>
             <p>Manage customer accounts and advance balances</p>
         </div>
-        <a href="{{ url_for('admin.add_customer') }}" class="btn-ui btn-primary-ui">
-            <i class="bi bi-plus-lg"></i> Add Customer
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.export_customers_excel') }}" class="btn-ui btn-success-ui">
+                <i class="bi bi-file-excel"></i> Export Customers Data
+            </a>
+            <a href="{{ url_for('admin.add_customer') }}" class="btn-ui btn-primary-ui">
+                <i class="bi bi-plus-lg"></i> Add Customer
+            </a>
+        </div>
     </div>
 
-    <!-- Stats Row - Matching sales page structure -->
+    <!-- Stats Row -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="stat-card">
@@ -809,21 +903,40 @@ body {
         </div>
     </div>
 
-    <!-- Search - Matching sales page exactly -->
+    <!-- Search and Per Page Controls -->
     <div class="card-ui mb-4">
         <div style="padding: 1rem;">
             <form method="GET" action="{{ url_for('admin.customers_list') }}" id="searchForm">
-                <div class="search-wrapper">
-                    <input type="text" class="search-input" name="search" placeholder="Search by name, phone, or email..." value="{{ search }}">
-                    <button type="submit" class="btn-ui btn-primary-ui">
-                        <i class="bi bi-search"></i> Search
-                    </button>
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="search-wrapper">
+                            <input type="text" class="search-input" name="search" 
+                                   placeholder="Search by name, phone, or email..." 
+                                   value="{{ search }}">
+                            <button type="submit" class="btn-ui btn-primary-ui">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="per_page" class="per-page-select" onchange="this.form.submit()">
+                            <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
+                            <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                            <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
+                            <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <span class="text-muted" style="font-size: 0.85rem;">
+                            Showing {{ customers.items|length }} of {{ customers.total }} customers
+                        </span>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Customers Table - Matching sales table structure exactly -->
+    <!-- Customers Table -->
     <div class="card-ui">
         <div style="overflow-x: auto;">
             <table class="customers-table">
@@ -924,20 +1037,94 @@ body {
              </table>
         </div>
         
-        <!-- Pagination - Matching sales page exactly -->
+        <!-- SMART PAGINATION -->
         {% if customers.pages > 1 %}
         <div class="pagination">
+            <!-- First Page -->
+            {% if customers.page > 1 %}
+                <a class="page-link" href="{{ url_for('admin.customers_list', page=1, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            {% endif %}
+            
+            <!-- Previous -->
             {% if customers.has_prev %}
-                <a class="page-link" href="{{ url_for('admin.customers_list', page=customers.prev_num, search=search) }}">←</a>
+                <a class="page-link" href="{{ url_for('admin.customers_list', page=customers.prev_num, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
             {% endif %}
-            {% for page_num in customers.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
-                {% if page_num %}
-                    <a class="page-link {% if page_num == customers.page %}active{% endif %}" href="{{ url_for('admin.customers_list', page=page_num, search=search) }}">{{ page_num }}</a>
+            
+            <!-- Smart Pagination Logic -->
+            {% set total_pages = customers.pages %}
+            {% set current_page = customers.page %}
+            
+            {% if total_pages <= 7 %}
+                {# Show all pages if total is small #}
+                {% for page_num in range(1, total_pages + 1) %}
+                    <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                       href="{{ url_for('admin.customers_list', page=page_num, per_page=per_page, search=search) }}">
+                        {{ page_num }}
+                    </a>
+                {% endfor %}
+            {% else %}
+                {# First 3 pages #}
+                {% for page_num in range(1, 4) %}
+                    <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                       href="{{ url_for('admin.customers_list', page=page_num, per_page=per_page, search=search) }}">
+                        {{ page_num }}
+                    </a>
+                {% endfor %}
+                
+                {# Ellipsis if current page is far from start #}
+                {% if current_page > 5 %}
+                    <span class="page-link disabled">…</span>
                 {% endif %}
-            {% endfor %}
-            {% if customers.has_next %}
-                <a class="page-link" href="{{ url_for('admin.customers_list', page=customers.next_num, search=search) }}">→</a>
+                
+                {# Pages around current page #}
+                {% set start = [current_page - 1, 4]|max %}
+                {% set end = [current_page + 1, total_pages - 3]|min %}
+                
+                {% for page_num in range(start, end + 1) %}
+                    {% if page_num > 3 and page_num < total_pages - 2 %}
+                        <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                           href="{{ url_for('admin.customers_list', page=page_num, per_page=per_page, search=search) }}">
+                            {{ page_num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                
+                {# Ellipsis if current page is far from end #}
+                {% if current_page < total_pages - 4 %}
+                    <span class="page-link disabled">…</span>
+                {% endif %}
+                
+                {# Last 3 pages #}
+                {% for page_num in range(total_pages - 2, total_pages + 1) %}
+                    <a class="page-link {% if page_num == current_page %}active{% endif %}" 
+                       href="{{ url_for('admin.customers_list', page=page_num, per_page=per_page, search=search) }}">
+                        {{ page_num }}
+                    </a>
+                {% endfor %}
             {% endif %}
+            
+            <!-- Next -->
+            {% if customers.has_next %}
+                <a class="page-link" href="{{ url_for('admin.customers_list', page=customers.next_num, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            {% endif %}
+            
+            <!-- Last Page -->
+            {% if customers.page < customers.pages %}
+                <a class="page-link" href="{{ url_for('admin.customers_list', page=customers.pages, per_page=per_page, search=search) }}">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            {% endif %}
+            
+            <!-- Page Info -->
+            <span class="page-info">
+                Page {{ customers.page }} of {{ customers.pages }}
+            </span>
         </div>
         {% endif %}
     </div>
@@ -1001,7 +1188,50 @@ body {
 </div>
 
 <script>
-// Close modal function
+// ============================================
+// TOAST NOTIFICATION SYSTEM (Better Error Handling)
+// ============================================
+function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+    
+    const icons = {
+        success: 'check-circle',
+        error: 'x-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-message toast-${type}`;
+    toast.innerHTML = `
+        <i class="bi bi-${icons[type] || 'info-circle'}" style="font-size: 24px;"></i>
+        <span style="flex: 1;">${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, 5000);
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+    return container;
+}
+
+// ============================================
+// MODAL FUNCTIONS
+// ============================================
 function closeModal(modalId = null) {
     if (modalId) {
         const modal = document.getElementById(modalId);
@@ -1012,7 +1242,6 @@ function closeModal(modalId = null) {
     }
 }
 
-// Show success/error modal
 function showModal(title, message, type = 'success', redirectUrl = null) {
     closeModal();
     const modalHtml = `
@@ -1021,8 +1250,8 @@ function showModal(title, message, type = 'success', redirectUrl = null) {
                 <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
                     <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
                 </div>
-                <div class="modal-title">${title}</div>
-                <div class="modal-message">${message}</div>
+                <div class="modal-title">${escapeHtml(title)}</div>
+                <div class="modal-message">${escapeHtml(message)}</div>
                 <div class="modal-buttons">
                     <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
                 </div>
@@ -1041,7 +1270,9 @@ function showModal(title, message, type = 'success', redirectUrl = null) {
     };
 }
 
-// Show delete confirmation modal
+// ============================================
+// DELETE CUSTOMER
+// ============================================
 function showDeleteConfirmation(customerId, customerName) {
     closeModal();
     const modalHtml = `
@@ -1053,7 +1284,7 @@ function showDeleteConfirmation(customerId, customerName) {
                 <div class="modal-title">Delete Customer?</div>
                 <div class="modal-message">
                     Are you sure you want to delete <strong>${escapeHtml(customerName)}</strong>?<br><br>
-                    <span style="color: #ef4444;">⚠️ This will also delete all associated sales and advance transactions!</span><br>
+                    <span style="color: #ef4444;">⚠️ This will delete all associated sales and transactions!</span><br>
                     <strong>This action cannot be undone!</strong>
                 </div>
                 <div class="modal-buttons">
@@ -1075,7 +1306,6 @@ function showDeleteConfirmation(customerId, customerName) {
     };
 }
 
-// Perform delete via AJAX
 async function performDelete(customerId, customerName) {
     const loadingHtml = `
         <div class="modal-overlay" id="loadingModal">
@@ -1103,39 +1333,21 @@ async function performDelete(customerId, customerName) {
         closeModal('loadingModal');
         
         if (data.success) {
-            showModal('Deleted!', data.message || `Customer "${customerName}" deleted successfully!`, 'success', '/admin/customers');
+            showToast(data.message || `Customer "${customerName}" deleted successfully!`, 'success');
+            setTimeout(() => location.reload(), 1500);
         } else {
-            showModal('Error', data.error || 'Failed to delete customer', 'error');
+            showToast(data.error || 'Failed to delete customer', 'error');
         }
     } catch (error) {
         closeModal('loadingModal');
         console.error('Error:', error);
-        showModal('Error', 'Network error. Please try again.', 'error');
+        showToast('Network error. Please try again.', 'error');
     }
 }
 
-// Escape HTML to prevent XSS
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
-}
-
-// Attach delete handlers
-document.querySelectorAll('.delete-customer-btn').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const customerId = this.dataset.customerId;
-        const customerName = this.dataset.customerName;
-        showDeleteConfirmation(customerId, customerName);
-    });
-});
-
-// Advance Modal Logic
+// ============================================
+// ADVANCE MODAL
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
     const advanceModal = new bootstrap.Modal(document.getElementById('advanceModal'));
     const modalButtons = document.querySelectorAll('.open-advance-modal');
@@ -1197,12 +1409,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const paymentMode = paymentModeSelect.value;
         
         if (amount <= 0) {
-            showModal('Validation Error', 'Please enter a valid amount', 'error');
+            showToast('Please enter a valid amount', 'error');
             return;
         }
         
         if (operation === 'deduct' && amount > selectedCustomerBalance) {
-            showModal('Validation Error', `Cannot deduct more than available balance (Rs ${selectedCustomerBalance.toFixed(2)})`, 'error');
+            showToast(`Cannot deduct more than available balance (Rs ${selectedCustomerBalance.toFixed(2)})`, 'error');
             return;
         }
         
@@ -1232,19 +1444,50 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             if (data.success) {
                 advanceModal.hide();
-                showModal('Success!', data.message || 'Transaction completed successfully!', 'success', '/admin/customers');
+                showToast(data.message || 'Transaction completed successfully!', 'success');
+                setTimeout(() => location.reload(), 1500);
             } else {
-                showModal('Error', data.error || 'An error occurred', 'error');
+                showToast(data.error || 'An error occurred', 'error');
                 submitBtn.disabled = false;
                 updateModalUI();
             }
         }).catch(error => {
             console.error('Error:', error);
-            showModal('Error', 'Network error. Please try again.', 'error');
+            showToast('Network error. Please try again.', 'error');
             submitBtn.disabled = false;
             updateModalUI();
         });
     });
+});
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// ============================================
+// ATTACH EVENT LISTENERS
+// ============================================
+document.querySelectorAll('.delete-customer-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const customerId = this.dataset.customerId;
+        const customerName = this.dataset.customerName;
+        showDeleteConfirmation(customerId, customerName);
+    });
+});
+
+// Auto-submit form when per_page changes
+document.querySelector('.per-page-select')?.addEventListener('change', function() {
+    this.closest('form').submit();
 });
 </script>
 

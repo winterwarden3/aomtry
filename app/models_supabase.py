@@ -1054,7 +1054,7 @@ class Payment:
             print(f"Error deleting payment: {e}")
             return False
         
-        # app/models_supabase.py - Add this method
+
 
 @staticmethod
 def get_by_email(email):
@@ -1071,3 +1071,17 @@ def get_by_email(email):
     except Exception as e:
         print(f"Error getting user by email: {e}")
         return None
+
+
+    @staticmethod
+    def count_sales(customer_id):
+        """Count total sales for a customer - for delete validation"""
+        try:
+            response = supabase.table("sales")\
+                .select("id", count="exact")\
+                .eq("customer_id", customer_id)\
+                .execute()
+            return response.count or 0
+        except Exception as e:
+            print(f"Error counting sales for customer {customer_id}: {e}")
+            return 0

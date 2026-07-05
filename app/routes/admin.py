@@ -238,21 +238,27 @@ def dashboard():
 @admin_required
 def sales_list():
     page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)  # NEW
     search = request.args.get('search', '')
     
-    sales_data, total = Sale.get_all_with_items(page, 10, search)
+    # Validate per_page
+    if per_page not in [10, 25, 50, 100]:
+        per_page = 10
+    
+    sales_data, total = Sale.get_all_with_items(page, per_page, search)  # Updated
     
     status_counts = Sale.count_all_payment_statuses()
     paid_sales_count = status_counts['paid']
     pending_sales_count = status_counts['pending']
     advance_sales_count = status_counts['advance']
     
-    sales = Pagination(sales_data, page, 10, total)
+    sales = Pagination(sales_data, page, per_page, total)  # Updated
     
     return render_template(
         'admin/sales.html',
         sales=sales,
         search=search,
+        per_page=per_page,  # NEW
         paid_sales_count=paid_sales_count,
         pending_sales_count=pending_sales_count,
         advance_sales_count=advance_sales_count,
@@ -479,7 +485,68 @@ def add_sale():
 
 
 
-
+@bp.route('/export-customers-excel')
+@login_required
+@admin_required
+def export_customers_excel():
+    """Export all customers to Excel with their stats"""
+    import pandas as pd
+    import io
+    
+    # Get ALL customers (no pagination)
+    all_customers, total = User.get_customers_paginated(1, 99999, "")
+    
+    # Enrich with sales stats
+    User.enrich_customers_with_sales_stats(all_customers)
+    
+    export_data = []
+    for customer in all_customers:
+        export_data.append({
+            'Name': customer.get('name', ''),
+            'Username': customer.get('username', ''),
+            'Email': customer.get('email', ''),
+            'Phone': customer.get('phone', ''),
+            'Address': customer.get('address', ''),
+            'Status': 'Active' if customer.get('is_active') else 'Inactive',
+            'Total Spending': float(customer.get('total_spending', 0) or 0),
+            'Total Due': float(customer.get('total_due', 0) or 0),
+            'Advance Balance': float(customer.get('advance_balance', 0) or 0),
+            'Joined Date': customer.get('created_at', '')[:10] if customer.get('created_at') else ''
+        })
+    
+    if not export_data:
+        export_data = [{'Message': 'No customers found'}]
+    
+    df = pd.DataFrame(export_data)
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Customers', index=False)
+        
+        # Auto-adjust column widths
+        worksheet = writer.sheets['Customers']
+        for column in worksheet.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = min(max_length + 2, 50)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+    
+    output.seek(0)
+    
+    filename = f"customers_export_{get_nepal_time().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    
+    return send_file(
+        output,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        as_attachment=True,
+        download_name=filename
+    )
 
 
 
@@ -1000,9 +1067,14 @@ def invoice_view(sale_id):
 @admin_required
 def customers_list():
     page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)  # NEW
     search = request.args.get('search', '')
     
-    customers_data, total = User.get_customers_paginated(page, 10, search)
+    # Validate per_page (limit to reasonable values)
+    if per_page not in [10, 25, 50, 100]:
+        per_page = 10
+    
+    customers_data, total = User.get_customers_paginated(page, per_page, search)
     User.enrich_customers_with_sales_stats(customers_data)
 
     list_stats = User.get_customer_list_stats()
@@ -1011,17 +1083,18 @@ def customers_list():
     active_customers_count = list_stats['active_customers_count']
     inactive_customers_count = list_stats['inactive_customers_count']
     
-    customers = Pagination(customers_data, page, 10, total)
+    customers = Pagination(customers_data, page, per_page, total)  # Updated
     
     return render_template(
         'admin/customers.html',
         customers=customers,
         search=search,
+        per_page=per_page,  # NEW
         active_customers_count=active_customers_count,
         inactive_customers_count=inactive_customers_count,
         total_advance_balance=total_advance_balance,
         total_customers_with_advance=total_customers_with_advance
-    )   
+    )
 
 @bp.route('/customers/add', methods=['GET', 'POST'])
 @login_required
