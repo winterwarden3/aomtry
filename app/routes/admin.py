@@ -19,25 +19,34 @@ from werkzeug.security import generate_password_hash
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timedelta
+from functools import lru_cache
+import pytz
+import time
+import os
+from flask import render_template, jsonify
+from flask_login import login_required
+
 @bp.route('/dashboard')
 @login_required
 @admin_required
 def dashboard():
     
-    from datetime import datetime, timedelta
-    import calendar
-    import pytz
-    
+    # ============================================================
+    # TIME CONFIGURATION
+    # ============================================================
     nepal_tz = pytz.timezone('Asia/Kathmandu')
     now = datetime.now(nepal_tz)
     today = now.date()
     
-    # Get current month name and abbreviation
-    current_month_name = now.strftime('%B')      # "June"
-    current_month_abbr = now.strftime('%b').upper()  # "JUN"
+    current_month_name = now.strftime('%B')
+    current_month_abbr = now.strftime('%b').upper()
     current_year = now.year
     
-    # TODAY'S STATS (Fixed - using Nepal date directly)
+    # ============================================================
+    # DATE RANGES
+    # ============================================================
     today_str = today.strftime('%Y-%m-%d')
     tomorrow = today + timedelta(days=1)
     tomorrow_str = tomorrow.strftime('%Y-%m-%d')
@@ -45,66 +54,123 @@ def dashboard():
     today_start = f"{today_str}T00:00:00"
     today_end = f"{tomorrow_str}T00:00:00"
     
-    today_sales = Sale.get_total_by_date_range(today_start, today_end)
-    today_sales_count = Sale.get_count_by_date_range(today_start, today_end)
-    today_expenses = Expense.get_total_by_date_range(today_start, today_end)
-    today_expenses_count = Expense.get_count_by_date_range(today_start, today_end)
-    today_profit = today_sales - today_expenses
-    
-    # MONTHLY STATS (Fixed - using Nepal date directly)
     month_start_str = f"{today.year}-{today.month:02d}-01T00:00:00"
-    
-    # Get next month's first day
     if today.month == 12:
         next_month_start = f"{today.year + 1}-01-01T00:00:00"
     else:
         next_month_start = f"{today.year}-{today.month + 1:02d}-01T00:00:00"
     
-    monthly_sales = Sale.get_total_by_date_range(month_start_str, next_month_start)
-    monthly_expenses = Expense.get_total_by_date_range(month_start_str, next_month_start)
+    # ============================================================
+    # EXECUTE QUERIES IN PARALLEL (Vercel-optimized)
+    # ============================================================
+    # Reduce worker count for Vercel's serverless environment
+    max_workers = min(8, os.cpu_count() or 4)
+    
+    try:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all queries with error handling wrappers
+            def safe_query(func, *args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    print(f"Query error in {func.__name__}: {e}")
+                    return None
+            
+            futures = {
+                'today_sales': executor.submit(safe_query, Sale.get_total_by_date_range, today_start, today_end),
+                'today_sales_count': executor.submit(safe_query, Sale.get_count_by_date_range, today_start, today_end),
+                'today_expenses': executor.submit(safe_query, Expense.get_total_by_date_range, today_start, today_end),
+                'today_expenses_count': executor.submit(safe_query, Expense.get_count_by_date_range, today_start, today_end),
+                'monthly_sales': executor.submit(safe_query, Sale.get_total_by_date_range, month_start_str, next_month_start),
+                'monthly_expenses': executor.submit(safe_query, Expense.get_total_by_date_range, month_start_str, next_month_start),
+                'pending_dues': executor.submit(safe_query, get_pending_dues),
+                'total_customers': executor.submit(safe_query, User.count_customers),
+                'new_customers': executor.submit(safe_query, User.count_new_customers_since, datetime(today.year, today.month, 1)),
+                'recent_sales': executor.submit(safe_query, Sale.get_recent, 5),
+                'recent_expenses': executor.submit(safe_query, Expense.get_recent, 5),
+                'all_customers': executor.submit(safe_query, User.get_all_customers)
+            }
+            
+            # Collect results with timeout (7 seconds to stay under Vercel's 10s limit)
+            results = {}
+            for key, future in futures.items():
+                try:
+                    result = future.result(timeout=7)
+                    results[key] = result if result is not None else (0 if 'total' in key or 'amount' in key or 'dues' in key else [])
+                except Exception as e:
+                    print(f"Timeout or error fetching {key}: {e}")
+                    results[key] = 0 if 'total' in key or 'amount' in key or 'dues' in key else []
+                    
+    except Exception as e:
+        print(f"Dashboard thread pool error: {e}")
+        # Return fallback
+        return render_template(
+            'admin/dashboard.html',
+            today_sales=0,
+            today_sales_count=0,
+            today_expenses=0,
+            today_expenses_count=0,
+            today_profit=0,
+            monthly_sales=0,
+            monthly_expenses=0,
+            monthly_profit=0,
+            pending_dues=0,
+            total_customers=0,
+            new_customers_this_month=0,
+            recent_activities=[],
+            business_name=Config.BUSINESS_NAME,
+            current_month_name=current_month_name,
+            current_month_abbr=current_month_abbr,
+            current_year=current_year,
+            error="Data temporarily unavailable"
+        )
+    
+    # ============================================================
+    # UNPACK RESULTS WITH SAFE DEFAULTS
+    # ============================================================
+    today_sales = results.get('today_sales', 0) or 0
+    today_sales_count = results.get('today_sales_count', 0) or 0
+    today_expenses = results.get('today_expenses', 0) or 0
+    today_expenses_count = results.get('today_expenses_count', 0) or 0
+    monthly_sales = results.get('monthly_sales', 0) or 0
+    monthly_expenses = results.get('monthly_expenses', 0) or 0
+    pending_dues = results.get('pending_dues', 0) or 0
+    total_customers = results.get('total_customers', 0) or 0
+    new_customers_this_month = results.get('new_customers', 0) or 0
+    recent_sales = results.get('recent_sales', []) or []
+    recent_expenses = results.get('recent_expenses', []) or []
+    all_customers = results.get('all_customers', []) or []
+    
+    # Calculate profits
+    today_profit = today_sales - today_expenses
     monthly_profit = monthly_sales - monthly_expenses
     
-    # OTHER STATS
-    pending_dues = get_pending_dues()
-    total_customers = User.count_customers()
-    new_customers_this_month = User.count_new_customers_since(datetime(today.year, today.month, 1))
-    
-    # RECENT ACTIVITIES
-    recent_activities = []
-    
     # ============================================================
-    # FIXED: format_time_ago with source parameter
+    # TIME FORMATTER WITH CACHE
     # ============================================================
-    def format_time_ago(date_val, source='auto'):
-        """Format time ago with support for both UTC and Nepal time dates"""
-        if not date_val:
+    @lru_cache(maxsize=256)
+    def format_time_ago_cached(date_str, source='auto'):
+        """Cached time formatter for better performance"""
+        if not date_str:
             return "Unknown"
         try:
-            import pytz
-            from datetime import datetime
-            
             nepal_tz = pytz.timezone('Asia/Kathmandu')
             now_nepal = datetime.now(nepal_tz)
             
-            # Parse the date value
-            if isinstance(date_val, str):
-                # Handle different date formats
-                if 'T' in date_val:
-                    date_val = date_val.replace('T', ' ').replace('Z', '').split('.')[0]
-                naive_date = datetime.strptime(date_val[:19], '%Y-%m-%d %H:%M:%S')
+            if isinstance(date_str, str):
+                if 'T' in date_str:
+                    date_str = date_str.replace('T', ' ').replace('Z', '').split('.')[0]
+                naive_date = datetime.strptime(date_str[:19], '%Y-%m-%d %H:%M:%S')
             else:
-                # If it's already a datetime object
-                naive_date = date_val
+                naive_date = date_str
             
-            # Determine timezone based on source
+            # Timezone handling
             if source == 'sale':
-                # Sale dates are already in Nepal time
                 if naive_date.tzinfo is None:
                     date_nepal = nepal_tz.localize(naive_date)
                 else:
                     date_nepal = naive_date.astimezone(nepal_tz)
             elif source == 'expense':
-                # Expense dates from Supabase are in UTC
                 if naive_date.tzinfo is None:
                     utc_tz = pytz.timezone('UTC')
                     date_utc = utc_tz.localize(naive_date)
@@ -112,7 +178,6 @@ def dashboard():
                 else:
                     date_nepal = naive_date.astimezone(nepal_tz)
             else:
-                # Default: treat as UTC (for customers and anything else from Supabase)
                 if naive_date.tzinfo is None:
                     utc_tz = pytz.timezone('UTC')
                     date_utc = utc_tz.localize(naive_date)
@@ -120,95 +185,90 @@ def dashboard():
                 else:
                     date_nepal = naive_date.astimezone(nepal_tz)
             
-            # Calculate difference
             diff = now_nepal - date_nepal
             seconds = diff.total_seconds()
             
-            # Format the output
             if seconds < 0:
                 return "Just now"
             elif seconds < 60:
                 return "Just now"
             elif seconds < 3600:
                 mins = int(seconds // 60)
-                return f"{mins} minute{'s' if mins > 1 else ''} ago"
+                return f"{mins}m ago"
             elif seconds < 86400:
                 hours = int(seconds // 3600)
-                return f"{hours} hour{'s' if hours > 1 else ''} ago"
-            elif seconds < 2592000:  # 30 days
+                return f"{hours}h ago"
+            elif seconds < 2592000:
                 days = int(seconds // 86400)
-                return f"{days} day{'s' if days > 1 else ''} ago"
+                return f"{days}d ago"
             else:
                 return date_nepal.strftime('%b %d, %Y')
                 
         except Exception as e:
-            print(f"Error formatting time: {e}")
-            return str(date_val)[:10] if date_val else "Unknown"
+            return str(date_str)[:10] if date_str else "Unknown"
     
     # ============================================================
-    # Recent Sales - PASS source='sale' because sale dates are in Nepal time
+    # PROCESS RECENT ACTIVITIES (Optimized)
     # ============================================================
-    recent_sales = Sale.get_recent(5)
-
-    # Batch fetch all customers at once
+    recent_activities = []
+    
+    # Batch fetch customer names - single query
     customer_ids = [sale.get('customer_id') for sale in recent_sales if sale.get('customer_id')]
     customers = {}
     if customer_ids:
-        # Fetch all customers in one query
-        response = supabase.table("users").select("id, name").in_("id", customer_ids).execute()
-        customers = {c['id']: c for c in response.data}
-
+        try:
+            # Use in_ filter for batch fetch
+            response = supabase.table("users").select("id, name").in_("id", customer_ids).execute()
+            customers = {c['id']: c for c in response.data}
+        except Exception as e:
+            print(f"Error fetching customers: {e}")
+    
+    # Process Recent Sales
     for sale in recent_sales:
         customer_id = sale.get('customer_id')
-        if customer_id and customer_id in customers:
-            customer_name = customers[customer_id].get('name')
-        else:
-            customer_name = "Walk-in Customer"
+        customer_name = customers.get(customer_id, {}).get('name', 'Walk-in Customer')
         
         recent_activities.append({
             'icon': 'bi bi-cart-check',
             'icon_bg': 'rgba(34,197,94,0.1)',
             'icon_color': '#16a34a',
             'title': 'New Sale',
-            'description': f"Invoice #{sale.get('invoice_number')} - Rs.{sale.get('total_amount', 0):,.2f} from {customer_name}",
-            'time_ago': format_time_ago(sale.get('date'), source='sale'),  # ← FIXED: pass source='sale'
-            'timestamp': sale.get('date')
+            'description': f"Invoice #{sale.get('invoice_number', 'N/A')} - Rs.{sale.get('total_amount', 0):,.2f} from {customer_name}",
+            'time_ago': format_time_ago_cached(sale.get('date'), 'sale'),
+            'timestamp': sale.get('date', '')
         })
     
-    # ============================================================
-    # Recent Expenses - PASS source='expense' (UTC from Supabase)
-    # ============================================================
-    recent_expenses = Expense.get_recent(5)
+    # Process Recent Expenses
     for expense in recent_expenses:
         recent_activities.append({
             'icon': 'bi bi-receipt',
             'icon_bg': 'rgba(220,38,38,0.1)',
             'icon_color': '#dc2626',
             'title': 'New Expense',
-            'description': f"{expense.get('category')} - Rs.{expense.get('amount', 0):,.2f}",
-            'time_ago': format_time_ago(expense.get('date'), source='sale'), 
-            'timestamp': expense.get('date')
+            'description': f"{expense.get('category', 'Other')} - Rs.{expense.get('amount', 0):,.2f}",
+            'time_ago': format_time_ago_cached(expense.get('date'), 'expense'),
+            'timestamp': expense.get('date', '')
         })
     
-    # ============================================================
-    # Recent Customers - NO source needed (defaults to UTC)
-    # ============================================================
-    recent_customers = User.get_all_customers()[:5]
-    for customer in recent_customers:
+    # Process Recent Customers
+    for customer in all_customers[:5]:
         recent_activities.append({
             'icon': 'bi bi-person-plus',
             'icon_bg': 'rgba(59,130,246,0.1)',
             'icon_color': '#3b82f6',
             'title': 'New Customer',
-            'description': f"{customer.get('name')} added to system",
-            'time_ago': format_time_ago(customer.get('created_at')),  # ← Works correctly (UTC)
-            'timestamp': customer.get('created_at')
+            'description': f"{customer.get('name', 'Unknown')} added to system",
+            'time_ago': format_time_ago_cached(customer.get('created_at'), 'auto'),
+            'timestamp': customer.get('created_at', '')
         })
     
-    # Sort activities by timestamp (newest first)
+    # Sort and limit activities
     recent_activities.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
     recent_activities = recent_activities[:10]
     
+    # ============================================================
+    # RENDER TEMPLATE
+    # ============================================================
     return render_template(
         'admin/dashboard.html',
         today_sales=today_sales,
