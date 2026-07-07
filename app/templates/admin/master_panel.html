@@ -677,7 +677,10 @@
                 <small><i class="bi bi-calculator"></i> Total Sales</small>
                 <strong id="totalSalesAmount">Rs 0</strong>
             </div>
-
+            <div class="summary-card">
+                <small><i class="bi bi-arrow-up-right-circle"></i> Total Advance Used</small>
+                <strong id="totalAdvanceUsed">Rs 0</strong>
+            </div>
             <div class="summary-card">
                 <small><i class="bi bi-cash-stack"></i> Total Cash</small>
                 <strong id="totalCashCollected">Rs 0</strong>
@@ -972,11 +975,12 @@ function updateBatchSummary() {
     const totalCash = customers.reduce((sum, c) => sum + (c.cashPaid || 0), 0);
     const totalEmails = customers.filter(c => c.sendEmail && c.email).length;
     
+    const el = document.getElementById('totalAdvanceUsed');
+    if (el) el.innerHTML = `Rs ${totalAdvance.toFixed(2)}`;
     document.getElementById('totalCustomers').textContent = totalCustomers;
     document.getElementById('newCustomers').textContent = newCustomers;
     document.getElementById('existingCustomers').textContent = existingCustomers;
     document.getElementById('totalSalesAmount').innerHTML = `Rs ${totalSales.toFixed(2)}`;
-    document.getElementById('totalAdvanceUsed').innerHTML = `Rs ${totalAdvance.toFixed(2)}`;
     document.getElementById('totalCashCollected').innerHTML = `Rs ${totalCash.toFixed(2)}`;
     document.getElementById('totalEmailsToSend').textContent = totalEmails;
 }
@@ -1820,9 +1824,9 @@ function downloadTemplate() {
 }
 
 // ============================================
-// IMPORT SALES WITH PROGRESS
+// IMPORT SALES WITH PROGRESS (FIXED WITH REAL PROGRESS)
 // ============================================
-async function importSales(fileInput, previewOnly) {
+function importSales(fileInput, previewOnly) {
     if (!fileInput.files || !fileInput.files[0]) return;
     
     const file = fileInput.files[0];
@@ -1830,52 +1834,81 @@ async function importSales(fileInput, previewOnly) {
     formData.append('file', file);
     if (previewOnly) formData.append('preview', 'true');
     
-    // Show progress
-    showProgressModal(100, 0, 'Uploading Excel file...');
+    // Show progress modal
+    showProgressModal(100, 0, 'Preparing upload...');
     
-    try {
-        const response = await fetch('/admin/import-sales-excel', { 
-            method: 'POST', 
-            body: formData 
-        });
-        
-        // Update progress
-        const modal = document.getElementById('progressModal');
-        if (modal) {
-            modal.querySelector('.progress-bar-fill').style.width = '70%';
-            modal.querySelector('#progressStats').textContent = '70%';
-            modal.querySelector('#progressMessage').textContent = 'Processing data from Excel...';
-        }
-        
-        const result = await response.json();
-        
-        if (modal) {
-            modal.querySelector('.progress-bar-fill').style.width = '90%';
-            modal.querySelector('#progressStats').textContent = '90%';
-            modal.querySelector('#progressMessage').textContent = 'Loading into form...';
-        }
-        
-        if (result.success) {
-            if (result.preview && result.customers) {
-                loadCustomersFromImport(result.customers);
-                showToast(result.message, 'success');
-                markUnsavedChanges();
-            } else {
-                showToast(result.message, 'success');
-                customers = [];
-                addCustomer();
-                localStorage.removeItem('batch_sales_draft');
-                hasUnsavedChanges = false;
+    // Create XHR request for real progress tracking
+    const xhr = new XMLHttpRequest();
+    
+    // Track upload progress
+    xhr.upload.addEventListener('progress', function(e) {
+        if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            const modal = document.getElementById('progressModal');
+            if (modal) {
+                const fill = modal.querySelector('.progress-bar-fill');
+                const stats = modal.querySelector('#progressStats');
+                const message = modal.querySelector('#progressMessage');
+                if (fill) fill.style.width = percent + '%';
+                if (stats) stats.textContent = percent + '%';
+                if (message) message.textContent = `Uploading... ${percent}%`;
             }
-        } else {
-            showToast(result.error || 'Import failed', 'error');
         }
-    } catch (error) {
-        showToast('Error importing file: ' + error.message, 'error');
-    } finally {
+    });
+    
+    // Handle response
+    xhr.onload = function() {
+        try {
+            const result = JSON.parse(xhr.responseText);
+            
+            // Show processing state
+            const modal = document.getElementById('progressModal');
+            if (modal) {
+                const fill = modal.querySelector('.progress-bar-fill');
+                const stats = modal.querySelector('#progressStats');
+                const message = modal.querySelector('#progressMessage');
+                if (fill) fill.style.width = '100%';
+                if (stats) stats.textContent = '100%';
+                if (message) message.textContent = 'Processing data...';
+            }
+            
+            if (result.success) {
+                if (result.preview && result.customers) {
+                    loadCustomersFromImport(result.customers);
+                    showToast(result.message, 'success');
+                    markUnsavedChanges();
+                } else {
+                    showToast(result.message, 'success');
+                    customers = [];
+                    addCustomer();
+                    localStorage.removeItem('batch_sales_draft');
+                    hasUnsavedChanges = false;
+                }
+            } else {
+                showToast(result.error || 'Import failed', 'error');
+            }
+        } catch (error) {
+            showToast('Error processing response: ' + error.message, 'error');
+        } finally {
+            hideProgressModal();
+            fileInput.value = '';
+        }
+    };
+    
+    xhr.onerror = function() {
+        showToast('Network error during upload', 'error');
         hideProgressModal();
         fileInput.value = '';
-    }
+    };
+    
+    xhr.onabort = function() {
+        hideProgressModal();
+        fileInput.value = '';
+    };
+    
+    // Send the request
+    xhr.open('POST', '/admin/import-sales-excel');
+    xhr.send(formData);
 }
 
 function loadCustomersFromImport(importedCustomers) {
@@ -1976,13 +2009,10 @@ async function rollbackBatch(batchId, reason) {
             }
             lastBatchId = null;
             
-            closeHistoryModal();
             
-            setTimeout(() => {
-                if (confirm('Rollback complete. Refresh page to see changes?')) {
-                    window.location.reload();
-                }
-            }, 1000);
+            
+            closeHistoryModal();
+            showToast('Rollback complete! Data has been reverted.', 'success');
         } else {
             showToast(result.error || 'Rollback failed', 'error');
         }
