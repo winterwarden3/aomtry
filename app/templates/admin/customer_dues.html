@@ -1131,9 +1131,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: formData
                 });
-                
+
+                // Check if response is a redirect
+                if (response.redirected) {
+                    paymentModal.hide();
+                    showModal('Success!', 'Payment recorded successfully! ✅', 'success');
+                    setTimeout(() => {
+                        window.location.href = response.url;
+                    }, 1500);
+                    return;
+                }
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     paymentModal.hide();
                     showModal('Success!', data.message || 'Payment recorded successfully!', 'success', '/admin/customer-dues');
