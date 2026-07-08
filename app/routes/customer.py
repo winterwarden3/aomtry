@@ -7,7 +7,9 @@ from app.config import Config
 import random
 from datetime import datetime, timedelta
 import re
+import json
 from app.brevo_service import send_reset_email, BREVO_API_KEY
+
 bp = Blueprint('customer', __name__, url_prefix='/customer')
 
 
@@ -183,6 +185,7 @@ def dashboard():
                          advance_balance=summary['advance_balance'],
                          total_pages=(total_count + per_page - 1) // per_page)
 
+
 @bp.route('/invoice/<sale_id>')
 @login_required
 def view_invoice(sale_id):
@@ -212,7 +215,6 @@ def view_invoice(sale_id):
             .eq("sale_id", sale_id)\
             .execute()
         
-        # ✅ Attach items to sale
         sale['items'] = items_response.data or []
         
     except Exception as e:
@@ -326,33 +328,30 @@ def profile():
 @bp.route('/profile/send-verification', methods=['POST'])
 @login_required
 def send_email_verification():
-    """Send verification OTP to new email before updating"""
+    """Send verification OTP for email change"""
     
-
+    if not request.is_json:
+        return jsonify({'success': False, 'error': 'Content-Type must be application/json'}), 415
     
     if current_user.role != 'customer':
-        print("❌ User is not customer")
         return jsonify({'success': False, 'error': 'Unauthorized'}), 403
     
     data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Invalid JSON data'}), 400
+    
     new_email = data.get('email', '').strip()
     
-    print(f"📧 Request received for email: {new_email}")
-    print(f"👤 Current user: {current_user.username} (ID: {current_user.id})")
-    
     if not new_email:
-        print("❌ No email provided")
         return jsonify({'success': False, 'error': 'Email is required'})
     
     # Validate email format
     email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_pattern, new_email):
-        print(f"❌ Invalid email format: {new_email}")
         return jsonify({'success': False, 'error': 'Invalid email format'})
     
     # Check if email already exists
     try:
-        print("🔍 Checking if email already exists...")
         existing_response = supabase.table("users")\
             .select("id")\
             .ilike("email", new_email)\
@@ -361,7 +360,6 @@ def send_email_verification():
         if existing_response.data:
             existing_user = existing_response.data[0]
             if existing_user['id'] != current_user.id:
-                print(f"❌ Email already registered to another user: {existing_user['id']}")
                 return jsonify({'success': False, 'error': 'Email already registered'})
     except Exception as e:
         print(f"❌ Error checking email: {e}")
@@ -369,19 +367,14 @@ def send_email_verification():
     
     # Check if email is same as current
     if new_email == current_user.email:
-        print(f"❌ Email is same as current: {new_email}")
         return jsonify({'success': False, 'error': 'This is already your current email'})
     
     # Generate OTP
     otp = str(random.randint(100000, 999999))
     expires_at = (datetime.now() + timedelta(minutes=5)).isoformat()
     
-    print(f"🔑 Generated OTP: {otp}")
-    print(f"⏰ Expires at: {expires_at}")
-    
-    # Store OTP
+    # Store OTP with metadata
     try:
-        print("💾 Storing OTP in database...")
         # Delete any existing OTPs for this purpose
         supabase.table("otp_requests")\
             .delete()\
@@ -389,13 +382,16 @@ def send_email_verification():
             .eq("purpose", "email_verification")\
             .execute()
         
+        # Store metadata as JSON string
+        metadata_json = json.dumps({"new_email": new_email})
+        
         insert_result = supabase.table("otp_requests").insert({
             "username": current_user.username,
             "otp": otp,
             "expires_at": expires_at,
             "attempts": 0,
             "purpose": "email_verification",
-            "metadata": {"new_email": new_email}
+            "metadata": metadata_json
         }).execute()
         
         print(f"✅ OTP stored: {insert_result.data}")
@@ -404,67 +400,116 @@ def send_email_verification():
         print(f"❌ Error storing OTP: {e}")
         return jsonify({'success': False, 'error': f'Failed to generate OTP: {str(e)}'}), 500
     
-    # Send OTP to new email
+    # ============================================
+    # DECIDE WHERE TO SEND THE OTP
+    # ============================================
+    # Check if user has an existing email
+    has_current_email = current_user.email and current_user.email.strip()
+    
+    # If user has current email, send OTP to current email (OLD email)
+    # If user has NO current email, send OTP to new email
+    target_email = current_user.email if has_current_email else new_email
+    
+    print(f"📧 Sending OTP to: {target_email} (Current email exists: {has_current_email})")
+    
+    # Send OTP email
     subject = "Email Verification OTP - Adarsh Oil Mill"
-    html_body = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Email Verification OTP</title>
-        <style>
-            body {{ font-family: Arial, sans-serif; }}
-            .container {{ max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px; }}
-            .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #0C5B3F; }}
-            .otp-box {{ background: #f0fdf4; padding: 25px; text-align: center; border-radius: 12px; margin: 25px 0; }}
-            .otp-code {{ font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #0C5B3F; }}
-            .expiry-note {{ color: #dc2626; font-size: 12px; margin-top: 10px; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h2 style="color: #0C5B3F;">Email Verification</h2>
-            </div>
-            <p>Hello <strong>{current_user.username}</strong>,</p>
-            <p>You requested to update your email address to:</p>
-            <p style="font-weight: 600; color: #0C5B3F;">{new_email}</p>
-            <div class="otp-box">
-                <div class="otp-code">{otp}</div>
-            </div>
-            <p>This OTP is valid for <strong>5 minutes</strong>.</p>
-            <p class="expiry-note">⚠️ Do not share this OTP with anyone.</p>
-            <p>If you didn't request this, please ignore this email.</p>
-            <hr>
-            <p style="font-size: 12px; color: #888;">Adarsh Oil Mill | Mainapokhar, Bardiya, Nepal</p>
-        </div>
-    </body>
-    </html>
-    """
     
-    print(f"📤 Attempting to send email to: {new_email}")
-    print(f"📝 Email subject: {subject}")
-    
-    # Import BREVO_API_KEY to check
-    from app.brevo_service import BREVO_API_KEY
-    print(f"🔑 BREVO_API_KEY is set: {bool(BREVO_API_KEY)}")
+    if has_current_email:
+        # Sending to old/current email
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Email Verification OTP</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; }}
+                .container {{ max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #0C5B3F; }}
+                .otp-box {{ background: #f0fdf4; padding: 25px; text-align: center; border-radius: 12px; margin: 25px 0; }}
+                .otp-code {{ font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #0C5B3F; }}
+                .expiry-note {{ color: #dc2626; font-size: 12px; margin-top: 10px; }}
+                .warning {{ background: #fef3c7; padding: 12px; border-radius: 8px; color: #92400e; margin: 15px 0; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h2 style="color: #0C5B3F;">Email Change Verification</h2>
+                </div>
+                <p>Hello <strong>{current_user.username}</strong>,</p>
+                <p>You requested to change your email address from:</p>
+                <p style="font-weight: 600; color: #0C5B3F;">{current_user.email}</p>
+                <p>To:</p>
+                <p style="font-weight: 600; color: #0C5B3F;">{new_email}</p>
+                <div class="warning">
+                    ⚠️ If you didn't request this, please ignore this email.
+                </div>
+                <div class="otp-box">
+                    <div class="otp-code">{otp}</div>
+                </div>
+                <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+                <p class="expiry-note">🔒 Do not share this OTP with anyone.</p>
+                <hr>
+                <p style="font-size: 12px; color: #888;">Adarsh Oil Mill | Mainapokhar, Bardiya, Nepal</p>
+            </div>
+        </body>
+        </html>
+        """
+    else:
+        # No current email - sending to new email
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Email Verification OTP</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; }}
+                .container {{ max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #0C5B3F; }}
+                .otp-box {{ background: #f0fdf4; padding: 25px; text-align: center; border-radius: 12px; margin: 25px 0; }}
+                .otp-code {{ font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #0C5B3F; }}
+                .expiry-note {{ color: #dc2626; font-size: 12px; margin-top: 10px; }}
+                .warning {{ background: #fef3c7; padding: 12px; border-radius: 8px; color: #92400e; margin: 15px 0; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h2 style="color: #0C5B3F;">Email Verification</h2>
+                </div>
+                <p>Hello <strong>{current_user.username}</strong>,</p>
+                <p>You are setting up your email address:</p>
+                <p style="font-weight: 600; color: #0C5B3F;">{new_email}</p>
+                <div class="warning">
+                    ⚠️ If you didn't request this, please ignore this email.
+                </div>
+                <div class="otp-box">
+                    <div class="otp-code">{otp}</div>
+                </div>
+                <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+                <p class="expiry-note">🔒 Do not share this OTP with anyone.</p>
+                <hr>
+                <p style="font-size: 12px; color: #888;">Adarsh Oil Mill | Mainapokhar, Bardiya, Nepal</p>
+            </div>
+        </body>
+        </html>
+        """
     
     try:
         from app.brevo_service import send_reset_email
         
-        email_sent = send_reset_email(new_email, subject, html_body, email_type='verification')
-        
-        print(f"📧 Email send result: {email_sent}")
+        email_sent = send_reset_email(target_email, subject, html_body, email_type='verification')
         
         if email_sent:
-            print(f"✅ Email sent successfully to {new_email}")
             return jsonify({
                 'success': True,
-                'message': f'Verification OTP sent to {new_email}'
+                'message': f'Verification OTP sent to {target_email}',
+                'sent_to': target_email
             })
         else:
-            print(f"❌ Email sending failed for {new_email}")
-            
             if not BREVO_API_KEY:
                 error_msg = "Email service not configured. Please contact support."
             else:
@@ -478,21 +523,28 @@ def send_email_verification():
         traceback.print_exc()
         return jsonify({'success': False, 'error': f'Email error: {str(e)}'}), 500
 
+
 @bp.route('/profile/verify-email', methods=['POST'])
 @login_required
 def verify_email_otp():
     """Verify OTP and update email"""
     
+    # Check if JSON request
+    if not request.is_json:
+        return jsonify({'success': False, 'error': 'Content-Type must be application/json'}), 415
+    
     if current_user.role != 'customer':
         return jsonify({'success': False, 'error': 'Unauthorized'}), 403
     
     data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Invalid JSON data'}), 400
+    
     otp = data.get('otp', '').strip()
     
     if not otp:
         return jsonify({'success': False, 'error': 'OTP is required'})
     
-    # ✅ FIRST: Get the OTP record and metadata BEFORE deleting
     new_email = None
     otp_record = None
     
@@ -507,16 +559,28 @@ def verify_email_otp():
             .limit(1)\
             .execute()
         
-        print(f"🔍 OTP record found: {response.data}")  # Debug
+        print(f"🔍 OTP record found: {response.data}")
         
         if not response.data:
             return jsonify({'success': False, 'error': 'OTP expired or not found. Please request a new OTP.'})
         
         otp_record = response.data[0]
         
-        # ✅ Get the new email from metadata BEFORE deleting
-        if otp_record.get('metadata'):
-            metadata = otp_record['metadata']
+        # Parse metadata - it's stored as JSON string
+        metadata = otp_record.get('metadata')
+        print(f"📦 Raw metadata: {metadata} (type: {type(metadata)})")
+        
+        if metadata:
+            # If metadata is a string, try to parse it as JSON
+            if isinstance(metadata, str):
+                try:
+                    metadata = json.loads(metadata)
+                    print(f"📦 Parsed metadata: {metadata}")
+                except json.JSONDecodeError:
+                    print(f"❌ Failed to parse metadata as JSON")
+                    return jsonify({'success': False, 'error': 'Invalid metadata format'})
+            
+            # Now metadata should be a dict
             if isinstance(metadata, dict):
                 new_email = metadata.get('new_email')
                 print(f"📧 Email from metadata: {new_email}")
@@ -524,11 +588,12 @@ def verify_email_otp():
         if not new_email:
             return jsonify({'success': False, 'error': 'No pending email change found. Please request a new OTP.'})
         
-        # ✅ Now check the OTP
+        # Check attempts
         if otp_record.get('attempts', 0) >= 5:
             supabase.table("otp_requests").delete().eq("id", otp_record['id']).execute()
             return jsonify({'success': False, 'error': 'Too many failed attempts. Please request a new OTP.'})
         
+        # Verify OTP
         if otp_record.get('otp') != otp:
             # Increment attempts
             supabase.table("otp_requests").update({
@@ -537,14 +602,16 @@ def verify_email_otp():
             remaining = 5 - (otp_record.get('attempts', 0) + 1)
             return jsonify({'success': False, 'error': f'Wrong OTP. {remaining} attempts remaining.'})
         
-        # ✅ OTP is correct! Delete it and update email
+        # OTP is correct! Delete it
         supabase.table("otp_requests").delete().eq("id", otp_record['id']).execute()
         
     except Exception as e:
         print(f"❌ Error in OTP verification: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': 'Error verifying OTP. Please try again.'})
     
-    # ✅ Now update the email
+    # Update the email
     try:
         response = supabase.table("users")\
             .update({"email": new_email})\
@@ -573,3 +640,183 @@ def verify_email_otp():
     except Exception as e:
         print(f"❌ Error updating email: {e}")
         return jsonify({'success': False, 'error': 'Database error. Please try again.'})
+
+
+
+@bp.route('/profile/send-password-otp', methods=['POST'])
+@login_required
+def send_password_otp():
+    """Send OTP for password change to user's email"""
+    
+    if current_user.role != 'customer':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    # Check if user has email
+    if not current_user.email or not current_user.email.strip():
+        return jsonify({'success': False, 'error': 'No email registered. OTP not required.'})
+    
+    # Generate OTP
+    otp = str(random.randint(100000, 999999))
+    expires_at = datetime.now() + timedelta(minutes=5)
+    
+    # Store OTP in session
+    session['password_change_otp'] = otp
+    session['password_change_otp_expiry'] = expires_at.isoformat()
+    session['password_otp_verified'] = False
+    
+    # Send OTP email
+    subject = "Password Change OTP - Adarsh Oil Mill"
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Password Change OTP</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px; }}
+            .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #0C5B3F; }}
+            .otp-box {{ background: #f0fdf4; padding: 25px; text-align: center; border-radius: 12px; margin: 25px 0; }}
+            .otp-code {{ font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #0C5B3F; }}
+            .expiry-note {{ color: #dc2626; font-size: 12px; margin-top: 10px; }}
+            .warning {{ background: #fef3c7; padding: 12px; border-radius: 8px; color: #92400e; margin: 15px 0; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2 style="color: #0C5B3F;">Password Change Request</h2>
+            </div>
+            <p>Hello <strong>{current_user.username}</strong>,</p>
+            <p>You requested to change your password.</p>
+            <div class="warning">
+                ⚠️ If you didn't request this, please ignore this email.
+            </div>
+            <div class="otp-box">
+                <div class="otp-code">{otp}</div>
+            </div>
+            <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+            <p class="expiry-note">🔒 Do not share this OTP with anyone.</p>
+            <hr>
+            <p style="font-size: 12px; color: #888;">Adarsh Oil Mill | Mainapokhar, Bardiya, Nepal</p>
+        </div>
+    </body>
+    </html>
+    """
+    
+    try:
+        from app.brevo_service import send_reset_email
+        email_sent = send_reset_email(current_user.email, subject, html_body, email_type='verification')
+        
+        if email_sent:
+            return jsonify({
+                'success': True,
+                'message': 'OTP sent to your registered email'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to send OTP email'}), 500
+            
+    except Exception as e:
+        print(f"❌ Error sending OTP: {e}")
+        return jsonify({'success': False, 'error': 'Error sending OTP'}), 500
+
+
+@bp.route('/profile/change-password', methods=['POST'])
+@login_required
+def change_password():
+    """Change password - OTP verified AND password changed in one step"""
+    
+    if current_user.role != 'customer':
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    # Get JSON data
+    if not request.is_json:
+        return jsonify({'success': False, 'error': 'Content-Type must be application/json'}), 415
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Invalid JSON data'}), 400
+    
+    old_password = data.get('old_password', '').strip()
+    new_password = data.get('new_password', '').strip()
+    otp = data.get('otp', '').strip()
+    
+    # Validate inputs
+    if not old_password or not new_password:
+        return jsonify({'success': False, 'error': 'All fields are required'})
+    
+    if len(new_password) < 6:
+        return jsonify({'success': False, 'error': 'Password must be at least 6 characters'})
+    
+    # Get user from database
+    try:
+        user_data = User.get_by_id(current_user.id)
+        
+        if not user_data:
+            return jsonify({'success': False, 'error': 'User not found'})
+        
+        # Verify old password
+        stored_password_hash = user_data.get('password_hash', '')
+        
+        if not stored_password_hash:
+            return jsonify({'success': False, 'error': 'No password set for this account'})
+        
+        from werkzeug.security import check_password_hash
+        if not check_password_hash(stored_password_hash, old_password):
+            return jsonify({'success': False, 'error': 'Current password is incorrect'})
+        
+        # Check if user has email registered
+        has_email = current_user.email and current_user.email.strip()
+        
+        # If email exists, verify OTP
+        if has_email:
+            # Get pending OTP from session
+            pending_otp = session.get('password_change_otp')
+            otp_expiry = session.get('password_change_otp_expiry')
+            
+            # Check if OTP was sent
+            if not pending_otp or not otp_expiry:
+                return jsonify({'success': False, 'error': 'Please request OTP verification first'})
+            
+            # Check if OTP expired
+            try:
+                expiry_time = datetime.fromisoformat(otp_expiry)
+                if datetime.now() > expiry_time:
+                    session.pop('password_change_otp', None)
+                    session.pop('password_change_otp_expiry', None)
+                    return jsonify({'success': False, 'error': 'OTP expired. Please request a new one'})
+            except Exception as e:
+                print(f"Error checking expiry: {e}")
+                return jsonify({'success': False, 'error': 'Invalid OTP session'})
+            
+            # Verify OTP
+            if not otp:
+                return jsonify({'success': False, 'error': 'OTP is required for verification'})
+            
+            if otp != pending_otp:
+                return jsonify({'success': False, 'error': 'Invalid OTP. Please try again'})
+            
+            # OTP is correct! Clear it from session
+            session.pop('password_change_otp', None)
+            session.pop('password_change_otp_expiry', None)
+        
+        # If no email OR OTP is verified, update password
+        from werkzeug.security import generate_password_hash
+        new_password_hash = generate_password_hash(new_password)
+        
+        # Update password in database
+        updated_user = User.update_password(current_user.id, new_password_hash)
+        
+        if updated_user:
+            return jsonify({
+                'success': True,
+                'message': 'Password changed successfully!'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to update password'})
+            
+    except Exception as e:
+        print(f"❌ Error changing password: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': f'Database error: {str(e)}'}), 500

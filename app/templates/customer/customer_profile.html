@@ -2,1410 +2,891 @@
 {% block content %}
 
 <style>
-/* ============================================
-   PREMIUM DASHBOARD PROFILE - 2026 DESIGN
-   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
-:root {
-    --primary: #059669;
-    --primary-light: #10b981;
-    --primary-dark: #047857;
-    --accent: #0ea5e9;
-    --surface: #ffffff;
-    --surface-elevated: #fafaf9;
-    --background: #f5f5f4;
-    --text-primary: #1c1917;
-    --text-secondary: #57534e;
-    --text-muted: #a8a29e;
-    --border-subtle: #e7e5e4;
-    --border-light: #f5f5f4;
-    --success: #10b981;
-    --success-bg: #ecfdf5;
-    --danger: #ef4444;
-    --danger-bg: #fef2f2;
-    --warning: #f59e0b;
-    --warning-bg: #fffbeb;
-    --info: #3b82f6;
-    --info-bg: #eff6ff;
-    --radius-xl: 20px;
-    --radius-lg: 16px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.04);
-    --shadow-glow: 0 0 20px rgba(5, 150, 105, 0.15);
-    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-
-/* Base */
-* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--background);
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f8f9fa;
+    color: #1a1a1a;
+    line-height: 1.6;
 }
 
-.container-fluid {
-    max-width: 1440px;
+.profile-container {
+    max-width: 900px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 40px 20px;
 }
 
-/* ============================================
-   ANIMATIONS
-   ============================================ */
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
+.profile-header {
+    margin-bottom: 40px;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.profile-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
 }
 
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+.profile-header p {
+    color: #6b7280;
+    font-size: 0.95rem;
 }
 
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(30px); }
-    to { opacity: 1; transform: translateX(0); }
+.profile-nav {
+    margin-bottom: 32px;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.3); }
-    50% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
-}
-
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-/* ============================================
-   HERO SECTION - PROFILE
-   ============================================ */
-
-.hero-section {
-    position: relative;
-    background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #0d9488 100%);
-    border-radius: var(--radius-xl);
-    padding: 2.5rem;
-    margin-bottom: 2rem;
-    overflow: hidden;
-    box-shadow: var(--shadow-xl), var(--shadow-glow);
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
-}
-
-.hero-section::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: float 8s ease-in-out infinite reverse;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.hero-avatar {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: white;
-    border: 3px solid rgba(255,255,255,0.3);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    flex-shrink: 0;
-    animation: pulse-glow 3s ease-in-out infinite;
-}
-
-.hero-text {
-    flex: 1;
-}
-
-.hero-greeting {
+.nav-back {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    padding: 0.35rem 1rem;
-    border-radius: 100px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.9);
-    margin-bottom: 0.75rem;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.hero-title {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 0.35rem;
-    letter-spacing: -0.02em;
-}
-
-.hero-subtitle {
-    font-size: 0.95rem;
-    color: rgba(255,255,255,0.75);
-    font-weight: 400;
-    line-height: 1.5;
-}
-
-.hero-decoration {
-    position: absolute;
-    right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 8rem;
-    opacity: 0.08;
-    color: white;
-    z-index: 1;
-}
-
-/* ============================================
-   STATS ROW - QUICK INFO
-   ============================================ */
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
-    margin-bottom: 2.5rem;
-}
-
-.stat-card {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    transition: all var(--transition-base);
-    animation: fadeInUp 0.6s ease-out backwards;
-    overflow: hidden;
-}
-
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    opacity: 0;
-    transition: opacity var(--transition-base);
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-    border-color: transparent;
-}
-
-.stat-card:hover::before {
-    opacity: 1;
-}
-
-.stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-
-.stat-icon-wrapper {
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    transition: all var(--transition-base);
-}
-
-.stat-card:hover .stat-icon-wrapper {
-    transform: scale(1.1) rotate(-5deg);
-}
-
-.stat-icon-user { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: var(--primary); }
-.stat-icon-email { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: var(--info); }
-.stat-icon-security { background: linear-gradient(135deg, #fef2f2, #fee2e2); color: var(--danger); }
-
-.stat-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-    word-break: break-all;
-}
-
-.stat-footer {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    gap: 6px;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.875rem;
     font-weight: 500;
+    transition: color 0.2s ease;
 }
 
-/* ============================================
-   SECTION HEADER
-   ============================================ */
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    animation: fadeInUp 0.6s ease-out 0.4s both;
+.nav-back:hover {
+    color: #1a1a1a;
 }
 
-.section-title-group {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.section-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
-}
-
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-}
-
-.section-subtitle {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 0.15rem;
-    font-weight: 500;
-}
-
-/* ============================================
-   SETTINGS CARDS GRID
-   ============================================ */
-
-.settings-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    animation: fadeInUp 0.6s ease-out 0.5s both;
-}
-
-.settings-card {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-xl);
+.card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 24px;
     overflow: hidden;
-    transition: all var(--transition-base);
-    animation: scaleIn 0.5s ease-out backwards;
-}
-
-.settings-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-    border-color: transparent;
-}
-
-.settings-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--accent));
-    opacity: 0;
-    transition: opacity var(--transition-base);
-}
-
-.settings-card:hover::after {
-    opacity: 1;
 }
 
 .card-header {
-    padding: 1.5rem 1.5rem 1rem;
-    background: linear-gradient(180deg, var(--surface-elevated) 0%, var(--surface) 100%);
-    border-bottom: 1px solid var(--border-light);
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
     display: flex;
     align-items: center;
-    gap: 0.875rem;
-}
-
-.card-icon {
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    flex-shrink: 0;
-}
-
-.card-icon-email { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: var(--info); }
-.card-icon-password { background: linear-gradient(135deg, #fef2f2, #fee2e2); color: var(--danger); }
-
-.card-title-group {
-    flex: 1;
-}
-
-.card-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-}
-
-.card-subtitle {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    margin-top: 0.15rem;
+    gap: 8px;
 }
 
 .card-body {
-    padding: 1.5rem;
+    padding: 24px;
 }
 
-/* ============================================
-   FORM STYLES
-   ============================================ */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    font-weight: 500;
+}
 
 .form-group {
-    margin-bottom: 1.25rem;
-}
-
-.form-group:last-child {
-    margin-bottom: 0;
+    margin-bottom: 20px;
 }
 
 .form-label {
     display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.02em;
+    font-size: 0.875rem;
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 8px;
 }
 
-.form-label .required {
-    color: var(--danger);
-    margin-left: 0.15rem;
-}
-
-.form-control {
+.form-input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1.5px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #1a1a1a;
+    font-size: 0.95rem;
     font-family: inherit;
-    font-weight: 500;
-    transition: all var(--transition-fast);
-    background: var(--surface);
-    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
     outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
 }
 
-.form-control::placeholder {
-    color: var(--text-muted);
-    font-weight: 400;
+.form-input:read-only {
+    background: #f9fafb;
+    color: #6b7280;
 }
-
-.form-control:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
-}
-
-.form-control:disabled {
-    background: var(--surface-elevated);
-    color: var(--text-muted);
-    cursor: not-allowed;
-    border-color: var(--border-light);
-}
-
-.form-hint {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 0.4rem;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-weight: 500;
-}
-
-.form-hint i {
-    font-size: 0.8rem;
-}
-
-.form-hint.success {
-    color: var(--success);
-}
-
-.form-hint.error {
-    color: var(--danger);
-}
-
-/* ============================================
-   BUTTONS
-   ============================================ */
 
 .btn {
-    border: none;
-    border-radius: var(--radius-md);
-    font-weight: 700;
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.2s ease;
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    text-decoration: none;
+    gap: 6px;
     font-family: inherit;
-    font-size: 0.85rem;
-    padding: 0.75rem 1.25rem;
-    letter-spacing: 0.01em;
-    width: 100%;
+}
+
+.btn:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    background: #1a1a1a;
     color: white;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    border-color: #1a1a1a;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
-}
-
-.btn-primary:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
-}
-
-.btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-secondary {
-    background: var(--surface-elevated);
-    border: 1.5px solid var(--border-subtle);
-    color: var(--text-secondary);
-}
-
-.btn-secondary:hover:not(:disabled) {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.btn-outline {
-    background: transparent;
-    border: 1.5px solid var(--border-subtle);
-    color: var(--text-secondary);
-}
-
-.btn-outline:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface-elevated);
-}
-
-.btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    width: auto;
+    background: #2d2d2d;
+    border-color: #2d2d2d;
 }
 
 .btn-group {
     display: flex;
-    gap: 0.75rem;
+    gap: 12px;
     flex-wrap: wrap;
-}
-
-/* ============================================
-   OTP SECTION
-   ============================================ */
-
-.otp-section {
-    margin-top: 1.25rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, var(--surface-elevated), var(--surface));
-    border: 1.5px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    display: none;
-    animation: fadeInUp 0.4s ease;
-}
-
-.otp-section.active {
-    display: block !important;
-}
-
-.otp-header {
-    margin-bottom: 1rem;
-}
-
-.otp-title {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.otp-title i {
-    color: var(--primary);
-}
-
-.otp-subtitle {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.otp-subtitle strong {
-    color: var(--text-secondary);
-}
-
-.otp-input-group {
-    display: flex;
-    gap: 0.75rem;
-    align-items: stretch;
-    margin-bottom: 1rem;
-}
-
-.otp-input-group .form-control {
-    flex: 1;
-    text-align: center;
-    font-size: 1.5rem;
-    letter-spacing: 8px;
-    font-weight: 700;
-    padding: 0.875rem 0.5rem;
-    min-height: 56px;
-    border-color: var(--primary);
-    background: var(--surface);
-    font-family: 'Plus Jakarta Sans', monospace;
-}
-
-.otp-input-group .form-control:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15);
-}
-
-.otp-input-group .btn {
-    width: auto;
-    white-space: nowrap;
-    padding: 0.75rem 1.5rem;
-}
-
-.otp-actions {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-/* ============================================
-   ALERTS
-   ============================================ */
-
-.alert-container {
-    margin-bottom: 1.5rem;
-    animation: fadeInUp 0.4s ease;
-}
-
-.alert {
-    padding: 0.875rem 1.25rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border: 1.5px solid transparent;
-}
-
-.alert:last-child {
-    margin-bottom: 0;
-}
-
-.alert-success {
-    background: var(--success-bg);
-    border-color: #a7f3d0;
-    color: #047857;
-}
-
-.alert-danger {
-    background: var(--danger-bg);
-    border-color: #fecaca;
-    color: #b91c1c;
-}
-
-.alert-info {
-    background: var(--info-bg);
-    border-color: #bfdbfe;
-    color: #1d4ed8;
-}
-
-.alert-warning {
-    background: var(--warning-bg);
-    border-color: #fde68a;
-    color: #b45309;
-}
-
-.alert-dismissible {
-    cursor: pointer;
-    transition: opacity var(--transition-fast);
-}
-
-.alert-dismissible:hover {
-    opacity: 0.85;
-}
-
-.alert i {
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-
-/* ============================================
-   DIVIDER
-   ============================================ */
-
-.divider {
-    margin: 2rem 0;
-    border: none;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
-}
-
-/* ============================================
-   BACK BUTTON
-   ============================================ */
-
-.back-section {
-    margin-top: 2rem;
-    animation: fadeInUp 0.6s ease-out 0.6s both;
-}
-
-/* ============================================
-   SPINNER
-   ============================================ */
-
-.spinner-sm {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2.5px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-}
-
-.spinner-dark {
-    border-color: rgba(0,0,0,0.1);
-    border-top-color: var(--primary);
-}
-
-/* ============================================
-   TOAST NOTIFICATIONS
-   ============================================ */
-
-.toast-container {
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
 }
 
 .toast {
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    box-shadow: var(--shadow-xl);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    animation: slideInRight 0.4s ease-out;
-    min-width: 320px;
-    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
     max-width: 400px;
+    font-size: 0.95rem;
 }
 
-.toast-success { border-left: 4px solid var(--success); }
-.toast-error { border-left: 4px solid var(--danger); }
-.toast-info { border-left: 4px solid var(--info); }
+.toast.show {
+    transform: translateX(0);
+}
 
-.toast-icon {
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 50%;
+.toast.success {
+    border-left: 4px solid #10b981;
+}
+
+.toast.error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast.warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.security-note {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 12px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
+    gap: 8px;
 }
 
-.toast-success .toast-icon { background: var(--success-bg); color: var(--success); }
-.toast-error .toast-icon { background: var(--danger-bg); color: var(--danger); }
-.toast-info .toast-icon { background: var(--info-bg); color: var(--info); }
-
-.toast-content {
-    flex: 1;
+.security-note.info {
+    background: #f0fdf4;
+    border-color: #10b981;
+    color: #065f46;
 }
 
-.toast-title {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.toast-message {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-top: 0.15rem;
+.otp-status {
     font-weight: 500;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+.otp-status.required {
+    color: #0C5B3F;
+    background: #d1fae5;
+}
 
-@media (max-width: 1024px) {
-    .settings-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+.otp-status.not-required {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.otp-status.verified {
+    color: #059669;
+    background: #d1fae5;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.pulse {
+    animation: pulse 1.5s infinite;
 }
 
 @media (max-width: 768px) {
-    .container-fluid {
-        padding: 1rem;
+    .profile-header h1 {
+        font-size: 1.5rem;
     }
     
-    .hero-section {
-        padding: 1.75rem;
-    }
-    
-    .hero-content {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .hero-avatar {
-        width: 72px;
-        height: 72px;
-        font-size: 2rem;
-    }
-    
-    .hero-title {
-        font-size: 1.35rem;
-    }
-    
-    .hero-decoration {
-        display: none;
-    }
-    
-    .stats-grid {
+    .info-grid {
         grid-template-columns: 1fr;
-        gap: 0.875rem;
-    }
-    
-    .stat-card {
-        padding: 1.25rem;
-    }
-    
-    .otp-input-group {
-        flex-direction: column;
-    }
-    
-    .otp-input-group .btn {
-        width: 100%;
     }
     
     .btn-group {
         flex-direction: column;
     }
     
-    .btn-group .btn {
+    .btn {
         width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
-    
-    .section-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
+        justify-content: center;
     }
 }
 </style>
 
-<div class="container-fluid">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-avatar">
-                <i class="bi bi-person-fill"></i>
-            </div>
-            <div class="hero-text">
-                <div class="hero-greeting">
-                    <i class="bi bi-shield-check"></i>
-                    Account Settings
-                </div>
-                <div class="hero-title">{{ current_user.name or current_user.username }}</div>
-                <div class="hero-subtitle">Manage your profile information, update your email address, and keep your account secure.</div>
-            </div>
-        </div>
-        <div class="hero-decoration">
-            <i class="bi bi-person-gear"></i>
-        </div>
-    </div>
-
-    <!-- Quick Info Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Username</span>
-                <div class="stat-icon-wrapper stat-icon-user">
-                    <i class="bi bi-person-badge"></i>
-                </div>
-            </div>
-            <div class="stat-value">{{ current_user.username }}</div>
-            <div class="stat-footer">Your unique identifier</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Current Email</span>
-                <div class="stat-icon-wrapper stat-icon-email">
-                    <i class="bi bi-envelope-at"></i>
-                </div>
-            </div>
-            <div class="stat-value">{{ current_user.email or 'Not set' }}</div>
-            <div class="stat-footer">Primary contact address</div>
-        </div>
-        
-        <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Account Status</span>
-                <div class="stat-icon-wrapper stat-icon-security">
-                    <i class="bi bi-shield-check"></i>
-                </div>
-            </div>
-            <div class="stat-value" style="color: var(--success);">Active</div>
-            <div class="stat-footer">Verified & secure</div>
-        </div>
-    </div>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="alert-container">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible" onclick="this.style.display='none'">
-                <i class="bi bi-{% if category=='success' %}check-circle-fill{% elif category=='danger' %}exclamation-triangle-fill{% elif category=='warning' %}exclamation-triangle-fill{% else %}info-circle-fill{% endif %}"></i>
-                <span>{{ message }}</span>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-    {% endwith %}
-
-    <!-- Section Header -->
-    <div class="section-header">
-        <div class="section-title-group">
-            <div class="section-icon">
-                <i class="bi bi-sliders"></i>
-            </div>
-            <div>
-                <div class="section-title">Account Settings</div>
-                <div class="section-subtitle">Update your email and password</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Cards -->
-    <div class="settings-grid">
-        <!-- Change Email Card -->
-        <div class="settings-card">
-            <div class="card-header">
-                <div class="card-icon card-icon-email">
-                    <i class="bi bi-envelope-fill"></i>
-                </div>
-                <div class="card-title-group">
-                    <div class="card-title">Change Email</div>
-                    <div class="card-subtitle">Update your primary contact address</div>
-                </div>
-            </div>
-            <div class="card-body">
-                <form id="emailForm" method="POST">
-                    <input type="hidden" name="action" value="update_email" />
-                    
-                    <div class="form-group">
-                        <label class="form-label">New Email Address <span class="required">*</span></label>
-                        <input type="email" class="form-control" id="newEmail" placeholder="Enter new email address" required autocomplete="email" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Confirm New Email <span class="required">*</span></label>
-                        <input type="email" class="form-control" id="confirmEmail" placeholder="Confirm new email address" required autocomplete="email" />
-                        <span class="form-hint" id="emailMatchHint"><i class="bi bi-info-circle"></i> Emails must match</span>
-                    </div>
-                    
-                    <button type="button" class="btn btn-primary" id="sendOtpBtn">
-                        <i class="bi bi-send-fill"></i> Send Verification Code
-                    </button>
-                </form>
-
-                <!-- OTP Section -->
-                <div class="otp-section" id="otpSection">
-                    <div class="otp-header">
-                        <div class="otp-title"><i class="bi bi-shield-lock-fill"></i> Verify Email</div>
-                        <div class="otp-subtitle">Enter the 6-digit code sent to <strong id="otpEmailDisplay"></strong></div>
-                    </div>
-                    <div class="otp-input-group">
-                        <input type="text" class="form-control" id="otpInput" placeholder="000000" maxlength="6" pattern="\\d*" inputmode="numeric" autocomplete="one-time-code" />
-                        <button class="btn btn-primary" id="verifyOtpBtn">
-                            <i class="bi bi-check-circle-fill"></i> Verify
-                        </button>
-                    </div>
-                    <div class="otp-actions">
-                        <button class="btn btn-secondary btn-sm" id="resendOtpBtn">
-                            <i class="bi bi-arrow-repeat"></i> Resend OTP
-                        </button>
-                        <button class="btn btn-outline btn-sm" id="cancelOtpBtn">
-                            <i class="bi bi-x-circle"></i> Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Change Password Card -->
-        <div class="settings-card">
-            <div class="card-header">
-                <div class="card-icon card-icon-password">
-                    <i class="bi bi-key-fill"></i>
-                </div>
-                <div class="card-title-group">
-                    <div class="card-title">Change Password</div>
-                    <div class="card-subtitle">Keep your account secure</div>
-                </div>
-            </div>
-            <div class="card-body">
-                <form id="passwordForm" method="POST" action="{{ url_for('auth.change_password') }}">
-                    <div class="form-group">
-                        <label class="form-label">Current Password <span class="required">*</span></label>
-                        <input type="password" class="form-control" id="old_password" name="old_password" placeholder="Enter your current password" required autocomplete="current-password" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">New Password <span class="required">*</span></label>
-                        <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Enter new password" required minlength="6" autocomplete="new-password" />
-                        <span class="form-hint"><i class="bi bi-info-circle"></i> Minimum 6 characters required</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Confirm New Password <span class="required">*</span></label>
-                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required autocomplete="new-password" />
-                        <span class="form-hint" id="passwordMatchHint"><i class="bi bi-info-circle"></i> Passwords must match</span>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary" id="changePasswordBtn">
-                        <i class="bi bi-shield-lock-fill"></i> Change Password
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="back-section">
-        <a href="{{ url_for('customer.dashboard') }}" class="btn btn-secondary">
+<div class="profile-container">
+    <div class="profile-nav">
+        <a href="{{ url_for('customer.dashboard') }}" class="nav-back">
             <i class="bi bi-arrow-left"></i> Back to Dashboard
         </a>
     </div>
+
+    <div class="profile-header">
+        <h1>Profile Settings</h1>
+        <p>Manage your account information and security</p>
+    </div>
+
+    <!-- Account Information -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="bi bi-person"></i> Account Information</h2>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">{{ user.name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value" id="currentEmailDisplay">{{ user.email or 'Not provided' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">{{ user.phone or 'Not provided' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Customer ID</div>
+                    <div class="info-value">#{{ user.id }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Address</div>
+                    <div class="info-value">{{ user.address or 'Not provided' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Member Since</div>
+                    <div class="info-value">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Email -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="bi bi-envelope"></i> Update Email</h2>
+        </div>
+        <div class="card-body">
+            <div class="security-note info" style="margin-bottom: 20px;">
+                <i class="bi bi-info-circle"></i>
+                {% if user.email and user.email.strip() %}
+                <span>OTP will be sent to your current email: <strong>{{ user.email }}</strong></span>
+                {% else %}
+                <span>No email registered. OTP will be sent to your new email.</span>
+                {% endif %}
+            </div>
+            
+            <form id="emailForm">
+                <div class="form-group">
+                    <label class="form-label">New Email Address</label>
+                    <input type="email" class="form-input" name="email" id="newEmail" 
+                           placeholder="Enter new email address" required>
+                </div>
+                
+                <div id="otpSection" class="form-group" style="display: none;">
+                    <label class="form-label">Verification Code</label>
+                    <input type="text" class="form-input" name="otp" id="emailOtp" 
+                           placeholder="Enter 6-digit code" maxlength="6">
+                    <div id="otpTimer" class="security-note" style="margin-top: 8px;">
+                        <i class="bi bi-clock"></i> <span id="timerText"></span>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" id="sendOtpBtn" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Send Verification Code
+                    </button>
+                    <button type="submit" id="verifyBtn" class="btn btn-primary" style="display: none;">
+                        <i class="bi bi-check"></i> Verify & Update Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="bi bi-lock"></i> Change Password</h2>
+        </div>
+        <div class="card-body">
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-input" name="old_password" id="oldPassword" 
+                           placeholder="Enter current password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-input" name="new_password" id="newPassword"
+                           placeholder="Enter new password (min 6 characters)" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-input" name="confirm_password" id="confirmPassword"
+                           placeholder="Re-enter new password" required minlength="6">
+                </div>
+
+                <!-- OTP Section (only shown if user has email) -->
+                {% if user.email and user.email.strip() %}
+                <div id="passwordOtpSection" class="form-group" style="display: none;">
+                    <label class="form-label">Verification Code</label>
+                    <input type="text" class="form-input" name="otp" id="passwordOtp" 
+                           placeholder="Enter 6-digit code sent to your email" maxlength="6">
+                    <div id="passwordOtpTimer" class="security-note" style="margin-top: 8px;">
+                        <i class="bi bi-clock"></i> <span id="passwordTimerText"></span>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" id="sendPasswordOtpBtn" class="btn btn-primary" style="display: none;">
+                        <i class="bi bi-send"></i> Send OTP to Email
+                    </button>
+                </div>
+                {% endif %}
+                
+                <div class="security-note">
+                    <i class="bi bi-info-circle"></i>
+                    Password must be at least 6 characters long
+                    {% if user.email and user.email.strip() %}
+                    <span class="otp-status required"> • OTP verification required</span>
+                    {% else %}
+                    <span class="otp-status not-required"> • No email registered, OTP not required</span>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button type="submit" id="changePasswordBtn" class="btn btn-primary">
+                        <i class="bi bi-key"></i> Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toastContainer"></div>
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // OTP Flow Elements
-    const newEmailInput = document.getElementById('newEmail');
-    const confirmEmailInput = document.getElementById('confirmEmail');
-    const sendOtpBtn = document.getElementById('sendOtpBtn');
-    const otpSection = document.getElementById('otpSection');
-    const otpEmailDisplay = document.getElementById('otpEmailDisplay');
-    const otpInput = document.getElementById('otpInput');
-    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-    const resendOtpBtn = document.getElementById('resendOtpBtn');
-    const cancelOtpBtn = document.getElementById('cancelOtpBtn');
-    const emailMatchHint = document.getElementById('emailMatchHint');
+// ============================================
+// MAIN JAVASCRIPT
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing profile page...');
 
-    let currentNewEmail = '';
-
-    // Toast Notification System
-    function showToast(title, message, type = 'success') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = `
-            <div class="toast-icon">
-                <i class="bi bi-${type === 'success' ? 'check-circle-fill' : type === 'error' ? 'x-circle-fill' : 'info-circle-fill'}"></i>
-            </div>
-            <div class="toast-content">
-                <div class="toast-title">${title}</div>
-                <div class="toast-message">${message}</div>
-            </div>
-        `;
-        container.appendChild(toast);
+    // Toast Notification
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
         
         setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
-            toast.style.transition = 'all 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
+            toast.classList.remove('show');
         }, 4000);
     }
 
-    // Email match validation
-    function validateEmails() {
-        if (!confirmEmailInput.value || !newEmailInput.value) return;
-        
-        if (confirmEmailInput.value === newEmailInput.value) {
-            confirmEmailInput.style.borderColor = 'var(--success)';
-            confirmEmailInput.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.1)';
-            emailMatchHint.innerHTML = '<i class="bi bi-check-circle-fill"></i> Emails match';
-            emailMatchHint.className = 'form-hint success';
-        } else {
-            confirmEmailInput.style.borderColor = 'var(--danger)';
-            confirmEmailInput.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.1)';
-            emailMatchHint.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Emails do not match';
-            emailMatchHint.className = 'form-hint error';
-        }
-    }
+    // ============================================
+    // EMAIL UPDATE WITH OTP
+    // ============================================
+    let otpTimer;
+    let otpSent = false;
 
-    if (confirmEmailInput && newEmailInput) {
-        confirmEmailInput.addEventListener('input', validateEmails);
-        newEmailInput.addEventListener('input', validateEmails);
-    }
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    const newEmailInput = document.getElementById('newEmail');
+    const otpSection = document.getElementById('otpSection');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const emailOtpInput = document.getElementById('emailOtp');
 
-    // Send OTP
-    async function sendOTP() {
-        const email = newEmailInput.value.trim();
-        const confirm = confirmEmailInput.value.trim();
-        
-        if (!email) { showToast('Missing Email', 'Please enter your new email address', 'error'); newEmailInput.focus(); return; }
-        if (email !== confirm) { showToast('Mismatch', 'Emails do not match!', 'error'); confirmEmailInput.focus(); return; }
-        
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailPattern.test(email)) { showToast('Invalid Email', 'Please enter a valid email address', 'error'); newEmailInput.focus(); return; }
-        if (email === '{{ current_user.email }}') { showToast('Same Email', 'This is already your current email', 'error'); return; }
+    // Check if user has current email
+    const hasCurrentEmail = {{ 'true' if user.email and user.email.strip() else 'false' }};
 
-        sendOtpBtn.disabled = true;
-        sendOtpBtn.innerHTML = '<span class="spinner-sm"></span> Sending...';
-
-        try {
-            const response = await fetch('{{ url_for("customer.send_email_verification") }}', {
+    if (sendOtpBtn) {
+        sendOtpBtn.addEventListener('click', function() {
+            const newEmail = newEmailInput.value;
+            
+            if (!newEmail) {
+                showToast('Please enter an email address', 'error');
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(newEmail)) {
+                showToast('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
+            
+            fetch('{{ url_for("customer.send_email_verification") }}', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                body: JSON.stringify({ email: email })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ email: newEmail })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || `Server error: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show where the OTP was sent
+                    const sentTo = data.sent_to || 'your email';
+                    
+                    let message = '';
+                    if (hasCurrentEmail) {
+                        message = `✅ Verification code sent to your current email (${sentTo})`;
+                    } else {
+                        message = `✅ Verification code sent to your new email (${sentTo})`;
+                    }
+                    
+                    showToast(message, 'success');
+                    otpSection.style.display = 'block';
+                    verifyBtn.style.display = 'inline-flex';
+                    this.style.display = 'none';
+                    otpSent = true;
+                    
+                    // Update placeholder
+                    if (emailOtpInput) {
+                        if (hasCurrentEmail) {
+                            emailOtpInput.placeholder = 'Enter 6-digit code sent to your current email';
+                        } else {
+                            emailOtpInput.placeholder = 'Enter 6-digit code sent to your new email';
+                        }
+                    }
+                    
+                    startOtpTimer(300);
+                } else {
+                    showToast(data.error || 'Failed to send verification code', 'error');
+                    this.disabled = false;
+                    this.innerHTML = '<i class="bi bi-send"></i> Send Verification Code';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast(error.message || 'Network error. Please try again.', 'error');
+                this.disabled = false;
+                this.innerHTML = '<i class="bi bi-send"></i> Send Verification Code';
             });
-            const data = await response.json();
-            
-            if (data.success) {
-                currentNewEmail = email;
-                otpSection.classList.add('active');
-                otpEmailDisplay.textContent = email;
-                otpInput.value = '';
-                setTimeout(() => { otpInput.focus(); otpInput.select(); }, 200);
-                showToast('Code Sent', data.message, 'success');
-            } else {
-                showToast('Error', data.error, 'error');
-            }
-        } catch(e) {
-            console.error(e);
-            showToast('Network Error', 'Please try again later', 'error');
-        } finally {
-            sendOtpBtn.disabled = false;
-            sendOtpBtn.innerHTML = '<i class="bi bi-send-fill"></i> Send Verification Code';
-        }
-    }
-
-    // Verify OTP
-    async function verifyOTP() {
-        const otp = otpInput.value.trim();
-        if (!otp) { showToast('Missing OTP', 'Please enter the verification code', 'error'); otpInput.focus(); return; }
-        if (otp.length !== 6 || !/^\d+$/.test(otp)) {
-            showToast('Invalid OTP', 'Please enter a valid 6-digit code', 'error');
-            otpInput.value = '';
-            otpInput.focus();
-            return;
-        }
-
-        verifyOtpBtn.disabled = true;
-        verifyOtpBtn.innerHTML = '<span class="spinner-sm"></span> Verifying...';
-
-        try {
-            const response = await fetch('{{ url_for("customer.verify_email_otp") }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                body: JSON.stringify({ otp: otp })
-            });
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Verified', data.message, 'success');
-                setTimeout(() => { location.reload(); }, 1500);
-            } else {
-                showToast('Invalid Code', data.error, 'error');
-                otpInput.value = '';
-                otpInput.focus();
-            }
-        } catch(e) {
-            console.error(e);
-            showToast('Network Error', 'Please try again later', 'error');
-        } finally {
-            verifyOtpBtn.disabled = false;
-            verifyOtpBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Verify';
-        }
-    }
-
-    // Resend OTP
-    async function resendOTP() {
-        if (!currentNewEmail) { showToast('Error', 'Please request a new OTP', 'error'); return; }
-        
-        resendOtpBtn.disabled = true;
-        resendOtpBtn.innerHTML = '<span class="spinner-sm spinner-dark"></span> Sending...';
-
-        try {
-            const response = await fetch('{{ url_for("customer.send_email_verification") }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                body: JSON.stringify({ email: currentNewEmail })
-            });
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Resent', 'OTP resent successfully', 'success');
-                otpInput.value = '';
-                otpInput.focus();
-            } else {
-                showToast('Error', data.error, 'error');
-            }
-        } catch(e) {
-            console.error(e);
-            showToast('Network Error', 'Please try again later', 'error');
-        } finally {
-            resendOtpBtn.disabled = false;
-            resendOtpBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Resend OTP';
-        }
-    }
-
-    // Cancel OTP
-    function cancelOTP() {
-        otpSection.classList.remove('active');
-        otpInput.value = '';
-        currentNewEmail = '';
-        showToast('Cancelled', 'Verification cancelled', 'info');
-    }
-
-    // Event Listeners
-    sendOtpBtn?.addEventListener('click', sendOTP);
-    verifyOtpBtn?.addEventListener('click', verifyOTP);
-    resendOtpBtn?.addEventListener('click', resendOTP);
-    cancelOtpBtn?.addEventListener('click', cancelOTP);
-
-    // OTP input restrictions
-    otpInput?.addEventListener('input', () => {
-        otpInput.value = otpInput.value.replace(/[^0-9]/g, '').slice(0, 6);
-    });
-    
-    otpInput?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); verifyOtpBtn?.click(); }
-    });
-
-    // Email input enter key
-    newEmailInput?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); sendOtpBtn?.click(); }
-    });
-    
-    confirmEmailInput?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); sendOtpBtn?.click(); }
-    });
-
-    // Password match validation
-    const oldPwd = document.getElementById('old_password');
-    const newPwd = document.getElementById('new_password');
-    const confirmPwd = document.getElementById('confirm_password');
-    const passwordHint = document.getElementById('passwordMatchHint');
-
-    function validatePasswords() {
-        if (!confirmPwd.value || !newPwd.value) return;
-        
-        if (confirmPwd.value === newPwd.value) {
-            confirmPwd.style.borderColor = 'var(--success)';
-            confirmPwd.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.1)';
-            passwordHint.innerHTML = '<i class="bi bi-check-circle-fill"></i> Passwords match';
-            passwordHint.className = 'form-hint success';
-        } else {
-            confirmPwd.style.borderColor = 'var(--danger)';
-            confirmPwd.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.1)';
-            passwordHint.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Passwords do not match';
-            passwordHint.className = 'form-hint error';
-        }
-    }
-
-    if (confirmPwd && newPwd) {
-        confirmPwd.addEventListener('input', validatePasswords);
-        newPwd.addEventListener('input', validatePasswords);
-    }
-
-    // Password form submit validation
-    const pwForm = document.getElementById('passwordForm');
-    if (pwForm) {
-        pwForm.addEventListener('submit', (e) => {
-            if (!oldPwd.value.trim()) {
-                e.preventDefault();
-                showToast('Missing Password', 'Please enter current password', 'error');
-                oldPwd.focus();
-                return false;
-            }
-            if (newPwd.value.length < 6) {
-                e.preventDefault();
-                showToast('Too Short', 'New password must be at least 6 characters', 'error');
-                newPwd.focus();
-                return false;
-            }
-            if (newPwd.value !== confirmPwd.value) {
-                e.preventDefault();
-                showToast('Mismatch', 'Passwords do not match!', 'error');
-                confirmPwd.focus();
-                return false;
-            }
-            
-            const btn = document.getElementById('changePasswordBtn');
-            btn.innerHTML = '<span class="spinner-sm"></span> Changing Password...';
-            btn.disabled = true;
         });
     }
 
-    // Auto dismiss alerts with fade
-    document.querySelectorAll('.alert-dismissible').forEach(a => {
-        setTimeout(() => {
-            a.style.opacity = '0';
-            a.style.transform = 'translateY(-10px)';
-            a.style.transition = 'all 0.3s ease';
-            setTimeout(() => a.remove(), 300);
-        }, 5000);
-    });
+    function startOtpTimer(seconds) {
+        let timeLeft = seconds;
+        const timerText = document.getElementById('timerText');
+        
+        if (otpTimer) {
+            clearInterval(otpTimer);
+        }
+        
+        otpTimer = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            timerText.textContent = `Code expires in ${minutes}:${secs.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(otpTimer);
+                timerText.textContent = 'Code expired. Please request a new one.';
+                sendOtpBtn.style.display = 'inline-flex';
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.innerHTML = '<i class="bi bi-send"></i> Resend Code';
+                otpSent = false;
+                verifyBtn.style.display = 'none';
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    const emailForm = document.getElementById('emailForm');
+    if (emailForm) {
+        emailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const otp = document.getElementById('emailOtp').value;
+            
+            if (!otpSent) {
+                showToast('Please send verification code first', 'error');
+                return;
+            }
+            
+            if (!otp || otp.length !== 6) {
+                showToast('Please enter the 6-digit verification code', 'error');
+                return;
+            }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Verifying...';
+            
+            fetch('{{ url_for("customer.verify_email_otp") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ otp: otp })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || `Server error: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ Email updated successfully!', 'success');
+                    document.getElementById('currentEmailDisplay').textContent = newEmailInput.value;
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showToast(data.error || 'Verification failed', 'error');
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = '<i class="bi bi-check"></i> Verify & Update Email';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast(error.message || 'Network error. Please try again.', 'error');
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = '<i class="bi bi-check"></i> Verify & Update Email';
+            });
+        });
+    }
+
+    // ============================================
+    // PASSWORD CHANGE WITH ONE-STEP OTP
+    // ============================================
+    const passwordForm = document.getElementById('passwordForm');
+    if (passwordForm) {
+        let passwordOtpSent = false;
+        let passwordOtpTimer;
+        
+        // Check if user has email
+        const hasEmail = {{ 'true' if user.email and user.email.strip() else 'false' }};
+        
+        if (hasEmail) {
+            const sendPasswordOtpBtn = document.getElementById('sendPasswordOtpBtn');
+            const passwordOtpSection = document.getElementById('passwordOtpSection');
+            
+            // Show Send OTP button when user starts typing password
+            const oldPassword = document.getElementById('oldPassword');
+            const newPassword = document.getElementById('newPassword');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
+            function checkPasswordFields() {
+                if (oldPassword.value && newPassword.value && confirmPassword.value) {
+                    sendPasswordOtpBtn.style.display = 'inline-flex';
+                } else {
+                    sendPasswordOtpBtn.style.display = 'none';
+                }
+            }
+            
+            oldPassword.addEventListener('input', checkPasswordFields);
+            newPassword.addEventListener('input', checkPasswordFields);
+            confirmPassword.addEventListener('input', checkPasswordFields);
+            
+            // Send Password OTP
+            sendPasswordOtpBtn.addEventListener('click', function() {
+                const oldPass = oldPassword.value;
+                const newPass = newPassword.value;
+                const confirmPass = confirmPassword.value;
+                
+                if (!oldPass || !newPass || !confirmPass) {
+                    showToast('Please fill all password fields first', 'error');
+                    return;
+                }
+                
+                if (newPass !== confirmPass) {
+                    showToast('Passwords do not match', 'error');
+                    return;
+                }
+                
+                if (newPass.length < 6) {
+                    showToast('Password must be at least 6 characters', 'error');
+                    return;
+                }
+                
+                this.disabled = true;
+                this.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending OTP...';
+                
+                fetch('{{ url_for("customer.send_password_otp") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Server error');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast('✅ OTP sent to your registered email!', 'success');
+                        passwordOtpSection.style.display = 'block';
+                        this.style.display = 'none';
+                        passwordOtpSent = true;
+                        startPasswordOtpTimer(300);
+                    } else {
+                        showToast(data.error || 'Failed to send OTP', 'error');
+                        this.disabled = false;
+                        this.innerHTML = '<i class="bi bi-send"></i> Send OTP to Email';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast(error.message || 'Network error. Please try again.', 'error');
+                    this.disabled = false;
+                    this.innerHTML = '<i class="bi bi-send"></i> Send OTP to Email';
+                });
+            });
+            
+            function startPasswordOtpTimer(seconds) {
+                let timeLeft = seconds;
+                const timerText = document.getElementById('passwordTimerText');
+                
+                if (passwordOtpTimer) {
+                    clearInterval(passwordOtpTimer);
+                }
+                
+                passwordOtpTimer = setInterval(() => {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const secs = timeLeft % 60;
+                    timerText.textContent = `OTP expires in ${minutes}:${secs.toString().padStart(2, '0')}`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(passwordOtpTimer);
+                        timerText.textContent = 'OTP expired. Please request a new one.';
+                        sendPasswordOtpBtn.style.display = 'inline-flex';
+                        sendPasswordOtpBtn.disabled = false;
+                        sendPasswordOtpBtn.innerHTML = '<i class="bi bi-send"></i> Resend OTP';
+                        passwordOtpSent = false;
+                        passwordOtpSection.style.display = 'none';
+                    }
+                    timeLeft--;
+                }, 1000);
+            }
+        }
+        
+        // Handle password form submission - ONE STEP
+        passwordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const otpInput = document.getElementById('passwordOtp');
+            const otp = otpInput ? otpInput.value : '';
+            
+            if (!oldPassword || !newPassword || !confirmPassword) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            const hasEmail = {{ 'true' if user.email and user.email.strip() else 'false' }};
+            
+            // If user has email but OTP not sent yet
+            if (hasEmail && !passwordOtpSent) {
+                const sendBtn = document.getElementById('sendPasswordOtpBtn');
+                if (sendBtn) {
+                    sendBtn.style.display = 'inline-flex';
+                    sendBtn.classList.add('pulse');
+                    showToast('Please request OTP verification first', 'warning');
+                }
+                return;
+            }
+            
+            // If OTP was sent but OTP field is empty
+            if (hasEmail && passwordOtpSent && !otp) {
+                showToast('Please enter the OTP code', 'error');
+                if (document.getElementById('passwordOtp')) {
+                    document.getElementById('passwordOtp').focus();
+                }
+                return;
+            }
+            
+            const submitBtn = document.getElementById('changePasswordBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Updating Password...';
+            
+            const formData = {
+                old_password: oldPassword,
+                new_password: newPassword,
+                otp: otp || ''
+            };
+            
+            console.log('Sending password change request with OTP...');
+            
+            fetch('{{ url_for("customer.change_password") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || `Server error: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Password changed successfully!
+                    showToast('✅ Password changed successfully!', 'success');
+                    
+                    // Clear all fields
+                    document.getElementById('oldPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                    if (document.getElementById('passwordOtp')) {
+                        document.getElementById('passwordOtp').value = '';
+                    }
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-key"></i> Update Password';
+                    
+                    // Reset OTP state
+                    passwordOtpSent = false;
+                    if (document.getElementById('passwordOtpSection')) {
+                        document.getElementById('passwordOtpSection').style.display = 'none';
+                    }
+                    const sendBtn = document.getElementById('sendPasswordOtpBtn');
+                    if (sendBtn) {
+                        sendBtn.style.display = 'none';
+                        sendBtn.classList.remove('pulse');
+                    }
+                    
+                    // Show success and reload after 2 seconds
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showToast(data.error || 'Failed to change password', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-key"></i> Update Password';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast(error.message || 'Network error. Please try again.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-key"></i> Update Password';
+            });
+        });
+    }
+
+    // Flash messages
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                showToast('{{ message }}', '{{ 'success' if category == 'success' else 'error' }}');
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 });
 </script>
 
-{% endblock %}'''
-
-output_path = '/mnt/agents/output/profile_dashboard.html'
-with open(output_path, 'w', encoding='utf-8') as f:
-    f.write(html_content)
-
-print(f"File saved to: {output_path}")
-print(f"File size: {len(html_content):,} characters")
+{% endblock %}

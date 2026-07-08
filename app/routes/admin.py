@@ -1257,7 +1257,7 @@ def edit_customer(customer_id):
                 'phone': request.form.get('phone'),
                 'email': request.form.get('email'),
                 'address': request.form.get('address'),
-                'is_active': 'is_active' in request.form
+                'is_active': request.form.get('is_active') == 'on'
             })
             
             if result:

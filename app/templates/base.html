@@ -25,25 +25,27 @@
     <style>
 
         :root {
-            --primary: #0C5B3F;
-            --accent: #138A52;
-            --dark-bg: #454838;
-            --main-bg: #FAFAF7;
-            --secondary-bg: #F4F4F2;
-            --heading: #1F1A17;
-            --secondary-text: #7C685B;
+            --primary: #1a1a1a;
+            --primary-hover: #2d2d2d;
+            --bg-main: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --border: #e5e7eb;
+            --border-dark: #d1d5db;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --info: #0dcaf0;
+            --info: #3b82f6;
             --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            --font-secondary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         /* ================= BASE TYPOGRAPHY ================= */
         body {
-            background: var(--main-bg);
+            background: var(--bg-main);
             font-family: var(--font-primary);
-            color: var(--heading);
+            color: var(--text-primary);
             font-size: 15px;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
@@ -51,36 +53,37 @@
         }
 
         h1, h2, h3, h4, h5, h6 {
-            font-family: var(--font-secondary);
+            font-family: var(--font-primary);
             font-weight: 600;
-            letter-spacing: -0.02em;
+            color: var(--text-primary);
             line-height: 1.3;
         }
 
-        h1 { font-size: 2rem; font-weight: 700; }
-        h2 { font-size: 1.75rem; font-weight: 700; }
-        h3 { font-size: 1.5rem; font-weight: 600; }
-        h4 { font-size: 1.25rem; font-weight: 600; }
-        h5 { font-size: 1.1rem; font-weight: 600; }
-        h6 { font-size: 0.95rem; font-weight: 600; }
+        h1 { font-size: 2rem; font-weight: 600; }
+        h2 { font-size: 1.5rem; font-weight: 600; }
+        h3 { font-size: 1.25rem; font-weight: 600; }
+        h4 { font-size: 1.125rem; font-weight: 600; }
+        h5 { font-size: 1rem; font-weight: 600; }
+        h6 { font-size: 0.95rem; font-weight: 500; }
 
         p {
             font-size: 0.95rem;
             line-height: 1.7;
-            color: var(--secondary-text);
+            color: var(--text-secondary);
         }
 
         .text-muted {
-            color: var(--secondary-text) !important;
-            font-size: 0.85rem;
+            color: var(--text-muted) !important;
+            font-size: 0.875rem;
         }
 
-        /* ================= NAVBAR - FIXED ALIGNMENT ================= */
+        /* ================= NAVBAR - MINIMAL ================= */
         .navbar {
-            background: var(--primary) !important;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            padding: 10px 0;
-            min-height: 60px;
+            background: white !important;
+            border-bottom: 1px solid var(--border);
+            box-shadow: none;
+            padding: 12px 0;
+            min-height: 64px;
         }
 
         .navbar .container-fluid {
@@ -91,11 +94,10 @@
         }
 
         .navbar-brand {
-            font-family: var(--font-secondary);
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: white !important;
-            letter-spacing: -0.3px;
+            font-family: var(--font-primary);
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary) !important;
             display: flex;
             align-items: center;
             padding: 0;
@@ -103,9 +105,9 @@
         }
 
         .navbar-brand i {
-            color: #fbbf24;
+            color: var(--text-primary);
             margin-right: 8px;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
         }
 
         /* Navbar collapse */
@@ -129,12 +131,11 @@
         .nav-link {
             font-family: var(--font-primary);
             font-weight: 500;
-            font-size: 0.85rem;
+            font-size: 0.875rem;
             border-radius: 6px;
-            padding: 8px 16px;
-            transition: 0.2s ease;
-            color: rgba(255,255,255,0.85) !important;
-            letter-spacing: 0.2px;
+            padding: 8px 14px;
+            transition: all 0.2s ease;
+            color: var(--text-secondary) !important;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -142,29 +143,28 @@
         }
 
         .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: white !important;
+            background: var(--bg-main);
+            color: var(--text-primary) !important;
         }
 
         .nav-link.active {
-            background: rgba(255,255,255,0.15);
-            color: white !important;
+            background: var(--bg-main);
+            color: var(--text-primary) !important;
         }
 
         .nav-link i {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
-        /* ================= LOGOUT BUTTON - RED ================= */
+        /* ================= LOGOUT BUTTON ================= */
         .nav-link-logout {
             font-family: var(--font-primary);
             font-weight: 500;
-            font-size: 0.85rem;
+            font-size: 0.875rem;
             border-radius: 6px;
-            padding: 8px 16px;
-            transition: 0.2s ease;
-            color: #fca5a5 !important;
-            letter-spacing: 0.2px;
+            padding: 8px 14px;
+            transition: all 0.2s ease;
+            color: var(--danger) !important;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -172,22 +172,17 @@
         }
 
         .nav-link-logout:hover {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fecaca !important;
+            background: #fee2e2;
+            color: #dc2626 !important;
         }
 
         .nav-link-logout i {
-            font-size: 0.9rem;
-            color: #fca5a5;
-        }
-
-        .nav-link-logout:hover i {
-            color: #fecaca;
+            font-size: 0.95rem;
         }
 
         /* Navbar toggler */
         .navbar-toggler {
-            border-color: rgba(255,255,255,0.3);
+            border: 1px solid var(--border);
             padding: 6px 10px;
         }
 
@@ -196,7 +191,7 @@
         }
 
         .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(26,26,26,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
         }
 
         /* ================= MAIN ================= */
@@ -207,31 +202,31 @@
 
         /* ================= CARDS ================= */
         .card {
-            border: none;
-            border-radius: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
             background: white;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            transition: 0.25s ease;
+            box-shadow: none;
+            transition: all 0.2s ease;
             overflow: hidden;
         }
 
         .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            border-color: var(--border-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .card-header {
             background: white;
-            border-bottom: 2px solid var(--secondary-bg);
-            font-family: var(--font-secondary);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-primary);
             font-weight: 600;
-            font-size: 1rem;
-            color: var(--heading);
-            padding: 16px 20px;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            padding: 20px 24px;
         }
 
         .card-body {
-            padding: 20px;
+            padding: 24px;
         }
 
         /* ================= BUTTONS ================= */

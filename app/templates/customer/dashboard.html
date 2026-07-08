@@ -1,52 +1,9 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 <style>
-/* ============================================
-   MODERN PREMIUM UI - 2026 DESIGN SYSTEM
-   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
-:root {
-    --primary: #059669;
-    --primary-light: #10b981;
-    --primary-dark: #047857;
-    --accent: #038617;
-    --accent-light: #38bdf8;
-    --surface: #ffffff;
-    --surface-elevated: #fafaf9;
-    --surface-glass: rgba(255, 255, 255, 0.72);
-    --background: #f5f5f4;
-    --text-primary: #1c1917;
-    --text-secondary: #57534e;
-    --text-muted: #a8a29e;
-    --border-subtle: #e7e5e4;
-    --border-light: #f5f5f4;
-    --success: #10b981;
-    --success-bg: #ecfdf5;
-    --danger: #ef4444;
-    --danger-bg: #fef2f2;
-    --warning: #f59e0b;
-    --warning-bg: #fffbeb;
-    --info: #3b82f6;
-    --info-bg: #eff6ff;
-    --radius-xl: 20px;
-    --radius-lg: 16px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.04);
-    --shadow-glow: 0 0 20px rgba(5, 150, 105, 0.15);
-    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Base Reset */
 * {
     margin: 0;
     padding: 0;
@@ -54,1474 +11,387 @@
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--background);
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-/* Container */
-.container-fluid {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-/* ============================================
-   ANIMATIONS
-   ============================================ */
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.3); }
-    50% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* ============================================
-   HERO SECTION - GLASSMORPHISM
-   ============================================ */
-
-.hero-section {
-    position: relative;
-    background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #0d9488 100%);
-    border-radius: var(--radius-xl);
-    padding: 2.5rem;
-    margin-bottom: 2rem;
-    overflow: hidden;
-    box-shadow: var(--shadow-xl), var(--shadow-glow);
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
-}
-
-.hero-section::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: float 8s ease-in-out infinite reverse;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-}
-
-.hero-greeting {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    padding: 0.35rem 1rem;
-    border-radius: 100px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.9);
-    margin-bottom: 1rem;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.hero-title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-}
-
-.hero-subtitle {
-    font-size: 0.95rem;
-    color: rgba(255,255,255,0.75);
-    font-weight: 400;
-    max-width: 500px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f8f9fa;
+    color: #1a1a1a;
     line-height: 1.6;
 }
 
-.hero-decoration {
-    position: absolute;
-    right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 8rem;
-    opacity: 0.08;
-    color: white;
-    z-index: 1;
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
 }
 
-/* ============================================
-   STATS CARDS - PREMIUM DESIGN
-   ============================================ */
+/* Header */
+.dashboard-header {
+    margin-bottom: 40px;
+}
 
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.dashboard-header p {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+/* Stats Grid */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem;
-    margin-bottom: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
 }
 
 .stat-card {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    transition: all var(--transition-base);
-    animation: fadeInUp 0.6s ease-out backwards;
-    overflow: hidden;
-}
-
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
-
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    opacity: 0;
-    transition: opacity var(--transition-base);
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-    border-color: transparent;
-}
-
-.stat-card:hover::before {
-    opacity: 1;
-}
-
-.stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .stat-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 8px;
 }
-
-.stat-icon-wrapper {
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    transition: all var(--transition-base);
-}
-
-.stat-card:hover .stat-icon-wrapper {
-    transform: scale(1.1) rotate(-5deg);
-}
-
-.stat-icon-purchase { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: var(--primary); }
-.stat-icon-payment { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: var(--success); }
-.stat-icon-due { background: linear-gradient(135deg, #fef2f2, #fee2e2); color: var(--danger); }
-.stat-icon-advance { background: linear-gradient(135deg, #eff6ff, #dbeafe); color: var(--info); }
 
 .stat-value {
-    font-size: 1.75rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    margin-bottom: 0.5rem;
-}
-
-.stat-footer {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.stat-trend {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.75rem;
+    font-size: 1.875rem;
     font-weight: 600;
-    padding: 0.2rem 0.5rem;
-    border-radius: 100px;
-    margin-top: 0.75rem;
+    color: #1a1a1a;
 }
 
-.trend-up { background: var(--success-bg); color: var(--success); }
-.trend-down { background: var(--danger-bg); color: var(--danger); }
+.stat-change {
+    font-size: 0.8rem;
+    color: #10b981;
+    margin-top: 4px;
+}
 
-/* ============================================
-   SECTION HEADER
-   ============================================ */
-
+/* Invoices Section */
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    animation: fadeInUp 0.6s ease-out 0.5s both;
+    margin-bottom: 20px;
 }
 
-.section-title-group {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.section-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
-}
-
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-}
-
-.section-subtitle {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 0.15rem;
-    font-weight: 500;
-}
-
-/* Refresh Button */
-.refresh-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--surface);
-    border: 1.5px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: 0.6rem 1rem;
-    font-family: inherit;
-    font-size: 0.8rem;
+.section-header h2 {
+    font-size: 1.25rem;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: #1a1a1a;
+}
+
+.btn-minimal {
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.refresh-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface-elevated);
-    box-shadow: var(--shadow-md);
+.btn-minimal:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
 }
 
-.refresh-btn:active {
-    transform: scale(0.96);
+.btn-primary {
+    background: #1a1a1a;
+    color: white;
+    border-color: #1a1a1a;
 }
 
-.refresh-btn.loading {
-    animation: spin 0.8s linear infinite;
-    pointer-events: none;
+.btn-primary:hover {
+    background: #2d2d2d;
+    border-color: #2d2d2d;
 }
 
-/* ============================================
-   INVOICE GRID
-   ============================================ */
-
-.invoice-grid {
+/* Invoices Grid */
+.invoices-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
-    gap: 1.5rem;
-    animation: fadeInUp 0.6s ease-out 0.6s both;
+    gap: 16px;
 }
-
-/* ============================================
-   INVOICE CARD - PREMIUM DESIGN
-   ============================================ */
 
 .invoice-card {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    transition: all var(--transition-base);
-    animation: scaleIn 0.5s ease-out backwards;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
 }
 
 .invoice-card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-xl);
-    border-color: transparent;
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.invoice-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--accent));
-    opacity: 0;
-    transition: opacity var(--transition-base);
-}
-
-.invoice-card:hover::after {
-    opacity: 1;
-}
-
-.invoice-header {
-    padding: 1.5rem;
-    background: linear-gradient(180deg, var(--surface-elevated) 0%, var(--surface) 100%);
-    border-bottom: 1px solid var(--border-light);
-}
-
-.invoice-header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1.25rem;
-}
-
-.brand-section {
-    display: flex;
-    align-items: center;
-    gap: 0.875rem;
-}
-
-.brand-icon {
-    width: 3rem;
-    height: 3rem;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    color: white;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
-    transition: all var(--transition-base);
-}
-
-.invoice-card:hover .brand-icon {
-    transform: scale(1.05) rotate(-3deg);
-    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
-}
-
-.brand-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.brand-title {
+.invoice-info h3 {
     font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 6px;
 }
 
-.brand-subtitle {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    margin-top: 0.15rem;
+.invoice-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.875rem;
+    color: #6b7280;
 }
 
-/* Status Badge */
-.status-badge {
-    display: inline-flex;
+.invoice-actions {
+    display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.875rem;
-    border-radius: 100px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    border: 1.5px solid transparent;
-    transition: all var(--transition-fast);
+    gap: 12px;
 }
 
-.status-badge i {
-    font-size: 0.8rem;
+.invoice-amount {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .status-paid {
-    background: var(--success-bg);
-    color: #047857;
-    border-color: #a7f3d0;
+    background: #d1fae5;
+    color: #065f46;
 }
 
 .status-partial {
-    background: var(--warning-bg);
-    color: #b45309;
-    border-color: #fde68a;
+    background: #fed7aa;
+    color: #92400e;
 }
 
-.status-credit {
-    background: var(--danger-bg);
-    color: #b91c1c;
-    border-color: #fecaca;
+.status-unpaid {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 .status-advance {
-    background: var(--info-bg);
-    color: #1d4ed8;
-    border-color: #bfdbfe;
+    background: #dbeafe;
+    color: #1e40af;
 }
 
-/* Invoice Meta */
-.invoice-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-}
-
-.meta-item {
+/* Pagination */
+.pagination {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.meta-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-}
-
-.meta-value {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    font-family: 'Plus Jakarta Sans', monospace;
-}
-
-/* Notes Box */
-.notes-box {
-    margin: 0 1.5rem;
-    padding: 0.875rem 1rem;
-    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
-    border: 1.5px solid #bbf7d0;
-    border-radius: var(--radius-md);
-    font-size: 0.8rem;
-    color: #166534;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.notes-box i {
-    color: var(--primary);
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-/* Invoice Content */
-.invoice-content {
-    padding: 1.25rem 1.5rem;
-}
-
-/* Items Table */
-.items-header {
-    display: grid;
-    grid-template-columns: 2fr 0.7fr 1fr;
-    gap: 1rem;
-    padding: 0.75rem 0;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid var(--border-light);
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-}
-
-.invoice-item {
-    display: grid;
-    grid-template-columns: 2fr 0.7fr 1fr;
-    gap: 1rem;
-    padding: 0.875rem 0;
-    border-bottom: 1px solid var(--border-light);
-    transition: background var(--transition-fast);
-    border-radius: var(--radius-sm);
-    margin: 0 -0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-}
-
-.invoice-item:hover {
-    background: var(--surface-elevated);
-}
-
-.invoice-item:last-child {
-    border-bottom: none;
-}
-
-.item-main {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.product-badge {
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: var(--radius-sm);
-    background: linear-gradient(135deg, var(--surface-elevated), var(--border-light));
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
-    color: var(--primary);
-    border: 1px solid var(--border-subtle);
-    transition: all var(--transition-fast);
+    gap: 8px;
+    margin-top: 32px;
 }
 
-.invoice-item:hover .product-badge {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: white;
-    border-color: transparent;
-}
-
-.product-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.product-name {
-    font-weight: 700;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-}
-
-.product-unit {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    margin-top: 0.15rem;
-}
-
-.product-qty {
-    font-weight: 700;
+.page-btn {
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #374151;
     font-size: 0.875rem;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-}
-
-.product-price {
-    font-weight: 800;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    text-align: right;
-    letter-spacing: -0.01em;
-}
-
-.more-items {
-    text-align: center;
-    padding: 0.75rem;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 600;
-    background: var(--surface-elevated);
-    border-radius: var(--radius-sm);
-    margin-top: 0.5rem;
-    border: 1px dashed var(--border-subtle);
-}
-
-/* Summary Section */
-.invoice-summary {
-    margin-top: 1.25rem;
-    padding: 1.25rem;
-    background: linear-gradient(180deg, var(--surface-elevated), var(--surface));
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-light);
-}
-
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.6rem 0;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-}
-
-.summary-row.final {
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 2px solid var(--border-subtle);
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-}
-
-.summary-amount {
-    font-family: 'Plus Jakarta Sans', monospace;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-}
-
-/* Invoice Footer */
-.invoice-footer {
-    padding: 1.25rem 1.5rem;
-    background: linear-gradient(180deg, var(--surface), var(--surface-elevated));
-    border-top: 1px solid var(--border-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.trust-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.trust-badge i {
-    color: var(--success);
-    font-size: 1rem;
-}
-
-/* Buttons */
-.btn-ui {
-    border: none;
-    border-radius: var(--radius-md);
-    font-weight: 700;
-    transition: all var(--transition-fast);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
     text-decoration: none;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.8rem;
-    padding: 0.6rem 1.25rem;
-    letter-spacing: 0.01em;
 }
 
-.btn-primary-ui {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+.page-btn:hover:not(.active):not(:disabled) {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.page-btn.active {
+    background: #1a1a1a;
     color: white;
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    border-color: #1a1a1a;
 }
 
-.btn-primary-ui:hover {
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
-}
-
-.btn-primary-ui:active {
-    transform: translateY(0) scale(0.98);
-}
-
-.btn-outline-ui {
-    background: var(--surface);
-    border: 1.5px solid var(--border-subtle);
-    color: var(--text-secondary);
-}
-
-.btn-outline-ui:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface-elevated);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-/* ============================================
-   EMPTY STATE
-   ============================================ */
-
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--surface);
-    border: 2px dashed var(--border-subtle);
-    border-radius: var(--radius-xl);
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.empty-icon-wrapper {
-    width: 5rem;
-    height: 5rem;
-    background: linear-gradient(135deg, var(--surface-elevated), var(--border-light));
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    border: 2px solid var(--border-subtle);
-}
-
-.empty-icon {
-    font-size: 2.5rem;
-    color: var(--text-muted);
-}
-
-.empty-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.01em;
-}
-
-.empty-desc {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    max-width: 400px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
-/* ============================================
-   LOAD MORE BUTTON
-   ============================================ */
-
-.load-more-container {
-    text-align: center;
-    margin-top: 2.5rem;
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.load-more-btn {
-    background: var(--surface);
-    border: 1.5px solid var(--border-subtle);
-    padding: 0.875rem 2.5rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    font-family: inherit;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all var(--transition-base);
-    border-radius: var(--radius-lg);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.load-more-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface-elevated);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-}
-
-.load-more-btn:disabled {
-    opacity: 0.6;
+.page-btn:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
 }
 
-/* Loading Spinner */
-.loading-spinner {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border: 2.5px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
+/* Empty State */
+.empty-state {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 60px 20px;
+    text-align: center;
 }
 
-/* ============================================
-   TOAST NOTIFICATION
-   ============================================ */
-
-.toast-container {
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+.empty-state i {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 16px;
 }
 
-.toast {
-    background: var(--surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    box-shadow: var(--shadow-xl);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    animation: slideInRight 0.4s ease-out;
-    min-width: 300px;
-    backdrop-filter: blur(10px);
+.empty-state h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
 }
 
-.toast-success { border-left: 4px solid var(--success); }
-.toast-error { border-left: 4px solid var(--danger); }
-
-.toast-icon {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
+.empty-state p {
+    color: #6b7280;
+    font-size: 0.875rem;
 }
 
-.toast-success .toast-icon { background: var(--success-bg); color: var(--success); }
-.toast-error .toast-icon { background: var(--danger-bg); color: var(--danger); }
-
-.toast-content {
-    flex: 1;
-}
-
-.toast-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.toast-message {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-top: 0.15rem;
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-
-@media (max-width: 1200px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .invoice-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-    .container-fluid {
-        padding: 1rem;
-    }
-    
-    .hero-section {
-        padding: 1.75rem;
-    }
-    
-    .hero-title {
+    .dashboard-header h1 {
         font-size: 1.5rem;
     }
     
-    .hero-decoration {
-        display: none;
-    }
-    
     .stats-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.875rem;
-    }
-    
-    .stat-card {
-        padding: 1.25rem;
-    }
-    
-    .stat-value {
-        font-size: 1.35rem;
-    }
-    
-    .invoice-header-top {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .items-header {
-        display: none;
-    }
-    
-    .invoice-item {
         grid-template-columns: 1fr;
-        gap: 0.5rem;
-        padding: 1rem 0.5rem;
     }
     
-    .item-main {
-        justify-content: space-between;
-    }
-    
-    .product-price {
-        text-align: left;
-        font-size: 1rem;
-    }
-    
-    .invoice-footer {
+    .invoice-card {
         flex-direction: column;
-        gap: 1rem;
-        text-align: center;
+        align-items: flex-start;
+        gap: 16px;
     }
     
-    .btn-ui {
+    .invoice-actions {
         width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .hero-section {
-        padding: 1.25rem;
-    }
-    
-    .hero-title {
-        font-size: 1.25rem;
-    }
-    
-    .invoice-meta-grid {
-        grid-template-columns: 1fr;
+        justify-content: space-between;
     }
     
     .section-header {
         flex-direction: column;
-        gap: 1rem;
         align-items: flex-start;
-    }
-    
-    .refresh-btn {
-        width: 100%;
-        justify-content: center;
+        gap: 16px;
     }
 }
 </style>
 
-<div class="container-fluid">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-greeting">
-                <i class="bi bi-person-circle"></i>
-                Welcome Back
-            </div>
-            <div class="hero-title">Hello, {{ current_user.name }}</div>
-            <div class="hero-subtitle">Track your purchases, manage invoices, monitor balances, and access your complete transaction history in one place.</div>
-        </div>
-        <div class="hero-decoration">
-            <i class="bi bi-receipt-cutoff"></i>
-        </div>
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1>Welcome back, {{ current_user.name }}</h1>
+        <p>Here's an overview of your account</p>
     </div>
 
     <!-- Stats Grid -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Total Purchase</span>
-                <div class="stat-icon-wrapper stat-icon-purchase">
-                    <i class="bi bi-cart3"></i>
-                </div>
-            </div>
-            <div class="stat-value stat-total-purchases" style="color: var(--primary);">Rs {{ "%.2f"|format(total_purchases) }}</div>
-            <div class="stat-footer">Lifetime spending</div>
-            <div class="stat-trend trend-up">
-                <i class="bi bi-graph-up-arrow"></i> All Time
-            </div>
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value">{{ total_sales_count or 0 }}</div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Total Payment</span>
-                <div class="stat-icon-wrapper stat-icon-payment">
-                    <i class="bi bi-wallet2"></i>
-                </div>
-            </div>
-            <div class="stat-value stat-total-payments" style="color: var(--success);">Rs {{ "%.2f"|format(total_payments) }}</div>
-            <div class="stat-footer">Amount paid</div>
-            <div class="stat-trend trend-up">
-                <i class="bi bi-check-circle-fill"></i> Cleared
-            </div>
+            <div class="stat-label">Total Spent</div>
+            <div class="stat-value">Rs. {{ "%.2f"|format(total_purchases or 0) }}</div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Due Balance</span>
-                <div class="stat-icon-wrapper stat-icon-due">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-            </div>
-            <div class="stat-value stat-due-balance" style="color: var(--danger);">
-                {% if pending_due > 0 %}Rs {{ "%.2f"|format(pending_due) }}{% else %}Rs 0.00{% endif %}
-            </div>
-            <div class="stat-footer">Outstanding amount</div>
-            {% if pending_due > 0 %}
-            <div class="stat-trend trend-down">
-                <i class="bi bi-clock-history"></i> Pending
-            </div>
-            {% else %}
-            <div class="stat-trend trend-up">
-                <i class="bi bi-shield-check"></i> Clear
-            </div>
-            {% endif %}
+            <div class="stat-label">Pending Dues</div>
+            <div class="stat-value">Rs. {{ "%.2f"|format(pending_due or 0) }}</div>
         </div>
         
         <div class="stat-card">
-            <div class="stat-header">
-                <span class="stat-label">Advance Balance</span>
-                <div class="stat-icon-wrapper stat-icon-advance">
-                    <i class="bi bi-piggy-bank-fill"></i>
-                </div>
-            </div>
-            <div class="stat-value stat-advance-balance" style="color: var(--info);">
-                {% if advance_balance and advance_balance > 0 %}Rs {{ "%.2f"|format(advance_balance) }}{% else %}Rs 0.00{% endif %}
-            </div>
-            <div class="stat-footer">Prepaid credit</div>
-            <div class="stat-trend trend-up">
-                <i class="bi bi-lightning-charge-fill"></i> Available
-            </div>
+            <div class="stat-label">Advance Balance</div>
+            <div class="stat-value">Rs. {{ "%.2f"|format(advance_balance or 0) }}</div>
         </div>
     </div>
 
-    <!-- Section Header -->
+    <!-- Recent Invoices -->
     <div class="section-header">
-        <div class="section-title-group">
-            <div class="section-icon">
-                <i class="bi bi-receipt"></i>
-            </div>
-            <div>
-                <div class="section-title">Recent Invoices</div>
-                <div class="section-subtitle" id="invoiceCount">{{ recent_sales|length }} invoices available</div>
-            </div>
-        </div>
-
+        <h2>Recent Invoices</h2>
+        <a href="{{ url_for('customer.profile') }}" class="btn-minimal">
+            <i class="bi bi-person"></i> Profile
+        </a>
     </div>
 
-    <!-- Invoices Grid -->
-    <div id="invoicesContainer">
-        <div class="invoice-grid" id="invoiceGrid">
-            {% for sale in recent_sales %}
-            <div class="invoice-card" data-sale-id="{{ sale.get('id') }}">
-                <div class="invoice-header">
-                    <div class="invoice-header-top">
-                        <div class="brand-section">
-                            <div class="brand-icon"><i class="bi bi-shop"></i></div>
-                            <div class="brand-info">
-                                <div class="brand-title">Adarsh Oil Mill</div>
-                                <div class="brand-subtitle">Premium Quality Products</div>
-                            </div>
-                        </div>
-                        <div>
-                            {% if sale.get('payment_status') == "paid" %}
-                                <span class="status-badge status-paid"><i class="bi bi-check-circle-fill"></i> Paid</span>
-                            {% elif sale.get('payment_status') == "partial" %}
-                                <span class="status-badge status-partial"><i class="bi bi-hourglass-split"></i> Partial</span>
-                            {% elif sale.get('payment_status') == "advance" %}
-                                <span class="status-badge status-advance"><i class="bi bi-lightning-charge-fill"></i> Advance</span>
-                            {% else %}
-                                <span class="status-badge status-credit"><i class="bi bi-exclamation-circle-fill"></i> Due</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <div class="invoice-meta-grid">
-                        <div class="meta-item">
-                            <div class="meta-label">Invoice Number</div>
-                            <div class="meta-value">#{{ sale.get('invoice_number', '') }}</div>
-                        </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Invoice Date</div>
-                            <div class="meta-value">{{ sale.get('date', '')[:10] if sale.get('date') else '' }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                {% if sale.get('notes') %}
-                <div class="notes-box">
-                    <i class="bi bi-info-circle-fill"></i>
-                    <span>{{ sale.get('notes') }}</span>
-                </div>
-                {% endif %}
-
-                <div class="invoice-content">
-                    <div class="items-header">
-                        <div>Product</div>
-                        <div>Qty</div>
-                        <div class="text-end">Total</div>
-                    </div>
-
-                    {% for item in sale.get('items', [])[:3] %}
-                    <div class="invoice-item">
-                        <div class="item-main">
-                            <div class="product-badge"><i class="bi bi-box-seam-fill"></i></div>
-                            <div class="product-details">
-                                <div class="product-name">{{ item.get('product_name', '') }}</div>
-                                <div class="product-unit">{{ item.get('unit', '') }}</div>
-                            </div>
-                        </div>
-                        <div class="product-qty">{{ item.get('quantity', 0) }}</div>
-                        <div class="product-price">Rs {{ "%.2f"|format(item.get('subtotal', 0)) }}</div>
-                    </div>
-                    {% endfor %}
-                    
-                    {% if sale.get('items', [])|length > 3 %}
-                    <div class="more-items">
-                        <i class="bi bi-three-dots"></i> + {{ sale.get('items', [])|length - 3 }} more item(s)
-                    </div>
+    {% if recent_sales and recent_sales|length > 0 %}
+    <div class="invoices-grid">
+        {% for invoice in recent_sales %}
+        <div class="invoice-card">
+            <div class="invoice-info">
+                <h3>#{{ invoice.invoice_number }}</h3>
+                <div class="invoice-meta">
+                    <span><i class="bi bi-calendar"></i> {{ invoice.date[:10] }}</span>
+                    {% if invoice.get('items') %}
+                    <span><i class="bi bi-box"></i> {{ invoice.get('items')|length }} item(s)</span>
                     {% endif %}
-
-                    <div class="invoice-summary">
-                        <div class="summary-row">
-                            <span>Total Amount</span>
-                            <span class="summary-amount">Rs {{ "%.2f"|format(sale.get('total_amount', 0)) }}</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Cash Paid</span>
-                            <span class="summary-amount">Rs {{ "%.2f"|format(sale.get('paid_amount', 0)) }}</span>
-                        </div>
-                        {% if sale.get('advance_used', 0) > 0 %}
-                        <div class="summary-row">
-                            <span>Advance Used</span>
-                            <span class="summary-amount">Rs {{ "%.2f"|format(sale.get('advance_used', 0)) }}</span>
-                        </div>
-                        {% endif %}
-                        {% set due = sale.get('due_amount', 0) %}
-                        {% set advance = sale.get('advance_amount', 0) %}
-                        <div class="summary-row final">
-                            <span>{% if due > 0 %}Due Balance{% elif advance > 0 %}Advance Credit{% else %}Status{% endif %}</span>
-                            <span class="summary-amount" style="color: {% if due > 0 %}#dc2626{% elif advance > 0 %}#2563eb{% else %}#059669{% endif %};">
-                                {% if due > 0 %}Rs {{ "%.2f"|format(due) }}{% elif advance > 0 %}Rs {{ "%.2f"|format(advance) }}{% else %}Fully Paid{% endif %}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="invoice-footer">
-                    <div class="trust-badge">
-                        <i class="bi bi-shield-check"></i>
-                        <span>Thank you for your business</span>
-                    </div>
-                    <a href="{{ url_for('customer.view_invoice', sale_id=sale.get('id')) }}" 
-                       class="btn-ui btn-primary-ui" 
-                       target="_blank">
-                        <i class="bi bi-printer-fill"></i> View Invoice
-                    </a>
                 </div>
             </div>
-            {% endfor %}
+            <div class="invoice-actions">
+                <span class="invoice-amount">Rs. {{ "%.2f"|format(invoice.total_amount) }}</span>
+                <span class="status-badge status-{{ invoice.payment_status }}">
+                    {{ invoice.payment_status }}
+                </span>
+                <a href="{{ url_for('customer.view_invoice', sale_id=invoice.id) }}" class="btn-minimal">
+                    View
+                </a>
+            </div>
         </div>
-        
-        {% if recent_sales|length < total_sales_count %}
-        <div class="load-more-container" id="loadMoreContainer">
-            <button class="load-more-btn" id="loadMoreBtn">
-                <i class="bi bi-arrow-down-circle"></i>
-                Load More Invoices
-            </button>
-        </div>
-        {% endif %}
+        {% endfor %}
     </div>
-    
-    {% if not recent_sales %}
-    <div class="empty-state">
-        <div class="empty-icon-wrapper">
-            <i class="bi bi-receipt empty-icon"></i>
-        </div>
-        <div class="empty-title">No Purchases Found</div>
-        <div class="empty-desc">Your invoices and purchases will appear here once records are available. Check back soon!</div>
+
+    <!-- Pagination -->
+    {% if total_pages and total_pages > 1 %}
+    {% set current_page = request.args.get('page', '1')|int %}
+    <div class="pagination">
+        {% if current_page > 1 %}
+        <a href="{{ url_for('customer.dashboard', page=current_page-1) }}" class="page-btn">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        {% endif %}
+        
+        {% for page_num in range(1, total_pages + 1) %}
+            {% if page_num == current_page %}
+            <span class="page-btn active">{{ page_num }}</span>
+            {% else %}
+            <a href="{{ url_for('customer.dashboard', page=page_num) }}" class="page-btn">{{ page_num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if current_page < total_pages %}
+        <a href="{{ url_for('customer.dashboard', page=current_page+1) }}" class="page-btn">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
     </div>
     {% endif %}
 
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h3>No invoices yet</h3>
+        <p>Your purchase history will appear here</p>
+    </div>
+    {% endif %}
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toastContainer"></div>
-
-<script>
-let currentPage = 1;
-let isLoading = false;
-let totalPages = {{ total_pages|default(1) }};
-
-// Toast notification system
-function showToast(title, message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-        <div class="toast-icon">
-            <i class="bi bi-${type === 'success' ? 'check-circle-fill' : 'x-circle-fill'}"></i>
-        </div>
-        <div class="toast-content">
-            <div class="toast-title">${title}</div>
-            <div class="toast-message">${message}</div>
-        </div>
-    `;
-    container.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// Helper function to format currency
-function formatCurrency(amount) {
-    return 'Rs ' + parseFloat(amount).toFixed(2);
-}
-
-// Update stats on the page
-function updateStats(data) {
-    if (data.total_purchases !== undefined) {
-        animateValue(document.querySelector('.stat-total-purchases'), data.total_purchases);
-    }
-    if (data.total_payments !== undefined) {
-        animateValue(document.querySelector('.stat-total-payments'), data.total_payments);
-    }
-    if (data.pending_due !== undefined) {
-        const dueElement = document.querySelector('.stat-due-balance');
-        animateValue(dueElement, data.pending_due);
-    }
-    if (data.advance_balance !== undefined) {
-        const advanceElement = document.querySelector('.stat-advance-balance');
-        animateValue(advanceElement, data.advance_balance);
-    }
-}
-
-// Animate number change
-function animateValue(element, newValue) {
-    if (!element) return;
-    const currentText = element.textContent.replace(/[^0-9.]/g, '');
-    const current = parseFloat(currentText) || 0;
-    const target = parseFloat(newValue) || 0;
-    const duration = 600;
-    const startTime = performance.now();
-    
-    function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
-        const currentVal = current + (target - current) * easeProgress;
-        
-        element.textContent = formatCurrency(currentVal);
-        
-        if (progress < 1) {
-            requestAnimationFrame(update);
-        }
-    }
-    
-    requestAnimationFrame(update);
-}
-
-// Refresh all data via AJAX
-async function refreshData() {
-    const refreshBtn = document.getElementById('refreshBtn');
-    const icon = refreshBtn.querySelector('i');
-    refreshBtn.classList.add('loading');
-    refreshBtn.disabled = true;
-    icon.classList.add('bi-arrow-repeat', 'spin');
-    
-    try {
-        const response = await fetch('{{ url_for("customer.dashboard") }}?ajax=1', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-            updateStats(data);
-            
-            document.getElementById('invoiceCount').innerHTML = data.sales_count + ' invoices available';
-            
-            if (data.html) {
-                document.getElementById('invoiceGrid').innerHTML = data.html;
-            }
-            
-            const loadMoreContainer = document.getElementById('loadMoreContainer');
-            if (loadMoreContainer) {
-                loadMoreContainer.style.display = data.has_more ? 'block' : 'none';
-            }
-            
-            currentPage = 1;
-            totalPages = data.total_pages || 1;
-            
-            showToast('Refreshed', 'Dashboard data updated successfully', 'success');
-        }
-    } catch (error) {
-        console.error('Error refreshing data:', error);
-        showToast('Error', 'Failed to refresh data', 'error');
-    } finally {
-        refreshBtn.classList.remove('loading');
-        refreshBtn.disabled = false;
-    }
-}
-
-// Load more invoices
-async function loadMoreInvoices() {
-    if (isLoading) return;
-    if (currentPage >= totalPages) {
-        document.getElementById('loadMoreContainer').style.display = 'none';
-        return;
-    }
-    
-    isLoading = true;
-    const nextPage = currentPage + 1;
-    const loadMoreBtn = document.getElementById('loadMoreBtn');
-    const originalText = loadMoreBtn.innerHTML;
-    loadMoreBtn.disabled = true;
-    loadMoreBtn.innerHTML = '<span class="loading-spinner"></span> Loading...';
-    
-    try {
-        const response = await fetch('{{ url_for("customer.dashboard") }}?page=' + nextPage + '&ajax=1', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        const data = await response.json();
-        
-        if (data.success && data.html) {
-            document.getElementById('invoiceGrid').insertAdjacentHTML('beforeend', data.html);
-            currentPage = nextPage;
-            totalPages = data.total_pages || totalPages;
-            
-            if (currentPage >= totalPages || !data.has_more) {
-                document.getElementById('loadMoreContainer').style.display = 'none';
-            }
-            
-            updateStats(data);
-        }
-    } catch (error) {
-        console.error('Error loading more invoices:', error);
-        showToast('Error', 'Failed to load more invoices', 'error');
-    } finally {
-        isLoading = false;
-        loadMoreBtn.disabled = false;
-        loadMoreBtn.innerHTML = originalText;
-    }
-}
-
-// Event listeners
-document.getElementById('refreshBtn')?.addEventListener('click', refreshData);
-document.getElementById('loadMoreBtn')?.addEventListener('click', loadMoreInvoices);
-
-// Auto-refresh every 60 seconds
-setInterval(refreshData, 60000);
-
-// Add hover effects to invoice cards dynamically
-document.addEventListener('mouseover', (e) => {
-    const card = e.target.closest('.invoice-card');
-    if (card) {
-        card.style.zIndex = '10';
-    }
-});
-
-document.addEventListener('mouseout', (e) => {
-    const card = e.target.closest('.invoice-card');
-    if (card) {
-        card.style.zIndex = '';
-    }
-});
-</script>
-
-{% endblock %}'''
-
-output_path = '/mnt/agents/output/customer_dashboard.html'
-with open(output_path, 'w', encoding='utf-8') as f:
-    f.write(html_content)
-
-print(f"File saved to: {output_path}")
-print(f"File size: {len(html_content):,} characters")
+{% endblock %}

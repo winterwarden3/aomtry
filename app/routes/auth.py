@@ -220,13 +220,27 @@ def login():
                 if response.data:
                     user_data = response.data[0]
 
-            if user_data and user_data.get('is_active', True):
+            # ============================================================
+            # FIX: Check if user exists FIRST
+            # ============================================================
+            if user_data:
+                # ============================================================
+                # FIX: Check if user is ACTIVE - BLOCK deactivated users
+                # ============================================================
+                if not user_data.get('is_active', True):
+                    error_msg = 'Your account has been deactivated. Please contact the administrator.'
+                    if is_ajax:
+                        return jsonify({'success': False, 'error': error_msg, 'deactivated': True})
+                    flash(error_msg, 'danger')
+                    return render_template('auth/login.html', user_type=user_type)
+                
                 # Ensure password_hash exists
                 if not user_data.get('password_hash'):
                     hash_response = supabase.table("users").select("password_hash").eq("id", user_data['id']).execute()
                     if hash_response.data and hash_response.data[0].get('password_hash'):
                         user_data['password_hash'] = hash_response.data[0]['password_hash']
                 
+                # Check password
                 if user_data.get('password_hash') and check_password_hash(user_data['password_hash'], password):
                     user = LoginUser(user_data)
                     
@@ -260,7 +274,7 @@ def login():
                         return redirect(url_for('admin.dashboard'))
                     return redirect(url_for('customer.dashboard'))
                 else:
-                    # Record FAILED attempt
+                    # Wrong password
                     record_login_attempt(username, ip_address, False)
                     
                     # Get remaining attempts
@@ -297,7 +311,6 @@ def login():
             return render_template('auth/login.html', user_type=user_type)
     
     return render_template('auth/login.html', user_type=user_type)
-
 
 @bp.route('/logout')
 @login_required
