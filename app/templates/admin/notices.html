@@ -7,7 +7,6 @@
 <style>
 /* ============================================
    PROFESSIONAL UI - FULLY MOBILE OPTIMIZED
-   MATCHES CUSTOMER MANAGEMENT PAGE EXACTLY
    ============================================ */
 
 :root {
@@ -35,99 +34,6 @@
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-/* Toast Notification - Matching Newsletter Style */
-.toast-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 10001;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.toast {
-    background: white;
-    padding: 16px 20px;
-    border-radius: var(--radius-md);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 280px;
-    animation: slideIn 0.3s ease;
-    border-left: 4px solid var(--primary);
-}
-
-.toast-success {
-    border-left-color: var(--success);
-}
-
-.toast-error {
-    border-left-color: var(--danger);
-}
-
-.toast-warning {
-    border-left-color: var(--warning);
-}
-
-.toast-icon {
-    font-size: 20px;
-}
-
-.toast-success .toast-icon {
-    color: var(--success);
-}
-
-.toast-error .toast-icon {
-    color: var(--danger);
-}
-
-.toast-warning .toast-icon {
-    color: var(--warning);
-}
-
-.toast-message {
-    flex: 1;
-    font-size: 0.9rem;
-    color: var(--gray-700);
-}
-
-.toast-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--gray-400);
-    font-size: 18px;
-    padding: 0 4px;
-}
-
-.toast-close:hover {
-    color: var(--gray-600);
-}
-
-/* Modal Animation */
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-/* Base */
 * {
     margin: 0;
     padding: 0;
@@ -144,7 +50,6 @@ body {
     background: var(--gray-50);
 }
 
-/* Container */
 .container-fluid {
     max-width: 1400px;
     margin: 0 auto;
@@ -330,14 +235,12 @@ body {
     background: var(--gray-50);
 }
 
-/* Notice Title */
 .notice-title {
     font-weight: 600;
     color: var(--gray-800);
     font-size: 0.85rem;
 }
 
-/* Notice Image */
 .notice-image-thumb {
     width: 50px;
     height: 50px;
@@ -368,7 +271,6 @@ body {
     color: var(--gray-600);
 }
 
-/* Notice Type Badges */
 .type-badge {
     display: inline-flex;
     align-items: center;
@@ -400,64 +302,10 @@ body {
     color: #92400e;
 }
 
-/* Action Buttons Group */
 .action-group {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-}
-
-/* Pagination - SMART PAGINATION */
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 0.375rem;
-    margin-top: 1.25rem;
-    padding: 1rem;
-    border-top: 1px solid var(--gray-200);
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.page-link {
-    padding: 0.375rem 0.75rem;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    color: var(--gray-500);
-    font-size: 0.8rem;
-    transition: all 0.2s ease;
-    background: white;
-    cursor: pointer;
-}
-
-.page-link:hover,
-.page-link.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-}
-
-.page-link.disabled {
-    color: var(--gray-400);
-    cursor: default;
-    background: transparent;
-    border-color: transparent;
-}
-
-.page-link.disabled:hover {
-    background: transparent;
-    border-color: transparent;
-    color: var(--gray-400);
-}
-
-.page-info {
-    padding: 0.375rem 0.75rem;
-    color: var(--gray-500);
-    font-size: 0.8rem;
-    font-weight: 500;
-    border: none;
-    background: transparent;
 }
 
 /* Empty State */
@@ -484,7 +332,7 @@ body {
     color: var(--gray-400);
 }
 
-/* Modal Styles */
+/* Modal */
 .modal-content {
     border-radius: var(--radius-lg);
     border: none;
@@ -532,11 +380,6 @@ body {
     box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
 }
 
-/* Image Preview */
-.image-preview-container {
-    margin-bottom: 10px;
-}
-
 .image-preview {
     max-width: 100%;
     max-height: 200px;
@@ -544,7 +387,43 @@ body {
     border: 2px solid var(--gray-200);
 }
 
-/* Loading Spinner */
+/* Toast */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background: white;
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+    animation: slideIn 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.toast-success { border-left-color: var(--success); }
+.toast-error { border-left-color: var(--danger); }
+.toast-warning { border-left-color: var(--warning); }
+
+.toast-icon { font-size: 20px; }
+.toast-success .toast-icon { color: var(--success); }
+.toast-error .toast-icon { color: var(--danger); }
+.toast-warning .toast-icon { color: var(--warning); }
+
+.toast-message { flex: 1; font-size: 0.9rem; color: var(--gray-700); }
+.toast-close { background: none; border: none; cursor: pointer; color: var(--gray-400); font-size: 18px; padding: 0 4px; }
+.toast-close:hover { color: var(--gray-600); }
+
 .loading-spinner {
     display: inline-block;
     width: 16px;
@@ -560,61 +439,19 @@ body {
     to { transform: rotate(360deg); }
 }
 
-.table-loading {
-    text-align: center;
-    padding: 3rem 1.5rem;
-}
-
-.table-loading .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--gray-200);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-/* ============================================
-   MOBILE RESPONSIVE
-   ============================================ */
-
-/* Tablet */
-@media (max-width: 1024px) {
-    .notices-table th:nth-child(3),
-    .notices-table td:nth-child(3) {
-        display: none;
-    }
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 /* Mobile */
 @media (max-width: 768px) {
-    .container-fluid {
-        padding: 0.75rem;
-    }
+    .container-fluid { padding: 0.75rem; }
+    .stat-value { font-size: 1.2rem; }
+    .icon-box { width: 2rem; height: 2rem; font-size: 1rem; }
+    .page-header h1 { font-size: 1.25rem; }
     
-    .stat-value {
-        font-size: 1.2rem;
-    }
-    
-    .icon-box {
-        width: 2rem;
-        height: 2rem;
-        font-size: 1rem;
-    }
-    
-    .page-header h1 {
-        font-size: 1.25rem;
-    }
-    
-    .row.g-3 {
-        --bs-gutter-y: 0.75rem;
-    }
-    
-    .notices-table thead {
-        display: none;
-    }
-    
+    .notices-table thead { display: none; }
     .notices-table tbody tr {
         display: block;
         margin-bottom: 1rem;
@@ -622,7 +459,6 @@ body {
         border-radius: var(--radius-lg);
         background: white;
     }
-    
     .notices-table td {
         display: flex;
         justify-content: space-between;
@@ -631,11 +467,7 @@ body {
         border: none;
         border-bottom: 1px solid #f0f0f0;
     }
-    
-    .notices-table td:last-child {
-        border-bottom: none;
-    }
-    
+    .notices-table td:last-child { border-bottom: none; }
     .notices-table td::before {
         content: attr(data-label);
         font-weight: 600;
@@ -644,191 +476,13 @@ body {
         color: var(--gray-500);
         min-width: 100px;
     }
-    
-    .action-group {
-        justify-content: flex-end;
-        width: 100%;
-    }
-    
-    .btn-ui {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.75rem;
-    }
 }
 
-/* Small mobile */
 @media (max-width: 480px) {
-    .action-group {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .btn-ui {
-        width: 100%;
-    }
-    
-    .notices-table td {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    
-    .notices-table td::before {
-        min-width: auto;
-    }
-    
-    .status-badge {
-        align-self: flex-start;
-    }
-    
-    .pagination {
-        justify-content: center;
-    }
-}
-
-/* Extra small */
-@media (max-width: 360px) {
-    .stat-value {
-        font-size: 1rem;
-    }
-}
-
-/* Notice Popup Styles */
-.notice-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 20px;
-}
-
-.notice-popup-content {
-    background: white;
-    border-radius: 16px;
-    max-width: 500px;
-    width: 100%;
-    padding: 30px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    position: relative;
-    animation: slideIn 0.3s ease;
-}
-
-.notice-popup-content.text-mode .notice-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--gray-800);
-}
-
-.notice-popup-content.text-mode .notice-content {
-    color: var(--gray-600);
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.notice-popup-content.image-mode {
-    padding: 0;
-    overflow: hidden;
-    max-width: 600px;
-}
-
-.notice-image-full {
-    width: 100%;
-    height: auto;
-    max-height: 70vh;
-    object-fit: cover;
-    display: block;
-}
-
-.notice-image-title {
-    padding: 15px 20px;
-    background: white;
-    font-size: 1.2rem;
-    font-weight: 600;
-    text-align: center;
-    color: var(--gray-800);
-}
-
-.notice-popup-content .notice-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 30px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-
-.notice-popup-content .notice-badge-info {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.notice-popup-content .notice-badge-danger {
-    background: #fecaca;
-    color: #991b1b;
-}
-
-.notice-popup-content .notice-badge-success {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.notice-popup-content .notice-badge-warning {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.notice-countdown {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 15px;
-    font-size: 0.85rem;
-    color: var(--gray-500);
-}
-
-.notice-countdown .countdown-number {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--primary);
-}
-
-.notice-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(0,0,0,0.1);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.notice-close-btn:hover {
-    background: rgba(0,0,0,0.2);
-}
-
-.image-mode .notice-close-btn {
-    background: rgba(0,0,0,0.3);
-    color: white;
-}
-
-.image-mode .notice-close-btn:hover {
-    background: rgba(0,0,0,0.5);
+    .action-group { flex-direction: column; width: 100%; }
+    .btn-ui { width: 100%; }
+    .notices-table td { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .notices-table td::before { min-width: auto; }
 }
 </style>
 
@@ -844,15 +498,14 @@ body {
         </button>
     </div>
 
-    <!-- Stats Row -->
-    <div class="row g-3 mb-4" id="statsContainer">
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
         <div class="col-6 col-md-4">
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Total Notices</h6>
-                        <div class="stat-value" id="totalNotices">{{ notices.total }}</div>
-                        <div class="stat-footer">all time</div>
+                        <div class="stat-value">{{ notices.total }}</div>
                     </div>
                     <div class="icon-box" style="background: rgba(12,91,63,0.1); color: #0C5B3F;">
                         <i class="bi bi-megaphone"></i>
@@ -865,8 +518,7 @@ body {
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Active</h6>
-                        <div class="stat-value" style="color: #16a34a;" id="activeNotices">{{ active_count or 0 }}</div>
-                        <div class="stat-footer">currently active</div>
+                        <div class="stat-value" style="color: #16a34a;">{{ active_count or 0 }}</div>
                     </div>
                     <div class="icon-box" style="background: rgba(22,163,74,0.1); color: #16a34a;">
                         <i class="bi bi-check-circle"></i>
@@ -879,8 +531,7 @@ body {
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6>Inactive</h6>
-                        <div class="stat-value" style="color: #ef4444;" id="inactiveNotices">{{ inactive_count or 0 }}</div>
-                        <div class="stat-footer">currently inactive</div>
+                        <div class="stat-value" style="color: #ef4444;">{{ inactive_count or 0 }}</div>
                     </div>
                     <div class="icon-box" style="background: rgba(239,68,68,0.1); color: #ef4444;">
                         <i class="bi bi-x-circle"></i>
@@ -890,7 +541,7 @@ body {
         </div>
     </div>
 
-    <!-- Notices Table -->
+    <!-- Table -->
     <div class="card-ui">
         <div style="overflow-x: auto;">
             <table class="notices-table">
@@ -902,7 +553,7 @@ body {
                         <th>Status</th>
                         <th>Show From</th>
                         <th>Show Until</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="noticesTableBody">
@@ -971,102 +622,11 @@ body {
                 </tbody>
             </table>
         </div>
-        
-        <!-- SMART PAGINATION - AJAX Version -->
-        {% if notices.items and notices.pages > 1 %}
-        <div class="pagination" id="paginationContainer">
-            <!-- First Page -->
-            {% if notices.page > 1 %}
-                <button class="page-link" onclick="loadNoticesPage(1)">
-                    <i class="bi bi-chevron-double-left"></i>
-                </button>
-            {% endif %}
-            
-            <!-- Previous -->
-            {% if notices.has_prev %}
-                <button class="page-link" onclick="loadNoticesPage({{ notices.prev_num }})">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-            {% endif %}
-            
-            <!-- Smart Pagination Logic -->
-            {% set total_pages = notices.pages %}
-            {% set current_page = notices.page %}
-            
-            {% if total_pages <= 7 %}
-                {# Show all pages if total is small #}
-                {% for page_num in range(1, total_pages + 1) %}
-                    <button class="page-link {% if page_num == current_page %}active{% endif %}" 
-                            onclick="loadNoticesPage({{ page_num }})">
-                        {{ page_num }}
-                    </button>
-                {% endfor %}
-            {% else %}
-                {# First 3 pages #}
-                {% for page_num in range(1, 4) %}
-                    <button class="page-link {% if page_num == current_page %}active{% endif %}" 
-                            onclick="loadNoticesPage({{ page_num }})">
-                        {{ page_num }}
-                    </button>
-                {% endfor %}
-                
-                {# Ellipsis if current page is far from start #}
-                {% if current_page > 5 %}
-                    <span class="page-link disabled">…</span>
-                {% endif %}
-                
-                {# Pages around current page #}
-                {% set start = [current_page - 1, 4]|max %}
-                {% set end = [current_page + 1, total_pages - 3]|min %}
-                
-                {% for page_num in range(start, end + 1) %}
-                    {% if page_num > 3 and page_num < total_pages - 2 %}
-                        <button class="page-link {% if page_num == current_page %}active{% endif %}" 
-                                onclick="loadNoticesPage({{ page_num }})">
-                            {{ page_num }}
-                        </button>
-                    {% endif %}
-                {% endfor %}
-                
-                {# Ellipsis if current page is far from end #}
-                {% if current_page < total_pages - 4 %}
-                    <span class="page-link disabled">…</span>
-                {% endif %}
-                
-                {# Last 3 pages #}
-                {% for page_num in range(total_pages - 2, total_pages + 1) %}
-                    <button class="page-link {% if page_num == current_page %}active{% endif %}" 
-                            onclick="loadNoticesPage({{ page_num }})">
-                        {{ page_num }}
-                    </button>
-                {% endfor %}
-            {% endif %}
-            
-            <!-- Next -->
-            {% if notices.has_next %}
-                <button class="page-link" onclick="loadNoticesPage({{ notices.next_num }})">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            {% endif %}
-            
-            <!-- Last Page -->
-            {% if notices.page < notices.pages %}
-                <button class="page-link" onclick="loadNoticesPage({{ notices.pages }})">
-                    <i class="bi bi-chevron-double-right"></i>
-                </button>
-            {% endif %}
-            
-            <!-- Page Info -->
-            <span class="page-info" id="pageInfo">
-                Page {{ notices.page }} of {{ notices.pages }}
-            </span>
-        </div>
-        {% endif %}
     </div>
 </div>
 
 <!-- ============================================ -->
-<!-- NOTICE MODAL (Add + Edit in one) -->
+<!-- MODAL -->
 <!-- ============================================ -->
 <div class="modal fade" id="noticeModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -1082,34 +642,21 @@ body {
                     <input type="hidden" id="noticeId" name="notice_id" value="">
                     
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Title <span class="text-muted">(optional)</span></label>
-                        <input type="text" id="noticeTitle" name="title" class="form-control" placeholder="Enter notice title">
+                        <label class="form-label fw-bold">Title</label>
+                        <input type="text" id="noticeTitle" name="title" class="form-control">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Content <span class="text-muted">(optional)</span></label>
-                        <textarea id="noticeContent" name="content" class="form-control" rows="4" placeholder="Enter notice content"></textarea>
+                        <label class="form-label fw-bold">Content</label>
+                        <textarea id="noticeContent" name="content" class="form-control" rows="4"></textarea>
                     </div>
 
-                    <!-- IMAGE UPLOAD SECTION -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Notice Image</label>
-                        
-                        <!-- Image Preview -->
+                        <label class="form-label fw-bold">Image</label>
                         <div id="imagePreviewContainer" style="display: none; margin-bottom: 10px;">
-                            <img id="imagePreview" src="" alt="Notice image preview" 
-                                 class="image-preview">
-                            <br>
-                            <small class="text-muted">Current image preview</small>
+                            <img id="imagePreview" src="" alt="Preview" class="image-preview">
                         </div>
-                        
-                        <!-- File Input -->
-                        <input type="file" id="noticeImage" name="notice_image" 
-                               class="form-control" accept="image/png, image/jpeg, image/gif, image/webp"
-                               onchange="previewImage(this)">
-                        <small class="text-muted">Allowed: PNG, JPG, JPEG, GIF, WEBP</small>
-                        
-                        <!-- Remove Image Checkbox (shown when editing) -->
+                        <input type="file" id="noticeImage" name="notice_image" class="form-control" accept="image/png,image/jpeg,image/gif,image/webp">
                         <div id="removeImageContainer" style="display: none; margin-top: 8px;">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="removeImage" name="remove_image">
@@ -1121,7 +668,7 @@ body {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Notice Type</label>
+                        <label class="form-label fw-bold">Type</label>
                         <select id="noticeType" name="notice_type" class="form-select">
                             <option value="info">Info (Blue)</option>
                             <option value="danger">Danger (Red)</option>
@@ -1134,13 +681,10 @@ body {
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Show From</label>
                             <input type="datetime-local" id="noticeShowFrom" name="show_from" class="form-control">
-                            <small class="text-muted">Leave empty to show immediately</small>
                         </div>
-
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Show Until</label>
                             <input type="datetime-local" id="noticeShowUntil" name="show_until" class="form-control">
-                            <small class="text-muted">Leave empty for no expiry</small>
                         </div>
                     </div>
 
@@ -1149,7 +693,6 @@ body {
                             <input class="form-check-input" type="checkbox" name="is_active" id="noticeIsActive" checked>
                             <label class="form-check-label fw-bold" for="noticeIsActive">Active</label>
                         </div>
-                        <small class="text-muted">Inactive notices won't be shown to customers</small>
                     </div>
                 </form>
             </div>
@@ -1163,91 +706,78 @@ body {
     </div>
 </div>
 
-<!-- NOTICE POPUP -->
-<div class="notice-popup-overlay" id="noticePopup">
-    <div class="notice-popup-content" id="noticePopupContent">
-        <button class="notice-close-btn" onclick="closeNoticePopup()">✕</button>
+<!-- ============================================ -->
+<!-- NOTICE POPUP - VERCEL FIX -->
+<!-- ============================================ -->
+<div id="noticePopup" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:999999; align-items:center; justify-content:center;">
+    <div style="background:white; max-width:500px; width:100%; padding:30px; border-radius:16px; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:slideIn 0.3s ease;">
+        <button onclick="document.getElementById('noticePopup').style.display='none'" 
+                style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.1); border:none; border-radius:50%; width:32px; height:32px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
         
-        <!-- Text Mode -->
-        <div id="noticeTextContainer">
-            <div class="notice-badge" id="noticeBadgeText">📢 Important</div>
-            <div class="notice-title" id="noticePopupTitle">Notice Title</div>
-            <div class="notice-content" id="noticePopupContentText">Notice content goes here.</div>
-        </div>
-        
-        <!-- Image Mode -->
-        <div id="noticeImageContainer" style="display: none;">
-            <img id="noticeImageDisplay" class="notice-image-full" src="" alt="Notice">
-            <div class="notice-image-title" id="noticeImageTitle">Notice Title</div>
-        </div>
-        
-        <div class="notice-countdown">
-            <span>This notice will auto-close in</span>
-            <span class="countdown-number" id="countdownDisplay">15</span>
+        <div id="noticeBadgeText" style="display:inline-block; padding:0.25rem 0.75rem; border-radius:30px; font-size:0.75rem; font-weight:600; margin-bottom:12px; background:#dbeafe; color:#1e40af;">📢 Important</div>
+        <div id="noticePopupTitle" style="font-size:1.5rem; font-weight:700; margin-bottom:12px; color:#111827;">Notice Title</div>
+        <div id="noticePopupContent" style="color:#4b5563; line-height:1.6; margin-bottom:20px;">Notice content goes here.</div>
+        <div style="display:flex; align-items:center; gap:10px; justify-content:center; margin-top:15px; font-size:0.85rem; color:#6b7280;">
+            <span>Auto-closes in</span>
+            <span id="countdownDisplay" style="font-weight:700; font-size:1.1rem; color:#0C5B3F;">15</span>
             <span>seconds</span>
         </div>
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- JAVASCRIPT - COMPLETE -->
+<!-- ============================================ -->
 <script>
 // ============================================
-// TOAST NOTIFICATION SYSTEM - Matching Newsletter
+// TOAST SYSTEM
 // ============================================
 function showToast(message, type = 'success') {
-    const toastContainer = document.getElementById('toastContainer') || (() => {
-        const container = document.createElement('div');
-        container.id = 'toastContainer';
-        container.className = 'toast-container';
-        document.body.appendChild(container);
-        return container;
+    const container = document.getElementById('toastContainer') || (() => {
+        const c = document.createElement('div');
+        c.id = 'toastContainer';
+        c.className = 'toast-container';
+        document.body.appendChild(c);
+        return c;
     })();
     
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    const icons = {
+    const iconMap = {
         success: 'bi-check-circle-fill',
         error: 'bi-x-circle-fill',
-        warning: 'bi-exclamation-triangle-fill',
-        info: 'bi-info-circle-fill'
+        warning: 'bi-exclamation-triangle-fill'
     };
-    const icon = icons[type] || 'bi-info-circle-fill';
     toast.innerHTML = `
-        <i class="bi ${icon} toast-icon"></i>
+        <i class="bi ${iconMap[type] || 'bi-info-circle-fill'} toast-icon"></i>
         <span class="toast-message">${message}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
     `;
-    
-    toastContainer.appendChild(toast);
-    
-    setTimeout(() => {
-        if (toast.parentElement) {
-            toast.remove();
-        }
-    }, 5000);
+    container.appendChild(toast);
+    setTimeout(() => { if (toast.parentElement) toast.remove(); }, 5000);
 }
 
 // ============================================
 // IMAGE PREVIEW
 // ============================================
 function previewImage(input) {
-    const previewContainer = document.getElementById('imagePreviewContainer');
+    const container = document.getElementById('imagePreviewContainer');
     const preview = document.getElementById('imagePreview');
-    
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
             preview.src = e.target.result;
-            previewContainer.style.display = 'block';
-        }
+            container.style.display = 'block';
+        };
         reader.readAsDataURL(input.files[0]);
     } else {
-        previewContainer.style.display = 'none';
+        container.style.display = 'none';
         preview.src = '';
     }
 }
 
 // ============================================
-// OPEN MODAL FUNCTIONS
+// MODAL FUNCTIONS
 // ============================================
 function openAddModal() {
     document.getElementById('noticeModalTitle').innerHTML = '<i class="bi bi-plus-lg"></i> Add Notice';
@@ -1255,15 +785,10 @@ function openAddModal() {
     document.getElementById('noticeForm').reset();
     document.getElementById('noticeId').value = '';
     document.getElementById('noticeIsActive').checked = true;
-    
     document.getElementById('imagePreviewContainer').style.display = 'none';
     document.getElementById('imagePreview').src = '';
     document.getElementById('removeImageContainer').style.display = 'none';
-    document.getElementById('removeImage').checked = false;
-    
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('noticeShowFrom').value = now.toISOString().slice(0, 16);
+    document.getElementById('noticeImage').value = '';
 }
 
 function openEditModal(id) {
@@ -1271,16 +796,9 @@ function openEditModal(id) {
     document.getElementById('saveBtnText').textContent = 'Update Notice';
     
     fetch(`/admin/notices/${id}/get`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             const notice = data.notice;
@@ -1291,13 +809,9 @@ function openEditModal(id) {
             document.getElementById('noticeIsActive').checked = notice.is_active;
             
             if (notice.image_url) {
-                const preview = document.getElementById('imagePreview');
-                preview.src = notice.image_url;
+                document.getElementById('imagePreview').src = notice.image_url;
                 document.getElementById('imagePreviewContainer').style.display = 'block';
                 document.getElementById('removeImageContainer').style.display = 'block';
-            } else {
-                document.getElementById('imagePreviewContainer').style.display = 'none';
-                document.getElementById('removeImageContainer').style.display = 'none';
             }
             
             if (notice.show_from) {
@@ -1307,20 +821,18 @@ function openEditModal(id) {
                 document.getElementById('noticeShowUntil').value = notice.show_until.slice(0, 16);
             }
             
-            const modal = new bootstrap.Modal(document.getElementById('noticeModal'));
-            modal.show();
+            new bootstrap.Modal(document.getElementById('noticeModal')).show();
         } else {
-            showToast(data.error || 'Failed to load notice data', 'error');
+            showToast(data.error || 'Failed to load notice', 'error');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        showToast('Failed to load notice data: ' + error.message, 'error');
+        showToast('Failed to load notice data', 'error');
     });
 }
 
 // ============================================
-// SAVE NOTICE (AJAX - No Reload)
+// SAVE NOTICE
 // ============================================
 function saveNotice() {
     const id = document.getElementById('noticeId').value;
@@ -1335,16 +847,10 @@ function saveNotice() {
     formData.append('show_until', document.getElementById('noticeShowUntil').value);
     
     const imageFile = document.getElementById('noticeImage').files[0];
-    if (imageFile) {
-        formData.append('notice_image', imageFile);
-    }
-    
-    if (document.getElementById('removeImage').checked) {
-        formData.append('remove_image', 'on');
-    }
+    if (imageFile) formData.append('notice_image', imageFile);
+    if (document.getElementById('removeImage').checked) formData.append('remove_image', 'on');
     
     const url = isEdit ? `/admin/notices/${id}/edit` : '/admin/notices/add';
-    
     const saveBtn = document.getElementById('saveBtnText');
     saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
     saveBtn.disabled = true;
@@ -1352,576 +858,190 @@ function saveNotice() {
     fetch(url, {
         method: 'POST',
         body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             bootstrap.Modal.getInstance(document.getElementById('noticeModal')).hide();
             showToast(data.message, 'success');
-            refreshNoticesTable();
+            setTimeout(() => location.reload(), 1000);
         } else {
-            showToast(data.error || 'Failed to save notice', 'error');
+            showToast(data.error || 'Failed to save', 'error');
             saveBtn.innerHTML = isEdit ? 'Update Notice' : 'Save Notice';
             saveBtn.disabled = false;
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        showToast('Network error. Please try again.', 'error');
+        showToast('Network error', 'error');
         saveBtn.innerHTML = isEdit ? 'Update Notice' : 'Save Notice';
         saveBtn.disabled = false;
     });
 }
 
 // ============================================
-// REFRESH NOTICES TABLE (AJAX - No Reload)
-// ============================================
-let currentPage = {{ notices.page or 1 }};
-
-function refreshNoticesTable(page = currentPage) {
-    const tableBody = document.getElementById('noticesTableBody');
-    const paginationContainer = document.getElementById('paginationContainer');
-    
-    // Show loading state
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="7">
-                <div class="table-loading">
-                    <div class="spinner"></div>
-                    <p class="text-muted">Loading notices...</p>
-                </div>
-            </td>
-        </tr>
-    `;
-    
-    if (paginationContainer) {
-        paginationContainer.innerHTML = `
-            <div class="text-center py-3">
-                <div class="spinner-border text-primary spinner-border-sm" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        `;
-    }
-    
-    fetch(`/admin/notices?ajax=1&page=${page}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            currentPage = page;
-            renderNoticesTable(data);
-            renderPagination(data);
-            updateStats(data);
-        } else {
-            showToast('Failed to load notices', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Network error loading notices', 'error');
-        // Restore previous content or show error
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7">
-                    <div class="empty-state">
-                        <div class="empty-icon"><i class="bi bi-exclamation-triangle"></i></div>
-                        <div class="empty-title">Failed to load notices</div>
-                        <div class="empty-desc">Please try refreshing the page</div>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-}
-
-function renderNoticesTable(data) {
-    const tableBody = document.getElementById('noticesTableBody');
-    
-    if (!data.notices || data.notices.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7">
-                    <div class="empty-state">
-                        <div class="empty-icon"><i class="bi bi-megaphone"></i></div>
-                        <div class="empty-title">No notices found</div>
-                        <div class="empty-desc">Create your first notice to inform customers</div>
-                        <button class="btn-ui btn-primary-ui mt-3" data-bs-toggle="modal" data-bs-target="#noticeModal" onclick="openAddModal()">
-                            <i class="bi bi-plus-lg"></i> Add Notice
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    let html = '';
-    data.notices.forEach(notice => {
-        const isActive = notice.is_active;
-        const statusClass = isActive ? 'status-active' : 'status-inactive';
-        const statusIcon = isActive ? 'check-circle' : 'x-circle';
-        const statusText = isActive ? 'Active' : 'Inactive';
-        const btnClass = isActive ? 'warning-ui' : 'success-ui';
-        const btnIcon = isActive ? 'pause' : 'play';
-        const btnText = isActive ? 'Pause' : 'Activate';
-        const typeClass = notice.notice_type || 'info';
-        
-        html += `
-            <tr id="notice-row-${notice.id}">
-                <td data-label="Title">
-                    <span class="notice-title">${escapeHtml(notice.title || 'Untitled')}</span>
-                </td>
-                <td data-label="Image">
-                    ${notice.image_url ? 
-                        `<img src="${notice.image_url}" alt="${escapeHtml(notice.image_alt_text || notice.title)}" class="notice-image-thumb">` :
-                        `<span class="text-muted" style="font-size: 0.7rem;">No image</span>`
-                    }
-                </td>
-                <td data-label="Type">
-                    <span class="type-badge type-${typeClass}">
-                        ${typeClass.charAt(0).toUpperCase() + typeClass.slice(1)}
-                    </span>
-                </td>
-                <td data-label="Status">
-                    <span class="status-badge ${statusClass}">
-                        <i class="bi bi-${statusIcon}"></i> ${statusText}
-                    </span>
-                </td>
-                <td data-label="Show From">
-                    ${notice.show_from ? notice.show_from.slice(0, 10) : 'Now'}
-                </td>
-                <td data-label="Show Until">
-                    ${notice.show_until ? notice.show_until.slice(0, 10) : '∞'}
-                </td>
-                <td data-label="Actions">
-                    <div class="action-group">
-                        <button class="btn-ui btn-outline-ui" onclick="openEditModal(${notice.id})">
-                            <i class="bi bi-pencil"></i> Edit
-                        </button>
-                        <button class="btn-ui btn-${btnClass}" onclick="toggleNotice(${notice.id})">
-                            <i class="bi bi-${btnIcon}"></i> ${btnText}
-                        </button>
-                        <button class="btn-ui btn-danger-ui" onclick="deleteNotice(${notice.id})">
-                            <i class="bi bi-trash"></i> Delete
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
-    
-    tableBody.innerHTML = html;
-}
-
-function renderPagination(data) {
-    const paginationContainer = document.getElementById('paginationContainer');
-    if (!paginationContainer) return;
-    
-    if (data.total_pages <= 1) {
-        paginationContainer.innerHTML = '';
-        return;
-    }
-    
-    let html = '';
-    const currentPage = data.page;
-    const totalPages = data.total_pages;
-    
-    // First Page
-    if (data.has_prev) {
-        html += `<button class="page-link" onclick="loadNoticesPage(1)">
-                    <i class="bi bi-chevron-double-left"></i>
-                </button>`;
-    }
-    
-    // Previous
-    if (data.has_prev) {
-        html += `<button class="page-link" onclick="loadNoticesPage(${data.prev_num})">
-                    <i class="bi bi-chevron-left"></i>
-                </button>`;
-    }
-    
-    // Page numbers
-    if (totalPages <= 7) {
-        for (let i = 1; i <= totalPages; i++) {
-            const activeClass = i === currentPage ? 'active' : '';
-            html += `<button class="page-link ${activeClass}" onclick="loadNoticesPage(${i})">${i}</button>`;
-        }
-    } else {
-        // First 3 pages
-        for (let i = 1; i <= 3; i++) {
-            const activeClass = i === currentPage ? 'active' : '';
-            html += `<button class="page-link ${activeClass}" onclick="loadNoticesPage(${i})">${i}</button>`;
-        }
-        
-        // Ellipsis
-        if (currentPage > 5) {
-            html += `<span class="page-link disabled">…</span>`;
-        }
-        
-        // Pages around current
-        let start = Math.max(4, currentPage - 1);
-        let end = Math.min(totalPages - 3, currentPage + 1);
-        for (let i = start; i <= end; i++) {
-            if (i > 3 && i < totalPages - 2) {
-                const activeClass = i === currentPage ? 'active' : '';
-                html += `<button class="page-link ${activeClass}" onclick="loadNoticesPage(${i})">${i}</button>`;
-            }
-        }
-        
-        // Ellipsis
-        if (currentPage < totalPages - 4) {
-            html += `<span class="page-link disabled">…</span>`;
-        }
-        
-        // Last 3 pages
-        for (let i = totalPages - 2; i <= totalPages; i++) {
-            const activeClass = i === currentPage ? 'active' : '';
-            html += `<button class="page-link ${activeClass}" onclick="loadNoticesPage(${i})">${i}</button>`;
-        }
-    }
-    
-    // Next
-    if (data.has_next) {
-        html += `<button class="page-link" onclick="loadNoticesPage(${data.next_num})">
-                    <i class="bi bi-chevron-right"></i>
-                </button>`;
-    }
-    
-    // Last Page
-    if (data.page < data.total_pages) {
-        html += `<button class="page-link" onclick="loadNoticesPage(${data.total_pages})">
-                    <i class="bi bi-chevron-double-right"></i>
-                </button>`;
-    }
-    
-    // Page Info
-    html += `<span class="page-info">Page ${data.page} of ${data.total_pages}</span>`;
-    
-    paginationContainer.innerHTML = html;
-}
-
-function updateStats(data) {
-    const totalElement = document.getElementById('totalNotices');
-    const activeElement = document.getElementById('activeNotices');
-    const inactiveElement = document.getElementById('inactiveNotices');
-    
-    if (totalElement) totalElement.textContent = data.total || 0;
-    if (activeElement) activeElement.textContent = data.active_count || 0;
-    if (inactiveElement) inactiveElement.textContent = data.inactive_count || 0;
-}
-
-function loadNoticesPage(page) {
-    refreshNoticesTable(page);
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// ============================================
-// TOGGLE NOTICE (AJAX)
+// TOGGLE NOTICE
 // ============================================
 function toggleNotice(id) {
     if (!confirm('Toggle this notice?')) return;
     
     fetch(`/admin/notices/${id}/toggle`, {
         method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
-            refreshNoticesTable();
+            setTimeout(() => location.reload(), 500);
         } else {
-            showToast(data.error || 'Failed to toggle notice', 'error');
+            showToast(data.error || 'Failed to toggle', 'error');
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Network error', 'error');
-    });
+    .catch(error => showToast('Network error', 'error'));
 }
 
 // ============================================
-// DELETE NOTICE (AJAX)
+// DELETE NOTICE
 // ============================================
 function deleteNotice(id) {
     if (!confirm('Delete this notice?')) return;
     
     fetch(`/admin/notices/${id}/delete`, {
         method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
-            refreshNoticesTable();
+            setTimeout(() => location.reload(), 500);
         } else {
-            showToast(data.error || 'Failed to delete notice', 'error');
+            showToast(data.error || 'Failed to delete', 'error');
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Network error', 'error');
-    });
+    .catch(error => showToast('Network error', 'error'));
 }
 
 // ============================================
-// PUBLIC NOTICE POPUP (Session based)
+// NOTICE POPUP - MAIN FUNCTION
 // ============================================
-let countdownInterval = null;
-let closeTimer = null;
-
-async function checkNotices() {
-    try {
-        // Try both paths - this fixes Vercel
-        let data = null;
-        let success = false;
-        
-        const paths = [
-            '/admin/api/notices/active',
-            '/api/notices/active'
-        ];
-        
-        for (const path of paths) {
-            try {
-                const response = await fetch(path, {
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (response.ok) {
-                    data = await response.json();
-                    success = true;
-                    break;
-                }
-            } catch (e) {}
-        }
-        
-        if (success && data && data.notices && data.notices.length > 0) {
-            const notice = data.notices[0];
-            showNoticePopup(notice);
-        }
-    } catch (error) {
-        console.error('Error fetching notices:', error);
-    }
-}
-
 function showNoticePopup(notice) {
+    console.log('📢 Showing popup:', notice);
     const popup = document.getElementById('noticePopup');
-    const title = document.getElementById('noticePopupTitle');
-    const content = document.getElementById('noticePopupContentText');
-    const badgeText = document.getElementById('noticeBadgeText');
-    const countdownDisplay = document.getElementById('countdownDisplay');
-    const imageContainer = document.getElementById('noticeImageContainer');
-    const imageDisplay = document.getElementById('noticeImageDisplay');
-    const imageTitle = document.getElementById('noticeImageTitle');
-    const textContainer = document.getElementById('noticeTextContainer');
-    const popupContent = document.getElementById('noticePopupContent');
-    
-    const hasImage = notice.image_url && notice.image_url.trim() !== '';
-    
-    if (hasImage) {
-        imageDisplay.src = notice.image_url;
-        imageDisplay.alt = notice.title || 'Notice';
-        imageTitle.textContent = notice.title || 'Notice';
-        
-        imageContainer.style.display = 'block';
-        textContainer.style.display = 'none';
-        popupContent.className = 'notice-popup-content image-mode';
-    } else {
-        imageContainer.style.display = 'none';
-        textContainer.style.display = 'block';
-        title.textContent = notice.title || 'Notice';
-        content.innerHTML = notice.content || '';
-        badgeText.textContent = getBadgeText(notice.notice_type);
-        badgeText.className = `notice-badge notice-badge-${notice.notice_type || 'info'}`;
-        popupContent.className = 'notice-popup-content text-mode';
+    if (!popup) {
+        console.error('Popup not found!');
+        return;
     }
     
-    popup.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    document.getElementById('noticePopupTitle').textContent = notice.title || 'Notice';
+    document.getElementById('noticePopupContent').innerHTML = notice.content || '';
     
-    let seconds = 15;
-    countdownDisplay.textContent = seconds;
-    
-    clearInterval(countdownInterval);
-    clearTimeout(closeTimer);
-    
-    countdownInterval = setInterval(() => {
-        seconds--;
-        countdownDisplay.textContent = seconds;
-        if (seconds <= 0) {
-            clearInterval(countdownInterval);
-            closeNoticePopup();
-        }
-    }, 1000);
-    
-    closeTimer = setTimeout(() => {
-        clearInterval(countdownInterval);
-        closeNoticePopup();
-    }, 15000);
-}
-
-function getBadgeText(type) {
     const badgeMap = {
         info: '📢 Important',
         danger: '🔴 Urgent',
         success: '✅ Announcement',
         warning: '⚠️ Notice'
     };
-    return badgeMap[type] || '📢 Important';
+    const badge = document.getElementById('noticeBadgeText');
+    badge.textContent = badgeMap[notice.notice_type] || '📢 Important';
+    badge.className = `notice-badge notice-badge-${notice.notice_type || 'info'}`;
+    
+    popup.style.display = 'flex';
+    
+    let seconds = 15;
+    document.getElementById('countdownDisplay').textContent = seconds;
+    
+    if (window._countdownInterval) clearInterval(window._countdownInterval);
+    if (window._closeTimeout) clearTimeout(window._closeTimeout);
+    
+    window._countdownInterval = setInterval(() => {
+        seconds--;
+        document.getElementById('countdownDisplay').textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(window._countdownInterval);
+            popup.style.display = 'none';
+        }
+    }, 1000);
+    
+    window._closeTimeout = setTimeout(() => {
+        popup.style.display = 'none';
+        clearInterval(window._countdownInterval);
+    }, 15000);
 }
 
-function closeNoticePopup() {
-    const popup = document.getElementById('noticePopup');
-    popup.style.display = 'none';
-    document.body.style.overflow = '';
-    clearInterval(countdownInterval);
-    clearTimeout(closeTimer);
+// ============================================
+// CHECK NOTICES - FETCH FROM API
+// ============================================
+function checkNotices() {
+    console.log('🔍 Checking for notices...');
+    
+    fetch('/admin/api/notices/active')
+        .then(response => {
+            console.log('📡 Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('📦 Notice data:', data);
+            if (data.success && data.notices && data.notices.length > 0) {
+                showNoticePopup(data.notices[0]);
+            } else {
+                console.log('ℹ️ No active notices found');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error:', error);
+        });
 }
 
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeNoticePopup();
-});
+// ============================================
+// TEST FUNCTION - Type testNotice() in console
+// ============================================
+window.testNotice = function() {
+    showNoticePopup({
+        title: '✅ Test Notice',
+        content: 'This is a test notice from the console. If you see this, the popup is working!',
+        notice_type: 'info'
+    });
+};
 
 // ============================================
 // INITIALIZE ON PAGE LOAD
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 Notice page loaded');
+    
     const noticeShown = sessionStorage.getItem('noticeShown');
+    console.log('📝 Session noticeShown:', noticeShown);
+    
     if (!noticeShown) {
-        setTimeout(checkNotices, 1500);
+        setTimeout(checkNotices, 2000);
         sessionStorage.setItem('noticeShown', 'true');
     }
     
-    // Show flashed messages as toasts
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                showToast('{{ message|safe }}', '{{ category }}');
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    console.log('✅ Type testNotice() in console to test popup');
 });
+
+// Close popup with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.getElementById('noticePopup').style.display = 'none';
+    }
+});
+
+// Also close when clicking outside
+document.getElementById('noticePopup').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.style.display = 'none';
+    }
+});
+
+// Expose functions globally
+window.checkNotices = checkNotices;
+window.showNoticePopup = showNoticePopup;
+window.closeNoticePopup = function() {
+    document.getElementById('noticePopup').style.display = 'none';
+};
 </script>
 
-<!-- FORCE POPUP - VERCEL FIX -->
-<script>
-// This will run immediately and show the popup
-(function() {
-    console.log('🚀 FORCE POPUP SCRIPT RUNNING');
-    
-    // Create popup if it doesn't exist
-    if (!document.getElementById('noticePopup')) {
-        const popup = document.createElement('div');
-        popup.id = 'noticePopup';
-        popup.style.cssText = 'display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:999999; align-items:center; justify-content:center;';
-        popup.innerHTML = `
-            <div style="background:white; max-width:500px; width:100%; padding:30px; border-radius:16px; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                <button onclick="this.closest('#noticePopup').style.display='none'" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.1); border:none; border-radius:50%; width:32px; height:32px; font-size:18px; cursor:pointer;">✕</button>
-                <div id="noticePopupTitle" style="font-size:1.5rem; font-weight:700; margin-bottom:12px; color:#111827;">Notice</div>
-                <div id="noticePopupContent" style="color:#4b5563; line-height:1.6; margin-bottom:20px;"></div>
-                <div style="text-align:center; font-size:0.85rem; color:#6b7280;">
-                    <span>Auto-closes in </span>
-                    <span id="countdownDisplay" style="font-weight:700; font-size:1.1rem; color:#0C5B3F;">15</span>
-                    <span> seconds</span>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(popup);
-    }
-    
-    // Function to show popup
-    window.showNoticePopup = function(notice) {
-        console.log('📢 Showing popup:', notice);
-        const popup = document.getElementById('noticePopup');
-        if (!popup) return;
-        
-        document.getElementById('noticePopupTitle').textContent = notice.title || 'Notice';
-        document.getElementById('noticePopupContent').innerHTML = notice.content || '';
-        
-        popup.style.display = 'flex';
-        
-        let seconds = 15;
-        document.getElementById('countdownDisplay').textContent = seconds;
-        
-        clearInterval(window._countdownInterval);
-        clearTimeout(window._closeTimeout);
-        
-        window._countdownInterval = setInterval(() => {
-            seconds--;
-            document.getElementById('countdownDisplay').textContent = seconds;
-            if (seconds <= 0) {
-                clearInterval(window._countdownInterval);
-                popup.style.display = 'none';
-            }
-        }, 1000);
-        
-        window._closeTimeout = setTimeout(() => {
-            popup.style.display = 'none';
-            clearInterval(window._countdownInterval);
-        }, 15000);
-    };
-    
-    // Function to fetch notices
-    window.checkNotices = async function() {
-        try {
-            console.log('🔍 Fetching notices...');
-            const response = await fetch('/admin/api/notices/active');
-            const data = await response.json();
-            console.log('📦 Data:', data);
-            
-            if (data.success && data.notices && data.notices.length > 0) {
-                window.showNoticePopup(data.notices[0]);
-            } else {
-                console.log('ℹ️ No notices found');
-            }
-        } catch (e) {
-            console.error('❌ Error:', e);
-        }
-    };
-    
-    // Auto-run after page loads
-    if (document.readyState === 'complete') {
-        setTimeout(window.checkNotices, 1500);
-    } else {
-        document.addEventListener('readystatechange', function() {
-            if (document.readyState === 'complete') {
-                setTimeout(window.checkNotices, 1500);
-            }
-        });
-    }
-    
-    console.log('✅ Popup script loaded. Type testNotice() to test');
-    
-    // Manual test
-    window.testNotice = function() {
-        window.showNoticePopup({
-            title: 'Test Notice',
-            content: 'This is a test notice from console',
-            notice_type: 'info'
-        });
-    };
-})();
-</script>
 {% endblock %}
