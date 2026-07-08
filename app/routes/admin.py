@@ -4133,20 +4133,17 @@ def get_batch_history():
 
 @bp.route('/api/notices/active')
 def get_active_notices():
-    """API endpoint to get active notices for frontend"""
     try:
         from app.models_supabase import Notice
         notices = Notice.get_active_notices()
-        return jsonify({
-            'success': True,
-            'notices': notices
-        })
+        
+        response = jsonify({'success': True, 'notices': notices})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-    
+        response = jsonify({'success': False, 'error': str(e), 'notices': []})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 500  
 
 # ============================================
 # NOTICE MANAGEMENT ROUTES - FULLY AJAX

@@ -1695,10 +1695,29 @@ let closeTimer = null;
 
 async function checkNotices() {
     try {
-        const response = await fetch('/admin/api/notices/active');
-        const data = await response.json();
+        // Try both paths - this fixes Vercel
+        let data = null;
+        let success = false;
         
-        if (data.success && data.notices && data.notices.length > 0) {
+        const paths = [
+            '/admin/api/notices/active',
+            '/api/notices/active'
+        ];
+        
+        for (const path of paths) {
+            try {
+                const response = await fetch(path, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (response.ok) {
+                    data = await response.json();
+                    success = true;
+                    break;
+                }
+            } catch (e) {}
+        }
+        
+        if (success && data && data.notices && data.notices.length > 0) {
             const notice = data.notices[0];
             showNoticePopup(notice);
         }
