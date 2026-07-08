@@ -7,10 +7,10 @@
 
     <title>{% block title %}{{ business_name }}{% endblock %}</title>
 
-    <!-- Google Fonts - Inter & Poppins -->
+    <!-- Google Fonts - Poppins (same as home) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,12 +21,15 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <!-- ================= ERP GLOBAL THEME ================= -->
+    <!-- ================= GLOBAL THEME - MATCHING HOME PAGE ================= -->
     <style>
 
         :root {
-            --primary: #1a1a1a;
-            --primary-hover: #2d2d2d;
+            --primary: #0C5B3F;
+            --primary-light: #138A52;
+            --accent: #138A52;
+            --secondary-bg: #f4f4f2;
+            --secondary-text: #6b7280;
             --bg-main: #f8f9fa;
             --bg-secondary: #ffffff;
             --border: #e5e7eb;
@@ -38,7 +41,7 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --info: #3b82f6;
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-primary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         /* ================= BASE TYPOGRAPHY ================= */
@@ -59,8 +62,8 @@
             line-height: 1.3;
         }
 
-        h1 { font-size: 2rem; font-weight: 600; }
-        h2 { font-size: 1.5rem; font-weight: 600; }
+        h1 { font-size: 2rem; font-weight: 700; }
+        h2 { font-size: 1.5rem; font-weight: 700; }
         h3 { font-size: 1.25rem; font-weight: 600; }
         h4 { font-size: 1.125rem; font-weight: 600; }
         h5 { font-size: 1rem; font-weight: 600; }
@@ -77,12 +80,12 @@
             font-size: 0.875rem;
         }
 
-        /* ================= NAVBAR - MINIMAL ================= */
+        /* ================= NAVBAR - MATCHING HOME ================= */
         .navbar {
             background: white !important;
             border-bottom: 1px solid var(--border);
-            box-shadow: none;
-            padding: 12px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            padding: 10px 0;
             min-height: 64px;
         }
 
@@ -95,19 +98,19 @@
 
         .navbar-brand {
             font-family: var(--font-primary);
-            font-weight: 600;
+            font-weight: 700;
             font-size: 1.125rem;
-            color: var(--text-primary) !important;
+            color: var(--primary) !important;
             display: flex;
             align-items: center;
             padding: 0;
             margin: 0;
+            gap: 8px;
         }
 
         .navbar-brand i {
-            color: var(--text-primary);
-            margin-right: 8px;
-            font-size: 1.25rem;
+            color: var(--primary);
+            font-size: 1.3rem;
         }
 
         /* Navbar collapse */
@@ -132,9 +135,9 @@
             font-family: var(--font-primary);
             font-weight: 500;
             font-size: 0.875rem;
-            border-radius: 6px;
-            padding: 8px 14px;
-            transition: all 0.2s ease;
+            border-radius: 10px;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
             color: var(--text-secondary) !important;
             display: flex;
             align-items: center;
@@ -143,27 +146,28 @@
         }
 
         .nav-link:hover {
-            background: var(--bg-main);
-            color: var(--text-primary) !important;
+            background: rgba(12,91,63,0.06);
+            color: var(--primary) !important;
+            transform: translateY(-1px);
         }
 
         .nav-link.active {
-            background: var(--bg-main);
-            color: var(--text-primary) !important;
+            background: rgba(12,91,63,0.08);
+            color: var(--primary) !important;
         }
 
         .nav-link i {
             font-size: 0.95rem;
         }
 
-        /* ================= LOGOUT BUTTON ================= */
+        /* Logout button */
         .nav-link-logout {
             font-family: var(--font-primary);
             font-weight: 500;
             font-size: 0.875rem;
-            border-radius: 6px;
-            padding: 8px 14px;
-            transition: all 0.2s ease;
+            border-radius: 10px;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
             color: var(--danger) !important;
             display: flex;
             align-items: center;
@@ -172,8 +176,9 @@
         }
 
         .nav-link-logout:hover {
-            background: #fee2e2;
+            background: rgba(239, 68, 68, 0.08);
             color: #dc2626 !important;
+            transform: translateY(-1px);
         }
 
         .nav-link-logout i {
@@ -184,6 +189,7 @@
         .navbar-toggler {
             border: 1px solid var(--border);
             padding: 6px 10px;
+            border-radius: 10px;
         }
 
         .navbar-toggler:focus {
@@ -200,19 +206,20 @@
             padding-bottom: 40px;
         }
 
-        /* ================= CARDS ================= */
+        /* ================= CARDS - MATCHING HOME ================= */
         .card {
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 16px;
             background: white;
-            box-shadow: none;
-            transition: all 0.2s ease;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
             overflow: hidden;
         }
 
         .card:hover {
             border-color: var(--border-dark);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.08);
         }
 
         .card-header {
@@ -229,27 +236,28 @@
             padding: 24px;
         }
 
-        /* ================= BUTTONS ================= */
+        /* ================= BUTTONS - MATCHING HOME ================= */
         .btn {
             font-family: var(--font-primary);
             font-weight: 600;
             font-size: 0.85rem;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 10px 24px;
             letter-spacing: 0.3px;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
             background: var(--primary);
             border: none;
             color: white;
+            box-shadow: 0 10px 30px rgba(12,91,63,0.25);
         }
 
         .btn-primary:hover {
             background: var(--accent);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(12, 91, 63, 0.3);
+            box-shadow: 0 12px 35px rgba(12, 91, 63, 0.3);
         }
 
         .btn-danger {
@@ -295,12 +303,11 @@
         .table thead th {
             background: var(--secondary-bg);
             border: none;
-            font-family: var(--font-secondary);
             font-weight: 600;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: var(--heading);
+            color: var(--text-secondary);
             padding: 12px 16px;
         }
 
@@ -319,15 +326,15 @@
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
             padding: 28px 32px;
-            border-radius: 14px;
+            border-radius: 16px;
             margin-bottom: 24px;
-            box-shadow: 0 6px 20px rgba(12, 91, 63, 0.25);
+            box-shadow: 0 10px 35px rgba(12, 91, 63, 0.25);
         }
 
         .page-header h1,
         .page-header h2,
         .page-header h3 {
-            font-family: var(--font-secondary);
+            font-family: var(--font-primary);
             font-weight: 700;
             color: white;
             letter-spacing: -0.5px;
@@ -344,34 +351,34 @@
         .form-select {
             font-family: var(--font-primary);
             font-size: 0.95rem;
-            border-radius: 10px;
-            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            border: 2px solid rgba(12,91,63,0.1);
             padding: 11px 14px;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus,
         .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(12, 91, 63, 0.1);
+            box-shadow: 0 0 0 4px rgba(12, 91, 63, 0.08);
         }
 
         .form-label {
-            font-family: var(--font-secondary);
+            font-family: var(--font-primary);
             font-weight: 600;
             font-size: 0.85rem;
-            color: var(--heading);
+            color: var(--text-secondary);
             margin-bottom: 6px;
         }
 
         .form-text {
             font-size: 0.8rem;
-            color: var(--secondary-text);
+            color: var(--text-secondary);
         }
 
         /* ================= ALERT ================= */
         .alert {
-            border-radius: 10px;
+            border-radius: 12px;
             border: none;
             font-family: var(--font-primary);
             font-size: 0.9rem;
@@ -381,10 +388,10 @@
         /* ================= FOOTER ================= */
         footer {
             background: white;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid var(--border);
             font-family: var(--font-primary);
             font-size: 0.8rem;
-            color: var(--secondary-text);
+            color: var(--text-secondary);
             padding: 20px 0;
         }
 
@@ -394,17 +401,17 @@
             font-weight: 600;
             font-size: 0.7rem;
             padding: 5px 12px;
-            border-radius: 8px;
+            border-radius: 20px;
             letter-spacing: 0.3px;
         }
 
         /* ================= STATS CARDS ================= */
         .stat-value {
-            font-family: var(--font-secondary);
+            font-family: var(--font-primary);
             font-weight: 700;
             font-size: 1.75rem;
             line-height: 1.2;
-            color: var(--heading);
+            color: var(--primary);
         }
 
         .stat-label {
@@ -413,7 +420,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: var(--secondary-text);
+            color: var(--text-secondary);
         }
 
         /* ================= MOBILE ================= */
@@ -473,6 +480,7 @@
             .btn {
                 font-size: 0.8rem;
                 padding: 8px 16px;
+                border-radius: 10px;
             }
         }
 
@@ -502,6 +510,59 @@
             color: white;
         }
 
+        /* ================= GLASS CARD UTILITY ================= */
+        .glass-card {
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 30px;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.05);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        /* ================= HERO SECTION UTILITY ================= */
+        .hero-section {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #FAFAF7 0%, #F4F4F2 100%);
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: rgba(19,138,82,0.08);
+            border-radius: 50%;
+            top: -200px;
+            right: -100px;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: rgba(12,91,63,0.06);
+            border-radius: 50%;
+            bottom: -120px;
+            left: -100px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -510,14 +571,14 @@
 
 <body>
 
-<!-- Loading Animation for Vercel -->
+<!-- Loading Animation -->
 <div id="appLoader" style="
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #0C5B3F 0%, #138A52 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     z-index: 99999;
     display: flex;
     align-items: center;
@@ -556,8 +617,8 @@
             margin: 15px auto;
         "></div>
         
-        <p style="color: white; font-weight: 600; font-family: 'Inter', sans-serif; margin-top: 10px;">Adarsh Oil Mill</p>
-        <p style="color: rgba(255,255,255,0.8); font-size: 12px; font-family: 'Inter', sans-serif;" id="loadingMsg">Loading...</p>
+        <p style="color: white; font-weight: 600; font-family: var(--font-primary); margin-top: 10px;">Adarsh Oil Mill</p>
+        <p style="color: rgba(255,255,255,0.8); font-size: 12px; font-family: var(--font-primary);" id="loadingMsg">Loading...</p>
     </div>
 </div>
 
@@ -601,15 +662,15 @@
     }, 1000);
 </script>
 
-<!-- ================= NAVBAR - PERFECTLY ALIGNED ================= -->
+<!-- ================= NAVBAR ================= -->
 {% if current_user.is_authenticated %}
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top">
 
     <div class="container-fluid">
 
         <!-- Brand - Left side -->
         <a class="navbar-brand" href="{% if current_user.role == 'admin' %}{{ url_for('admin.dashboard') }}{% else %}{{ url_for('customer.dashboard') }}{% endif %}">
-            <i class="bi bi-droplet"></i> Adarsh Oil Mill
+            <i class="bi bi-droplet-fill"></i> Adarsh Oil Mill
         </a>
 
         <!-- Toggler for mobile -->
@@ -702,7 +763,7 @@
 
 <style>
 .toast-glass {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
     border-radius: 14px;
@@ -756,10 +817,10 @@
     color: #f59e0b;
 }
 .toast-glass.info {
-    border-left-color: #0C5B3F;
+    border-left-color: var(--primary);
 }
 .toast-glass.info i {
-    color: #0C5B3F;
+    color: var(--primary);
 }
 
 .toast-glass i {
@@ -769,13 +830,13 @@
     flex: 1;
 }
 .toast-title {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: 700;
     font-size: 0.85rem;
     margin-bottom: 2px;
 }
 .toast-message {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 0.8rem;
     color: #555;
     line-height: 1.5;
@@ -831,6 +892,8 @@ function showToast(message, category) {
         {% endfor %}
     {% endif %}
 {% endwith %}
+
+
 </script>
 
 <!-- ================= CONTENT ================= -->
@@ -855,7 +918,8 @@ function showToast(message, category) {
 
             {% else %}
 
-                Customer Dashboard
+                Customer Dashboard <br>
+                Crafted By Kushal
 
             {% endif %}
 

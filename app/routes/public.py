@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 from app.brevo_service import send_email_via_brevo
 from app.models_supabase import Product
-
+from app.config import Config
 load_dotenv()
 
 bp = Blueprint('public', __name__, url_prefix='')
@@ -43,6 +43,16 @@ def products():
         categories[cat].append(product)
     
     return render_template('pages/products.html', products=all_products, categories=categories)
+
+@bp.route('/privacy-policy')
+def privacy_policy():
+    """Privacy Policy page"""
+    return render_template('pages/privacy_policy.html')
+
+@bp.route('/terms-of-service')
+def terms_of_service():
+    """Terms of Service page"""
+    return render_template('pages/terms_of_service.html')
 
 @bp.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -118,3 +128,82 @@ def contact():
     
     # GET request - show contact page
     return render_template('pages/contact.html')
+
+@bp.route('/unsubscribe/<string:email>')
+def unsubscribe(email):
+    """Unsubscribe page - GET request"""
+    try:
+        from app.models_supabase import Newsletter
+        
+        # Get subscriber
+        subscriber = Newsletter.get_subscriber_by_email(email)
+        
+        if subscriber:
+            return render_template('unsubscribe.html', 
+                                 email=email, 
+                                 exists=True,
+                                 business_name=Config.BUSINESS_NAME)
+        else:
+            return render_template('unsubscribe.html', 
+                                 email=email, 
+                                 exists=False,
+                                 business_name=Config.BUSINESS_NAME)
+            
+    except Exception as e:
+        print(f"Error loading unsubscribe: {e}")
+        return render_template('unsubscribe.html', 
+                             email=email, 
+                             exists=False,
+                             error=True,
+                             business_name=Config.BUSINESS_NAME)
+
+
+@bp.route('/unsubscribe/confirm/<string:email>', methods=['POST'])
+def unsubscribe_confirm(email):
+    """Confirm unsubscribe - POST request"""
+    try:
+        from app.models_supabase import Newsletter
+        
+        result = Newsletter.unsubscribe(email)
+        
+        if result:
+            return render_template('unsubscribe.html', 
+                                 email=email, 
+                                 confirmed=True,
+                                 success=True,
+                                 business_name=Config.BUSINESS_NAME)
+        else:
+            return render_template('unsubscribe.html', 
+                                 email=email, 
+                                 confirmed=True,
+                                 success=False,
+                                 business_name=Config.BUSINESS_NAME)
+            
+    except Exception as e:
+        print(f"Error unsubscribing: {e}")
+        return render_template('unsubscribe.html', 
+                             email=email, 
+                             confirmed=True,
+                             success=False,
+                             error=str(e),
+                             business_name=Config.BUSINESS_NAME)
+
+
+@bp.route('/unsubscribe/success')
+def unsubscribe_success():
+    """Unsubscribe success page"""
+    return render_template('unsubscribe.html', 
+                         confirmed=True,
+                         success=True,
+                         business_name=Config.BUSINESS_NAME)
+
+@bp.route('/unsubscribe', methods=['GET', 'POST'])
+def unsubscribe_generic():
+    """Generic unsubscribe page where user enters their email"""
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        if email:
+            return redirect(url_for('public.unsubscribe', email=email))
+        flash('Please enter your email address', 'warning')
+    
+    return render_template('unsubscribe_generic.html', business_name=Config.BUSINESS_NAME)

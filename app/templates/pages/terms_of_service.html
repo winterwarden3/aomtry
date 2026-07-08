@@ -1,0 +1,240 @@
+{% extends "base_public.html" %}
+
+{% block title %}Terms of Service - Adarsh Oil Mill{% endblock %}
+
+{% block content %}
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.legal-section {
+    padding: 90px 0;
+    background: #FAFAF7;
+}
+
+.legal-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 50px 60px;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+}
+
+.legal-container h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.legal-container .last-updated {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.legal-container h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 35px;
+    margin-bottom: 15px;
+}
+
+.legal-container h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.legal-container p {
+    color: #4a5a6a;
+    line-height: 1.9;
+    margin-bottom: 15px;
+}
+
+.legal-container ul {
+    padding-left: 25px;
+    margin-bottom: 20px;
+}
+
+.legal-container ul li {
+    color: #4a5a6a;
+    line-height: 1.9;
+    margin-bottom: 8px;
+}
+
+.legal-container .highlight-box {
+    background: #f8f9fa;
+    padding: 20px 25px;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+    margin: 25px 0;
+}
+
+.legal-container .highlight-box.warning {
+    border-left-color: #ff6b35;
+    background: #fff8f5;
+}
+
+@media (max-width: 768px) {
+    .legal-container {
+        padding: 30px 20px;
+    }
+    
+    .legal-container h1 {
+        font-size: 1.8rem;
+    }
+}
+</style>
+
+<!-- Terms of Service Content -->
+<section class="legal-section">
+    <div class="container">
+        <div class="legal-container">
+            <h1>Terms of Service</h1>
+            <p class="last-updated">Last Updated: July 2026</p>
+
+            <p>
+                Welcome to <strong>Adarsh Oil Mill</strong>. By using our website and services, you agree 
+                to comply with and be bound by the following terms and conditions. Please read them carefully.
+            </p>
+
+            <div class="highlight-box">
+                <strong> By using our services, you agree to these terms.</strong> If you do not agree, 
+                please do not use our website or services.
+            </div>
+
+            <h2>1. Acceptance of Terms</h2>
+            <p>
+                By accessing or using our website, placing orders, or creating an account, you agree to 
+                these Terms of Service. These terms apply to all visitors, users, and customers.
+            </p>
+
+            <h2>2. Account Registration</h2>
+            <ul>
+                <li>You must provide accurate and complete information when creating an account</li>
+                <li>You are responsible for maintaining the confidentiality of your account credentials</li>
+                <li>You are responsible for all activities that occur under your account</li>
+                <li>You must notify us immediately of any unauthorized use of your account</li>
+                <li>We reserve the right to terminate accounts that violate these terms</li>
+            </ul>
+
+            <h2>3. Products & Orders</h2>
+            <h3>3.1 Product Descriptions</h3>
+            <p>
+                We strive to ensure product descriptions, images, and prices are accurate. However, we do 
+                not warrant that product descriptions or other content are error-free. If a product is 
+                mispriced, we reserve the right to cancel or refuse orders.
+            </p>
+
+            <h3>3.2 Order Acceptance</h3>
+            <ul>
+                <li>All orders are subject to acceptance and availability</li>
+                <li>We reserve the right to refuse or cancel orders at our discretion</li>
+                <li>You will receive an order confirmation email after placing an order</li>
+                <li>Invoices will be sent via email upon order confirmation</li>
+            </ul>
+
+            <h3>3.3 Pricing & Payments</h3>
+            <ul>
+                <li>All prices are in Nepalese Rupees (NRS) unless otherwise stated</li>
+                <li>Prices are subject to change without notice</li>
+                <li>Payment must be made in full at the time of order</li>
+                <li>We accept cash, bank transfer, and other payment methods as listed</li>
+            </ul>
+
+            <h2>4. Shipping & Delivery</h2>
+            <ul>
+                <li>Delivery times are estimates and not guaranteed</li>
+                <li>We deliver to locations within Nepal</li>
+                <li>Risk of loss passes to you upon delivery</li>
+                <li>Shipping costs will be according to the locations</li>
+            </ul>
+
+            <h2>5. Returns & Refunds</h2>
+            <ul>
+                <li>Returns are accepted within 3 days of delivery</li>
+                <li>Products must be unused and in original packaging</li>
+                <li>Refunds will be processed within 1-7 business days</li>
+                <li>Shipping costs are non-refundable</li>
+                <li>Custom or bulk orders may have different return policies</li>
+            </ul>
+
+            <div class="highlight-box warning">
+                <strong> Damaged or Defective Products:</strong> If you receive a damaged or defective 
+                product, please contact us immediately at <a href="mailto:contact@adarshoilmill.com.np">contact@adarshoilmill.com.np</a> 
+                with photos of the product.
+            </div>
+
+            <h2>6. User Conduct</h2>
+            <p>You agree not to:</p>
+            <ul>
+                <li>❌ Use our services for any unlawful purpose</li>
+                <li>❌ Impersonate any person or entity</li>
+                <li>❌ Interfere with the operation of our website</li>
+                <li>❌ Upload viruses or malicious code</li>
+                <li>❌ Access unauthorized areas of our systems</li>
+                <li>❌ Harass, abuse, or harm others</li>
+            </ul>
+
+            <h2>7. Intellectual Property</h2>
+            <p>
+                All content on our website, including text, images, logos, and trademarks, is the property 
+                of Adarsh Oil Mill and is protected by intellectual property laws. You may not reproduce, 
+                distribute, or create derivative works without our written consent.
+            </p>
+
+            <h2>8. Privacy</h2>
+            <p>
+                Your use of our services is also governed by our <a href="{{ url_for('public.privacy_policy') }}">Privacy Policy</a>. 
+                Please review it to understand how we collect and use your information.
+            </p>
+
+            <h2>9. Limitation of Liability</h2>
+            <p>
+                To the fullest extent permitted by law, Adarsh Oil Mill is not liable for any indirect, 
+                incidental, or consequential damages arising from your use of our services. Our total 
+                liability is limited to the amount you paid for the product.
+            </p>
+
+            <h2>10. Governing Law</h2>
+            <p>
+                These terms are governed by the laws of Nepal. Any disputes shall be resolved in the 
+                courts of Nepal.
+            </p>
+
+            <h2>11. Changes to Terms</h2>
+            <p>
+                We may update these Terms of Service from time to time. Continued use of our services 
+                after changes constitutes acceptance of the revised terms.
+            </p>
+
+            <h2>12. Contact Information</h2>
+            <p>
+                If you have any questions about these terms, please contact us:
+            </p>
+            <ul>
+                <li><strong>Email:</strong> <a href="mailto:legal@adarshoilmill.com">contact@adarshoilmill.com.np</a></li>
+                <li><strong>Phone:</strong> +977-9848023150</li>
+                <li><strong>Address:</strong> Mainapokhar, Nepal</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>This policy was last updated on July 2026.</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

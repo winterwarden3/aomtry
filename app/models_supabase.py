@@ -1411,3 +1411,18 @@ class Newsletter:
         except Exception as e:
             print(f"Error counting new subscribers: {e}")
             return 0
+        
+@staticmethod
+def unsubscribe(email):
+    """Unsubscribe a user from newsletter"""
+    try:
+        response = supabase.table("newsletter_subscribers")\
+            .update({'is_active': False, 'updated_at': datetime.now().isoformat()})\
+            .eq("email", email)\
+            .execute()
+        return response.data[0] if response.data else None
+    except Exception as e:
+        print(f"Error unsubscribing: {e}")
+        return None
+    
+

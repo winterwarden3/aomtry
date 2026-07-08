@@ -1,380 +1,629 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Invoice {{ sale.get('invoice_number') }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <style>
-        /* Universal Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f8f9fa;
-            color: #1a1a1a;
-            line-height: 1.6;
-            padding: 40px 20px;
-        }
+{% block title %}
+    Invoice {{ sale.get('invoice_number') }} - Adarsh Oil Mill
+{% endblock %}
 
-        .invoice-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+{% block content %}
 
-        /* Action Bar - Screen Only */
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
+<!-- Google Font - Same as home -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        .btn {
-            padding: 10px 20px;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            color: #374151;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .btn:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-        }
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f8f9fa;
+    color: #1a1a1a;
+    line-height: 1.6;
+}
 
-        .btn-primary {
-            background: #1a1a1a;
-            color: white;
-            border-color: #1a1a1a;
-        }
+/* HERO - EXACTLY LIKE HOME */
+.invoice-hero {
+    min-height: auto;
+    padding: 40px 0;
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(135deg,
+        #FAFAF7 0%,
+        #F4F4F2 100%);
+}
 
-        .btn-primary:hover {
-            background: #2d2d2d;
-        }
+.invoice-hero::before {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: rgba(19,138,82,0.08);
+    border-radius: 50%;
+    top: -200px;
+    right: -100px;
+}
 
-        /* Invoice Card */
-        .invoice-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-        }
+.invoice-hero::after {
+    content: '';
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: rgba(12,91,63,0.06);
+    border-radius: 50%;
+    bottom: -120px;
+    left: -100px;
+}
 
-        /* Header */
-        .invoice-header {
-            padding: 40px;
-            border-bottom: 1px solid #e5e7eb;
-        }
+.invoice-content {
+    position: relative;
+    z-index: 2;
+}
 
-        .company-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-        }
+/* GLASS CARD - EXACTLY LIKE HOME */
+.invoice-card {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.2);
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    transition: all 0.4s ease;
+}
 
-        .company-details {
-            color: #6b7280;
-            font-size: 0.875rem;
-            line-height: 1.6;
-        }
+.invoice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+}
 
-        .invoice-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-top: 24px;
-            letter-spacing: 0.5px;
-        }
+/* Action Bar */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
 
-        /* Invoice Info */
-        .invoice-info {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            padding: 32px 40px;
-            background: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-        }
+.btn-modern {
+    padding: 10px 24px;
+    border-radius: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+}
 
-        .info-block {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+.btn-outline-modern {
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(12px);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
 
-        .info-label {
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.btn-outline-modern:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
+}
 
-        .info-value {
-            font-size: 0.95rem;
-            color: #1a1a1a;
-            font-weight: 600;
-        }
+.btn-primary-modern {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 10px 30px rgba(12,91,63,0.25);
+}
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.btn-primary-modern:hover {
+    background: var(--accent);
+    transform: translateY(-3px);
+    color: white;
+}
 
-        .status-paid {
-            background: #d1fae5;
-            color: #065f46;
-        }
+/* Invoice Header */
+.invoice-header {
+    padding: 35px 40px 30px 40px;
+    border-bottom: 1px solid rgba(12,91,63,0.1);
+}
 
-        .status-partial {
-            background: #fed7aa;
-            color: #92400e;
-        }
+.company-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
 
-        .status-unpaid {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+.company-details {
+    color: var(--secondary-text);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
 
-        .status-advance {
-            background: #dbeafe;
-            color: #1e40af;
-        }
+.invoice-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 16px;
+    letter-spacing: 1px;
+}
 
-        /* Customer Info */
-        .customer-info {
-            padding: 32px 40px;
-            border-bottom: 1px solid #e5e7eb;
-        }
+/* Invoice Info */
+.invoice-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 25px 40px;
+    background: rgba(255,255,255,0.4);
+    border-bottom: 1px solid rgba(12,91,63,0.08);
+}
 
-        .customer-info strong {
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: block;
-            margin-bottom: 8px;
-        }
+.info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
-        .customer-info div {
-            color: #1a1a1a;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
+.info-label {
+    font-size: 0.7rem;
+    color: var(--secondary-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        /* Items Table */
-        .table-wrapper {
-            padding: 32px 40px;
-        }
+.info-value {
+    font-size: 0.95rem;
+    color: var(--primary);
+    font-weight: 600;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        thead th {
-            text-align: left;
-            padding: 12px 0;
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #e5e7eb;
-        }
+.status-paid {
+    background: #d1fae5;
+    color: #065f46;
+}
 
-        tbody td {
-            padding: 16px 0;
-            color: #1a1a1a;
-            font-size: 0.95rem;
-            border-bottom: 1px solid #f3f4f6;
-        }
+.status-partial {
+    background: #fed7aa;
+    color: #92400e;
+}
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
+.status-unpaid {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
-        .text-right {
-            text-align: right;
-        }
+.status-advance {
+    background: #dbeafe;
+    color: #1e40af;
+}
 
-        /* Summary */
-        .summary {
-            padding: 32px 40px;
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-        }
+/* Customer Info */
+.customer-info {
+    padding: 25px 40px;
+    border-bottom: 1px solid rgba(12,91,63,0.08);
+}
 
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            font-size: 0.95rem;
-        }
+.customer-info strong {
+    font-size: 0.7rem;
+    color: var(--secondary-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 6px;
+}
 
-        .summary-row.total {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 2px solid #e5e7eb;
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
+.customer-info div {
+    color: var(--primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.6;
+}
 
-        .summary-row.due-row {
-            color: #dc2626;
-            font-weight: 600;
-            margin-top: 12px;
-        }
+/* Items Table */
+.table-wrapper {
+    padding: 25px 40px;
+}
 
-        .summary-row.advance-row {
-            color: #2563eb;
-            font-weight: 600;
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        .summary-row.advance-balance-row {
-            color: #2563eb;
-            font-weight: 600;
-            margin-top: 12px;
-        }
+thead th {
+    text-align: left;
+    padding: 10px 0;
+    font-size: 0.7rem;
+    color: var(--secondary-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(12,91,63,0.1);
+}
 
-        /* Payment Details */
-        .payment-details {
-            margin: 0 40px 32px 40px;
-            padding: 20px;
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-        }
+tbody td {
+    padding: 14px 0;
+    color: var(--primary);
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(12,91,63,0.06);
+}
 
-        .payment-details strong {
-            font-size: 0.875rem;
-            color: #1a1a1a;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 8px;
-        }
+tbody tr:last-child td {
+    border-bottom: none;
+}
 
-        .payment-details div {
-            color: #6b7280;
-            font-size: 0.875rem;
-            line-height: 1.6;
-        }
+tbody td strong {
+    font-weight: 600;
+}
 
-        /* Footer */
-        .invoice-footer {
-            padding: 32px 40px;
-            text-align: center;
-            border-top: 1px solid #e5e7eb;
-        }
+.text-right {
+    text-align: right;
+}
 
-        .invoice-footer strong {
-            display: block;
-            color: #1a1a1a;
-            font-size: 0.875rem;
-            margin-bottom: 4px;
-        }
+/* Summary */
+.summary {
+    padding: 25px 40px;
+    background: rgba(255,255,255,0.4);
+    border-top: 1px solid rgba(12,91,63,0.08);
+}
 
-        .invoice-footer p {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: var(--primary);
+}
 
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
+.summary-row.total {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 2px solid rgba(12,91,63,0.15);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary);
+}
 
-            .action-bar,
-            .no-print {
-                display: none !important;
-            }
+.summary-row.due-row {
+    color: #dc2626;
+    font-weight: 600;
+}
 
-            .invoice-card {
-                border: none;
-                border-radius: 0;
-            }
+.summary-row.advance-row {
+    color: #2563eb;
+    font-weight: 600;
+}
 
-            .invoice-header {
-                page-break-after: avoid;
-            }
+.summary-row.advance-balance-row {
+    color: #2563eb;
+    font-weight: 600;
+}
 
-            table {
-                page-break-inside: avoid;
-            }
-        }
+/* Payment Details */
+.payment-details {
+    margin: 0 40px 25px 40px;
+    padding: 18px 20px;
+    background: rgba(255,255,255,0.4);
+    border: 1px solid rgba(12,91,63,0.08);
+    border-radius: 14px;
+}
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            body {
-                padding: 20px 12px;
-            }
+.payment-details strong {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
 
-            .invoice-header,
-            .customer-info,
-            .table-wrapper,
-            .summary {
-                padding: 24px 20px;
-            }
+.payment-details div {
+    color: var(--secondary-text);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
 
-            .invoice-info {
-                grid-template-columns: 1fr;
-                gap: 16px;
-                padding: 24px 20px;
-            }
+/* Footer */
+.invoice-footer {
+    padding: 25px 40px 35px 40px;
+    text-align: center;
+    border-top: 1px solid rgba(12,91,63,0.08);
+}
 
-            .payment-details {
-                margin: 0 20px 24px 20px;
-            }
+.invoice-footer strong {
+    display: block;
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
 
-            .action-bar {
-                flex-direction: column;
-                gap: 12px;
-            }
+.invoice-footer p {
+    color: var(--secondary-text);
+    font-size: 0.8rem;
+}
 
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
 
-            table {
-                font-size: 0.875rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="invoice-container">
+    .action-bar,
+    .no-print {
+        display: none !important;
+    }
+
+    .invoice-hero {
+        padding: 0;
+        background: white;
+    }
+
+    .invoice-hero::before,
+    .invoice-hero::after {
+        display: none;
+    }
+
+    .invoice-card {
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        transform: none !important;
+    }
+
+    .invoice-card:hover {
+        transform: none !important;
+    }
+
+    .invoice-header {
+        page-break-after: avoid;
+    }
+
+    table {
+        page-break-inside: avoid;
+    }
+
+    .invoice-info {
+        background: #f9fafb;
+    }
+
+    .summary {
+        background: #f9fafb;
+    }
+
+    .payment-details {
+        background: #f9fafb;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .invoice-hero {
+        padding: 30px 0 20px 0;
+    }
+
+    .invoice-header,
+    .customer-info,
+    .table-wrapper,
+    .summary {
+        padding: 20px;
+    }
+
+    .invoice-info {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        padding: 20px;
+    }
+
+    .payment-details {
+        margin: 0 20px 20px 20px;
+        padding: 16px;
+    }
+
+    .invoice-footer {
+        padding: 20px;
+    }
+
+    .action-bar {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .btn-modern {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.85rem;
+        padding: 10px 20px;
+    }
+
+    .company-name {
+        font-size: 1.3rem;
+    }
+
+    .company-details {
+        font-size: 0.8rem;
+    }
+
+    .invoice-title {
+        font-size: 1rem;
+        margin-top: 12px;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    thead th {
+        font-size: 0.65rem;
+        padding: 8px 0;
+    }
+
+    tbody td {
+        font-size: 0.85rem;
+        padding: 10px 0;
+    }
+
+    .info-value {
+        font-size: 0.85rem;
+    }
+
+    .summary-row {
+        font-size: 0.85rem;
+        padding: 6px 0;
+    }
+
+    .summary-row.total {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .invoice-hero {
+        padding: 20px 0 15px 0;
+    }
+
+    .invoice-header,
+    .customer-info,
+    .table-wrapper,
+    .summary {
+        padding: 16px;
+    }
+
+    .invoice-info {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .payment-details {
+        margin: 0 16px 16px 16px;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .invoice-footer {
+        padding: 16px;
+    }
+
+    .company-name {
+        font-size: 1.1rem;
+    }
+
+    .company-details {
+        font-size: 0.75rem;
+    }
+
+    .invoice-title {
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+
+    table {
+        font-size: 0.75rem;
+    }
+
+    thead th {
+        font-size: 0.6rem;
+        padding: 6px 0;
+    }
+
+    tbody td {
+        font-size: 0.75rem;
+        padding: 8px 0;
+    }
+
+    .info-label {
+        font-size: 0.6rem;
+    }
+
+    .info-value {
+        font-size: 0.8rem;
+    }
+
+    .status-badge {
+        font-size: 0.6rem;
+        padding: 3px 10px;
+    }
+
+    .summary-row {
+        font-size: 0.8rem;
+        padding: 5px 0;
+    }
+
+    .summary-row.total {
+        font-size: 0.85rem;
+        padding-top: 8px;
+        margin-top: 6px;
+    }
+
+    .payment-details strong {
+        font-size: 0.75rem;
+    }
+
+    .payment-details div {
+        font-size: 0.75rem;
+    }
+
+    .invoice-footer strong {
+        font-size: 0.8rem;
+    }
+
+    .invoice-footer p {
+        font-size: 0.7rem;
+    }
+
+    .btn-modern {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+        border-radius: 10px;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.invoice-card {
+    animation: fadeInUp 0.5s ease forwards;
+}
+</style>
+
+<!-- INVOICE SECTION -->
+<section class="invoice-hero">
+    <div class="container invoice-content">
         
         <!-- Action Bar (screen only) -->
         <div class="action-bar no-print">
-            <a href="{{ url_for('customer.dashboard') }}" class="btn">
+            <a href="{{ url_for('customer.dashboard') }}" class="btn-modern btn-outline-modern">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
-            <button class="btn btn-primary" onclick="window.print()">
+            <button class="btn-modern btn-primary-modern" onclick="window.print()">
                 <i class="bi bi-printer"></i> Print / Save PDF
             </button>
         </div>
@@ -387,7 +636,8 @@
                 <div class="company-name">{{ business_name }}</div>
                 <div class="company-details">
                     Mainapokhar, Bardiya, Nepal<br>
-                    Phone: 9848023150 | Email: contact@adarshoilmill.com.np
+                    Phone: 9848023150 <br>
+                    Email: contact@adarshoilmill.com.np
                 </div>
                 <div class="invoice-title">PAYMENT RECEIPT</div>
             </div>
@@ -395,20 +645,20 @@
             <!-- Invoice Info -->
             <div class="invoice-info">
                 <div class="info-block">
-                    <div class="info-label">Invoice Number</div>
-                    <div class="info-value">#{{ sale.get('invoice_number', '') }}</div>
+                    <span class="info-label">Invoice Number</span>
+                    <span class="info-value">#{{ sale.get('invoice_number', '') }}</span>
                 </div>
                 <div class="info-block">
-                    <div class="info-label">Invoice Date</div>
-                    <div class="info-value">{{ sale.get('date', '')[:10] if sale.get('date') else '' }}</div>
+                    <span class="info-label">Invoice Date</span>
+                    <span class="info-value">{{ sale.get('date', '')[:10] if sale.get('date') else '' }}</span>
                 </div>
                 <div class="info-block">
-                    <div class="info-label">Status</div>
-                    <div class="info-value">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">
                         <span class="status-badge status-{{ sale.get('payment_status') }}">
                             {{ sale.get('payment_status', '').upper() }}
                         </span>
-                    </div>
+                    </span>
                 </div>
             </div>
             
@@ -505,6 +755,8 @@
             </div>
             
         </div>
+        
     </div>
-</body>
-</html>
+</section>
+
+{% endblock %}

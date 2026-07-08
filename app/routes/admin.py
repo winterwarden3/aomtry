@@ -4708,27 +4708,31 @@ def newsletter_export():
 
 @bp.route('/api/newsletter/subscribe', methods=['POST'])
 def api_newsletter_subscribe():
-    """Public API endpoint for newsletter subscription (AJAX)"""
-    from app.models_supabase import Newsletter
-    from app.brevo_service import send_newsletter_welcome_email
-    
+    """Public API endpoint for newsletter subscription"""
     try:
+        from app.models_supabase import Newsletter
+        from app.brevo_service import send_newsletter_welcome_email
+        
         data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Invalid request'}), 400
+            
         email = data.get('email', '').strip()
         
-        if not email or not '@' in email:
+        if not email or '@' not in email:
             return jsonify({'success': False, 'error': 'Please enter a valid email address'}), 400
         
-        # Subscribe user
         subscriber = Newsletter.subscribe(email, source='footer')
         
         if subscriber:
-            # Send welcome email
-            send_newsletter_welcome_email(email)
+            try:
+                send_newsletter_welcome_email(email)
+            except Exception as e:
+                print(f"Welcome email error: {e}")
             
             return jsonify({
                 'success': True,
-                'message': '✅ Subscribed successfully! Check your email for confirmation.'
+                'message': 'Subscribed successfully! Check your email.'
             })
         else:
             return jsonify({'success': False, 'error': 'Failed to subscribe. Please try again.'}), 500
@@ -4736,7 +4740,21 @@ def api_newsletter_subscribe():
     except Exception as e:
         print(f"❌ Newsletter subscription error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/newsletter/subscribe', methods=['OPTIONS'])
+def options_newsletter_subscribe():
+    response = jsonify({})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+    return response, 200
     
+
+
+
+
+
 
 @bp.route('/api/newsletter/subscribers', methods=['GET'])
 @login_required

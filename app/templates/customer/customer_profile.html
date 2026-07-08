@@ -1,89 +1,139 @@
 {% extends "base.html" %}
+
+{% block title %}
+    Profile Settings - Adarsh Oil Mill
+{% endblock %}
+
 {% block content %}
 
+<!-- Google Font - Same as home -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #f8f9fa;
-    color: #1a1a1a;
-    line-height: 1.6;
+    font-family: 'Poppins', sans-serif;
 }
 
-.profile-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 20px;
+/* HERO - EXACTLY LIKE HOME */
+.profile-hero {
+    min-height: auto;
+    padding: 60px 0 40px 0;
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(135deg,
+        #FAFAF7 0%,
+        #F4F4F2 100%);
 }
 
+.profile-hero::before {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: rgba(19,138,82,0.08);
+    border-radius: 50%;
+    top: -200px;
+    right: -100px;
+}
+
+.profile-hero::after {
+    content: '';
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: rgba(12,91,63,0.06);
+    border-radius: 50%;
+    bottom: -120px;
+    left: -100px;
+}
+
+.profile-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* GLASS CARD - EXACTLY LIKE HOME */
+.glass-card {
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 30px;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+.glass-card-header {
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(12,91,63,0.1);
+    margin-bottom: 20px;
+}
+
+.glass-card-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.glass-card-header h2 i {
+    color: var(--primary);
+}
+
+/* Profile Header */
 .profile-header {
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 .profile-header h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 8px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 5px;
 }
 
 .profile-header p {
-    color: #6b7280;
-    font-size: 0.95rem;
+    color: var(--secondary-text);
+    font-size: 1rem;
 }
 
+/* Navigation */
 .profile-nav {
-    margin-bottom: 32px;
+    margin-bottom: 25px;
 }
 
 .nav-back {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: #6b7280;
+    gap: 8px;
+    color: var(--secondary-text);
     text-decoration: none;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 500;
-    transition: color 0.2s ease;
+    transition: all 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .nav-back:hover {
-    color: #1a1a1a;
+    color: var(--primary);
+    transform: translateX(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
-.card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    margin-bottom: 24px;
-    overflow: hidden;
-}
-
-.card-header {
-    padding: 24px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.card-header h2 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.card-body {
-    padding: 24px;
-}
-
+/* Info Grid */
 .info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -93,92 +143,108 @@ body {
 .info-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .info-label {
-    font-size: 0.875rem;
-    color: #6b7280;
+    font-size: 0.75rem;
+    color: var(--secondary-text);
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .info-value {
-    font-size: 0.95rem;
-    color: #1a1a1a;
-    font-weight: 500;
+    font-size: 1rem;
+    color: var(--primary);
+    font-weight: 600;
 }
 
+/* Form Elements */
 .form-group {
     margin-bottom: 20px;
 }
 
 .form-label {
     display: block;
-    font-size: 0.875rem;
-    color: #374151;
-    font-weight: 500;
-    margin-bottom: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--secondary-text);
+    margin-bottom: 6px;
 }
 
 .form-input {
     width: 100%;
-    padding: 10px 14px;
+    padding: 12px 16px;
     background: white;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    color: #1a1a1a;
+    border: 2px solid rgba(12,91,63,0.1);
+    border-radius: 14px;
+    color: var(--primary);
     font-size: 0.95rem;
-    font-family: inherit;
-    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
 }
 
 .form-input:focus {
     outline: none;
-    border-color: #1a1a1a;
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(12,91,63,0.08);
 }
 
 .form-input:read-only {
-    background: #f9fafb;
-    color: #6b7280;
+    background: rgba(255,255,255,0.5);
+    color: var(--secondary-text);
 }
 
-.btn {
-    padding: 10px 20px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    color: #374151;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.form-input::placeholder {
+    color: #b0b0b0;
+    font-size: 0.85rem;
+}
+
+/* Buttons - MATCHING HOME PAGE */
+.btn-modern {
+    padding: 10px 24px;
+    border-radius: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-family: inherit;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
 }
 
-.btn:hover:not(:disabled) {
-    background: #f9fafb;
-    border-color: #d1d5db;
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.btn-primary {
-    background: #1a1a1a;
+.btn-primary-modern {
+    background: var(--primary);
     color: white;
-    border-color: #1a1a1a;
+    box-shadow: 0 10px 30px rgba(12,91,63,0.25);
 }
 
-.btn-primary:hover:not(:disabled) {
-    background: #2d2d2d;
-    border-color: #2d2d2d;
+.btn-primary-modern:hover:not(:disabled) {
+    background: var(--accent);
+    transform: translateY(-3px);
+    color: white;
+}
+
+.btn-primary-modern:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-outline-modern {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-outline-modern:hover:not(:disabled) {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-3px);
 }
 
 .btn-group {
@@ -187,20 +253,73 @@ body {
     flex-wrap: wrap;
 }
 
+/* Security Notes */
+.security-note {
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    color: var(--secondary-text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.security-note.info {
+    background: rgba(209, 250, 229, 0.5);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #065f46;
+}
+
+.security-note i {
+    font-size: 1.1rem;
+}
+
+/* OTP Status */
+.otp-status {
+    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.otp-status.required {
+    color: #0C5B3F;
+    background: rgba(209, 250, 229, 0.5);
+}
+
+.otp-status.not-required {
+    color: #dc2626;
+    background: rgba(254, 226, 226, 0.5);
+}
+
+.otp-status.verified {
+    color: #059669;
+    background: rgba(209, 250, 229, 0.5);
+}
+
+/* Toast Notification */
 .toast {
     position: fixed;
     top: 24px;
     right: 24px;
     background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
     padding: 16px 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
     z-index: 9999;
     transform: translateX(400px);
     transition: transform 0.3s ease;
     max-width: 400px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
+    backdrop-filter: blur(12px);
 }
 
 .toast.show {
@@ -219,47 +338,7 @@ body {
     border-left: 4px solid #f59e0b;
 }
 
-.security-note {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin-top: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.security-note.info {
-    background: #f0fdf4;
-    border-color: #10b981;
-    color: #065f46;
-}
-
-.otp-status {
-    font-weight: 500;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-}
-
-.otp-status.required {
-    color: #0C5B3F;
-    background: #d1fae5;
-}
-
-.otp-status.not-required {
-    color: #dc2626;
-    background: #fee2e2;
-}
-
-.otp-status.verified {
-    color: #059669;
-    background: #d1fae5;
-}
-
+/* Animations */
 @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -270,79 +349,215 @@ body {
     animation: pulse 1.5s infinite;
 }
 
-@media (max-width: 768px) {
-    .profile-header h1 {
-        font-size: 1.5rem;
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.glass-card {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.glass-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.glass-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-hero {
+        padding: 40px 0 30px 0;
+    }
+
+    .profile-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .profile-header p {
+        font-size: 0.9rem;
+    }
+
     .info-grid {
         grid-template-columns: 1fr;
+        gap: 14px;
     }
-    
+
+    .glass-card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .glass-card-header h2 {
+        font-size: 1.1rem;
+    }
+
     .btn-group {
         flex-direction: column;
     }
-    
-    .btn {
+
+    .btn-modern {
         width: 100%;
         justify-content: center;
+    }
+
+    .nav-back {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .form-input {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-hero {
+        padding: 30px 0 20px 0;
+    }
+
+    .profile-header h1 {
+        font-size: 1.3rem;
+    }
+
+    .profile-header p {
+        font-size: 0.8rem;
+    }
+
+    .glass-card {
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+    }
+
+    .glass-card-header {
+        padding-bottom: 14px;
+        margin-bottom: 14px;
+    }
+
+    .glass-card-header h2 {
+        font-size: 0.95rem;
+        gap: 6px;
+    }
+
+    .glass-card-header h2 i {
+        font-size: 1.1rem;
+    }
+
+    .info-label {
+        font-size: 0.65rem;
+    }
+
+    .info-value {
+        font-size: 0.85rem;
+    }
+
+    .form-label {
+        font-size: 0.7rem;
+    }
+
+    .form-input {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+        border-width: 1.5px;
+    }
+
+    .btn-modern {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    .security-note {
+        font-size: 0.75rem;
+        padding: 8px 12px;
+        border-radius: 10px;
+    }
+
+    .otp-status {
+        font-size: 0.6rem;
+        padding: 2px 8px;
+    }
+
+    .toast {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+        font-size: 0.8rem;
+        padding: 12px 16px;
+        border-radius: 12px;
     }
 }
 </style>
 
-<div class="profile-container">
-    <div class="profile-nav">
-        <a href="{{ url_for('customer.dashboard') }}" class="nav-back">
-            <i class="bi bi-arrow-left"></i> Back to Dashboard
-        </a>
-    </div>
-
-    <div class="profile-header">
-        <h1>Profile Settings</h1>
-        <p>Manage your account information and security</p>
-    </div>
-
-    <!-- Account Information -->
-    <div class="card">
-        <div class="card-header">
-            <h2><i class="bi bi-person"></i> Account Information</h2>
+<!-- PROFILE SECTION -->
+<section class="profile-hero">
+    <div class="container profile-content">
+        
+        <!-- Navigation -->
+        <div class="profile-nav">
+            <a href="{{ url_for('customer.dashboard') }}" class="nav-back">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
         </div>
-        <div class="card-body">
+
+        <!-- Header -->
+        <div class="profile-header">
+            <h1>Profile Settings</h1>
+            <p>Manage your account information and security</p>
+        </div>
+
+        <!-- Account Information -->
+        <div class="glass-card">
+            <div class="glass-card-header">
+                <h2><i class="bi bi-person"></i> Account Information</h2>
+            </div>
             <div class="info-grid">
                 <div class="info-item">
-                    <div class="info-label">Full Name</div>
-                    <div class="info-value">{{ user.name }}</div>
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value">{{ user.name }}</span>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Email Address</div>
-                    <div class="info-value" id="currentEmailDisplay">{{ user.email or 'Not provided' }}</div>
+                    <span class="info-label">Email Address</span>
+                    <span class="info-value" id="currentEmailDisplay">{{ user.email or 'Not provided' }}</span>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Phone Number</div>
-                    <div class="info-value">{{ user.phone or 'Not provided' }}</div>
+                    <span class="info-label">Phone Number</span>
+                    <span class="info-value">{{ user.phone or 'Not provided' }}</span>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Customer ID</div>
-                    <div class="info-value">#{{ user.id }}</div>
+                    <span class="info-label">Customer ID</span>
+                    <span class="info-value">#{{ user.id }}</span>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Address</div>
-                    <div class="info-value">{{ user.address or 'Not provided' }}</div>
+                    <span class="info-label">Address</span>
+                    <span class="info-value">{{ user.address or 'Not provided' }}</span>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Member Since</div>
-                    <div class="info-value">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}</div>
+                    <span class="info-label">Member Since</span>
+                    <span class="info-value">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'N/A' }}</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Update Email -->
-    <div class="card">
-        <div class="card-header">
-            <h2><i class="bi bi-envelope"></i> Update Email</h2>
-        </div>
-        <div class="card-body">
+        <!-- Update Email -->
+        <div class="glass-card">
+            <div class="glass-card-header">
+                <h2><i class="bi bi-envelope"></i> Update Email</h2>
+            </div>
+            
             <div class="security-note info" style="margin-bottom: 20px;">
                 <i class="bi bi-info-circle"></i>
                 {% if user.email and user.email.strip() %}
@@ -369,23 +584,22 @@ body {
                 </div>
                 
                 <div class="btn-group">
-                    <button type="button" id="sendOtpBtn" class="btn btn-primary">
+                    <button type="button" id="sendOtpBtn" class="btn-modern btn-primary-modern">
                         <i class="bi bi-send"></i> Send Verification Code
                     </button>
-                    <button type="submit" id="verifyBtn" class="btn btn-primary" style="display: none;">
+                    <button type="submit" id="verifyBtn" class="btn-modern btn-primary-modern" style="display: none;">
                         <i class="bi bi-check"></i> Verify & Update Email
                     </button>
                 </div>
             </form>
         </div>
-    </div>
 
-    <!-- Change Password -->
-    <div class="card">
-        <div class="card-header">
-            <h2><i class="bi bi-lock"></i> Change Password</h2>
-        </div>
-        <div class="card-body">
+        <!-- Change Password -->
+        <div class="glass-card">
+            <div class="glass-card-header">
+                <h2><i class="bi bi-lock"></i> Change Password</h2>
+            </div>
+            
             <form id="passwordForm">
                 <div class="form-group">
                     <label class="form-label">Current Password</label>
@@ -417,7 +631,7 @@ body {
                 </div>
 
                 <div class="btn-group">
-                    <button type="button" id="sendPasswordOtpBtn" class="btn btn-primary" style="display: none;">
+                    <button type="button" id="sendPasswordOtpBtn" class="btn-modern btn-primary-modern" style="display: none;">
                         <i class="bi bi-send"></i> Send OTP to Email
                     </button>
                 </div>
@@ -434,14 +648,15 @@ body {
                 </div>
                 
                 <div style="margin-top: 20px;">
-                    <button type="submit" id="changePasswordBtn" class="btn btn-primary">
+                    <button type="submit" id="changePasswordBtn" class="btn-modern btn-primary-modern">
                         <i class="bi bi-key"></i> Update Password
                     </button>
                 </div>
             </form>
         </div>
+
     </div>
-</div>
+</section>
 
 <!-- Toast Notification -->
 <div id="toast" class="toast"></div>
@@ -515,7 +730,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data.success) {
-                    // Show where the OTP was sent
                     const sentTo = data.sent_to || 'your email';
                     
                     let message = '';
@@ -531,7 +745,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.style.display = 'none';
                     otpSent = true;
                     
-                    // Update placeholder
                     if (emailOtpInput) {
                         if (hasCurrentEmail) {
                             emailOtpInput.placeholder = 'Enter 6-digit code sent to your current email';
@@ -646,14 +859,12 @@ document.addEventListener('DOMContentLoaded', function() {
         let passwordOtpSent = false;
         let passwordOtpTimer;
         
-        // Check if user has email
         const hasEmail = {{ 'true' if user.email and user.email.strip() else 'false' }};
         
         if (hasEmail) {
             const sendPasswordOtpBtn = document.getElementById('sendPasswordOtpBtn');
             const passwordOtpSection = document.getElementById('passwordOtpSection');
             
-            // Show Send OTP button when user starts typing password
             const oldPassword = document.getElementById('oldPassword');
             const newPassword = document.getElementById('newPassword');
             const confirmPassword = document.getElementById('confirmPassword');
@@ -670,7 +881,6 @@ document.addEventListener('DOMContentLoaded', function() {
             newPassword.addEventListener('input', checkPasswordFields);
             confirmPassword.addEventListener('input', checkPasswordFields);
             
-            // Send Password OTP
             sendPasswordOtpBtn.addEventListener('click', function() {
                 const oldPass = oldPassword.value;
                 const newPass = newPassword.value;
@@ -757,7 +967,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Handle password form submission - ONE STEP
         passwordForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -784,7 +993,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const hasEmail = {{ 'true' if user.email and user.email.strip() else 'false' }};
             
-            // If user has email but OTP not sent yet
             if (hasEmail && !passwordOtpSent) {
                 const sendBtn = document.getElementById('sendPasswordOtpBtn');
                 if (sendBtn) {
@@ -795,7 +1003,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // If OTP was sent but OTP field is empty
             if (hasEmail && passwordOtpSent && !otp) {
                 showToast('Please enter the OTP code', 'error');
                 if (document.getElementById('passwordOtp')) {
@@ -814,8 +1021,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 otp: otp || ''
             };
             
-            console.log('Sending password change request with OTP...');
-            
             fetch('{{ url_for("customer.change_password") }}', {
                 method: 'POST',
                 headers: {
@@ -825,7 +1030,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(formData)
             })
             .then(response => {
-                console.log('Response status:', response.status);
                 if (!response.ok) {
                     return response.json().then(data => {
                         throw new Error(data.error || `Server error: ${response.status}`);
@@ -834,12 +1038,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                console.log('Response data:', data);
                 if (data.success) {
-                    // Password changed successfully!
                     showToast('✅ Password changed successfully!', 'success');
                     
-                    // Clear all fields
                     document.getElementById('oldPassword').value = '';
                     document.getElementById('newPassword').value = '';
                     document.getElementById('confirmPassword').value = '';
@@ -850,7 +1051,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="bi bi-key"></i> Update Password';
                     
-                    // Reset OTP state
                     passwordOtpSent = false;
                     if (document.getElementById('passwordOtpSection')) {
                         document.getElementById('passwordOtpSection').style.display = 'none';
@@ -861,7 +1061,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         sendBtn.classList.remove('pulse');
                     }
                     
-                    // Show success and reload after 2 seconds
                     setTimeout(() => location.reload(), 2000);
                 } else {
                     showToast(data.error || 'Failed to change password', 'error');

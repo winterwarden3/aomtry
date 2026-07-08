@@ -713,17 +713,17 @@ document.addEventListener('DOMContentLoaded', function() {
     {% block content %}{% endblock %}
 </main>
 
-<!-- FOOTER - COMPACT VERSION -->
+<!-- FOOTER - 4 COLUMN VERSION -->
 <footer>
     <div class="container">
         <div class="row g-4">
-            <!-- BRAND -->
-            <div class="col-lg-4">
+            <!-- COLUMN 1: BRAND -->
+            <div class="col-lg-3 col-md-6 d-flex flex-column">
                 <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
                     <i class="bi bi-droplet-fill"></i>
                     Adarsh Oil Mill
                 </h5>
-                <p style="font-size: 0.85rem; line-height: 1.5;">
+                <p style="font-size: 0.85rem; line-height: 1.5; flex-grow: 1;">
                     Delivering purity, quality,
                     and trust since 2062 BS.
                     Natural products crafted
@@ -732,108 +732,108 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="social-icons mt-3">
                     <a href="https://www.facebook.com/adarshoillmill"
                        target="_blank"
-                       style="width: 35px; height: 35px; font-size: 0.9rem;">
+                       style="width: 35px; height: 35px; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.08); margin-right: 8px; transition: all 0.3s ease; color: #cfcfcf; text-decoration: none;">
                         <i class="bi bi-facebook"></i>
                     </a>
                     <a href="https://wa.me/9779848023150"
                        target="_blank"
-                       style="width: 35px; height: 35px; font-size: 0.9rem;">
+                       style="width: 35px; height: 35px; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.08); margin-right: 8px; transition: all 0.3s ease; color: #cfcfcf; text-decoration: none;">
                         <i class="bi bi-whatsapp"></i>
                     </a>
                 </div>
             </div>
 
-            <!-- LINKS -->
-            <div class="col-lg-4">
+            <!-- COLUMN 2: QUICK LINKS -->
+            <div class="col-lg-3 col-md-6 d-flex flex-column">
                 <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
                     Quick Links
                 </h5>
-                <ul class="list-unstyled" style="font-size: 0.85rem;">
+                <ul class="list-unstyled" style="font-size: 0.85rem; flex-grow: 1;">
                     <li class="mb-2">
-                        <a href="{{ url_for('public.home') }}">Home</a>
+                        <a href="{{ url_for('public.home') }}" style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">Home</a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ url_for('public.about') }}">About Us</a>
+                        <a href="{{ url_for('public.about') }}" style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">About Us</a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ url_for('public.products') }}">Products</a>
+                        <a href="{{ url_for('public.products') }}" style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">Products</a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ url_for('public.contact') }}">Contact</a>
+                        <a href="{{ url_for('public.contact') }}" style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">Contact</a>
+                    </li>
+                      <li class="mb-2">
+                        <a href="{{ url_for('public.privacy_policy') }}" style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">Privacy Policy</a>
+                    </li>
+                     <li class="mb-2">
+                        <a href="{{ url_for('public.terms_of_service') }}" style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">Terms of Service</a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ url_for('auth.login', type='customer') }}">Login</a>
+                        <a href="{{ url_for('auth.login', type='customer') }}" style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">Login</a>
                     </li>
                 </ul>
             </div>
 
-            <!-- CONTACT -->
-            <div class="col-lg-4">
+            <!-- COLUMN 3: CONTACT INFO -->
+            <div class="col-lg-3 col-md-6 d-flex flex-column">
                 <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
                     Contact Info
                 </h5>
-                <!-- Location - Opens Google Maps -->
-                <p style="font-size: 0.85rem; margin-bottom: 8px;">
-                    <a href="https://www.google.com/maps/place/Adarsh+Oil+Mill/@28.1835509,81.4796051,19.25z/data=!4m6!3m5!1s0x39988850f734f1b1:0x1bf6799c805fe87!8m2!3d28.1836746!4d81.4797783!16s%2Fg%2F11f11fm2qw?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style="color: #cfcfcf; text-decoration: none;">
-                        <i class="bi bi-geo-alt-fill"></i> Mainapokhar, Bardiya, Nepal
-                    </a>
-                </p>
+                <div style="flex-grow: 1;">
+                    <p style="font-size: 0.85rem; margin-bottom: 8px;">
+                        <a href="https://www.google.com/maps/place/Adarsh+Oil+Mill/@28.1835509,81.4796051,19.25z/data=!4m6!3m5!1s0x39988850f734f1b1:0x1bf6799c805fe87!8m2!3d28.1836746!4d81.4797783!16s%2Fg%2F11f11fm2qw?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">
+                            <i class="bi bi-geo-alt-fill"></i> Mainapokhar, Bardiya
+                        </a>
+                    </p>
+                    <p style="font-size: 0.85rem; margin-bottom: 8px;">
+                        <a href="tel:+9779848023150" 
+                        style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">
+                            <i class="bi bi-telephone-fill"></i>
+                            +977-9848023150
+                        </a>
+                    </p>
+                    <p style="font-size: 0.85rem; margin-bottom: 8px;">
+                        <a href="mailto:contact@adarshoilmill.com.np" 
+                        style="color: #cfcfcf; text-decoration: none; transition: all 0.3s ease;">
+                            <i class="bi bi-envelope-fill"></i>
+                            contact@adarshoilmill.com.np
+                        </a>
+                    </p>
+                </div>
+            </div>
 
-                <!-- Phone - Opens Phone App -->
-                <p style="font-size: 0.85rem; margin-bottom: 8px;">
-                    <a href="tel:+9779848023150" 
-                    style="color: #cfcfcf; text-decoration: none;">
-                        <i class="bi bi-telephone-fill"></i>
-                        +977-9848023150
-                    </a>
+            <!-- COLUMN 4: NEWSLETTER -->
+            <div class="col-lg-3 col-md-6 d-flex flex-column">
+                <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
+                    Newsletter
+                </h5>
+                <p style="font-size: 0.85rem; margin-bottom: 10px; color: #cfcfcf;">
+                    Subscribe to get updates and offers. 
                 </p>
-
-                <!-- Email - Opens Email App -->
-                <p style="font-size: 0.85rem; margin-bottom: 8px;">
-                    <a href="mailto:contact@adarshoilmill.com.np" 
-                    style="color: #cfcfcf; text-decoration: none;">
-                        <i class="bi bi-envelope-fill"></i>
-                        contact@adarshoilmill.com.np
-                    </a>
-                </p>
+                <form id="newsletterForm" onsubmit="subscribeNewsletter(event)" style="display: flex; flex-direction: column; gap: 10px;">
+                    <input type="email" id="newsletterEmail" placeholder="Your email address" required
+                        style="width: 100%; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; background: rgba(255,255,255,0.1); color: white; font-size: 0.85rem; outline: none; transition: all 0.3s ease;">
+                    <button type="submit" id="newsletterSubscribeBtn" 
+                            style="width: 100%; padding: 12px 24px; background: linear-gradient(135deg,var(--primary),var(--accent)); color: white; border: none; border-radius: 100px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease;">
+                        <span id="newsletterBtnText">Subscribe</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </form>
+                <div id="newsletterMessage" style="margin-top: 8px; font-size: 0.8rem; display: none;"></div>
+                <small style="font-size: 0.7rem; color: rgba(255,255,255,0.4);">We respect your privacy. No spam</small>
             </div>
         </div>
 
         <hr class="my-4" style="border-color:rgba(255,255,255,0.08);">
 
-
-
-
-                <!-- NEWSLETTER SIGNUP - Add this inside your footer -->
-        <div class="col-lg-4">
-            <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
-                <i class="bi bi-envelope"></i> Newsletter
-            </h5>
-            <p style="font-size: 0.85rem; margin-bottom: 10px;">
-                Subscribe to get updates, offers, and news from us.
-            </p>
-            <form id="newsletterForm" onsubmit="subscribeNewsletter(event)" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="email" id="newsletterEmail" placeholder="Your email address" required
-                    style="flex: 1; min-width: 180px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; background: rgba(255,255,255,0.1); color: white; font-size: 0.85rem;">
-                <button type="submit" id="newsletterSubscribeBtn" 
-                        style="padding: 10px 24px; background: linear-gradient(135deg,var(--primary),var(--accent)); color: white; border: none; border-radius: 100px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; white-space: nowrap;">
-                    <span id="newsletterBtnText">Subscribe</span>
-                </button>
-            </form>
-            <div id="newsletterMessage" style="margin-top: 8px; font-size: 0.8rem; display: none;"></div>
-            <small style="font-size: 0.7rem; color: rgba(255,255,255,0.5);">We respect your privacy. No spam, unsubscribe anytime.</small>
-        </div>
-
-
         <div class="text-center">
-            <small style="font-size: 0.75rem;">
-                © 2026 Adarsh Oil Mill. All Rights Reserved.
+            <small style="font-size: 0.75rem; color: #cfcfcf;">
+                &copy; 2026 Adarsh Oil Mill. All Rights Reserved.
             </small>
             <br>
-            <small style="font-size: 0.7rem;">
+            <small style="font-size: 0.7rem; color: rgba(255,255,255,0.4);">
                 Developed by Kushal
             </small>
         </div>
@@ -1109,6 +1109,22 @@ document.addEventListener('DOMContentLoaded', function() {
         padding: 6px 18px;
     }
 }
+
+footer a:hover {
+    color: white !important;
+    padding-left: 5px;
+}
+
+.social-icons a:hover {
+    background: linear-gradient(135deg,var(--primary),var(--accent));
+    transform: translateY(-3px);
+    color: white !important;
+}
+
+#newsletterSubscribeBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(12, 91, 63, 0.3);
+}
 </style>
 
 <script>
@@ -1224,7 +1240,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // ============================================
-// NEWSLETTER SUBSCRIPTION (AJAX)
+// NEWSLETTER SUBSCRIPTION (AJAX) - WITH AUTO-HIDE
 // ============================================
 function subscribeNewsletter(e) {
     e.preventDefault();
@@ -1239,6 +1255,12 @@ function subscribeNewsletter(e) {
         messageDiv.style.color = '#ef4444';
         messageDiv.textContent = 'Please enter a valid email address.';
         messageDiv.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        clearTimeout(messageDiv._hideTimer);
+        messageDiv._hideTimer = setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
         return;
     }
     
@@ -1246,9 +1268,9 @@ function subscribeNewsletter(e) {
     btnText.textContent = 'Subscribing...';
     btn.disabled = true;
     messageDiv.style.display = 'none';
+    clearTimeout(messageDiv._hideTimer);
     
-    // Send AJAX request
-    fetch('/api/newsletter/subscribe', {
+    fetch('/admin/api/newsletter/subscribe', {  
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -1260,7 +1282,7 @@ function subscribeNewsletter(e) {
     .then(data => {
         if (data.success) {
             messageDiv.style.color = '#22c55e';
-            messageDiv.textContent = data.message || '✅ Subscribed successfully! Check your email.';
+            messageDiv.textContent = data.message || 'Subscribed successfully! Check your email.';
             messageDiv.style.display = 'block';
             document.getElementById('newsletterEmail').value = '';
         } else {
@@ -1268,18 +1290,27 @@ function subscribeNewsletter(e) {
             messageDiv.textContent = data.error || 'Something went wrong. Please try again.';
             messageDiv.style.display = 'block';
         }
+        
+        // Auto-hide after 5 seconds
+        messageDiv._hideTimer = setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
     })
     .catch(error => {
         messageDiv.style.color = '#ef4444';
         messageDiv.textContent = 'Network error. Please try again.';
         messageDiv.style.display = 'block';
+        
+        // Auto-hide after 5 seconds
+        messageDiv._hideTimer = setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
     })
     .finally(() => {
         btnText.textContent = 'Subscribe';
         btn.disabled = false;
     });
 }
-
 </script>
 </body>
 </html>

@@ -253,7 +253,7 @@ def login():
                         return redirect(url_for('auth.login', type='admin'))
                     
                     if login_type == 'customer' and user.role == 'admin':
-                        error_msg = 'This is an admin account. Please use Admin Login.'
+                        error_msg = 'Invalid Credentials. Please Login With Correct Credentials.'
                         if is_ajax:
                             return jsonify({'success': False, 'error': error_msg})
                         flash(error_msg, 'danger')

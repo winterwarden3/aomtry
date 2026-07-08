@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribe - {{ business_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0C5B3F;
+            --accent: #138A52;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .unsubscribe-card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 40px 40px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .unsubscribe-card .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .unsubscribe-card .icon-circle.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .unsubscribe-card .icon-circle.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .unsubscribe-card .icon-circle.warning {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+        
+        .unsubscribe-card .icon-circle.info {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+        
+        .unsubscribe-card h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        
+        .unsubscribe-card .subtitle {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .unsubscribe-card .email-display {
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            color: #0f172a;
+            font-size: 14px;
+            margin-bottom: 24px;
+            word-break: break-all;
+        }
+        
+        .unsubscribe-card .email-display span {
+            color: #0C5B3F;
+        }
+        
+        .unsubscribe-card .btn {
+            display: inline-block;
+            padding: 14px 44px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .unsubscribe-card .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 8px 24px rgba(12, 91, 63, 0.25);
+        }
+        
+        .unsubscribe-card .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(12, 91, 63, 0.35);
+        }
+        
+        .unsubscribe-card .btn-danger {
+            background: #dc2626;
+            color: white;
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
+        }
+        
+        .unsubscribe-card .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(220, 38, 38, 0.35);
+        }
+        
+        .unsubscribe-card .btn-outline {
+            background: transparent;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .unsubscribe-card .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .unsubscribe-card .btn-success {
+            background: #16a34a;
+            color: white;
+            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.25);
+        }
+        
+        .unsubscribe-card .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(22, 163, 74, 0.35);
+        }
+        
+        .unsubscribe-card .divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin: 24px 0;
+        }
+        
+        .unsubscribe-card .back-link {
+            display: inline-block;
+            color: #94a3b8;
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: 16px;
+            transition: color 0.2s ease;
+        }
+        
+        .unsubscribe-card .back-link:hover {
+            color: var(--primary);
+        }
+        
+        .unsubscribe-card .reason-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: #0f172a;
+            background: white;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .unsubscribe-card .reason-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(12, 91, 63, 0.1);
+        }
+        
+        .unsubscribe-card .reason-select option {
+            padding: 8px;
+        }
+        
+        @media (max-width: 480px) {
+            .unsubscribe-card {
+                padding: 32px 20px 28px;
+            }
+            
+            .unsubscribe-card h1 {
+                font-size: 20px;
+            }
+            
+            .unsubscribe-card .btn {
+                width: 100%;
+                padding: 14px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="unsubscribe-card">
+    
+    {% if confirmed %}
+        <!-- ===== CONFIRMATION PAGE ===== -->
+        
+        {% if success %}
+            <div class="icon-circle success">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <h1>You're Unsubscribed</h1>
+            <p class="subtitle">
+                You have been successfully unsubscribed from 
+                <strong>{{ business_name }}</strong> newsletter.
+            </p>
+            <p class="subtitle" style="font-size: 14px; color: #94a3b8;">
+                We're sorry to see you go. If this was a mistake, 
+                you can <a href="{{ url_for('public.home') }}" style="color: var(--primary); text-decoration: none; font-weight: 500;">resubscribe</a> anytime.
+            </p>
+            <hr class="divider">
+            <a href="{{ url_for('public.home') }}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Return to Home
+            </a>
+        {% else %}
+            <div class="icon-circle error">
+                <i class="bi bi-x-lg"></i>
+            </div>
+            <h1>Something Went Wrong</h1>
+            <p class="subtitle">
+                We couldn't process your unsubscribe request.
+                {% if error %}
+                    <br><small style="color: #94a3b8;">{{ error }}</small>
+                {% endif %}
+            </p>
+            <p class="subtitle" style="font-size: 14px; color: #94a3b8;">
+                Please try again or contact support if the problem persists.
+            </p>
+            <hr class="divider">
+            <a href="{{ url_for('public.home') }}" class="btn btn-outline">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+            <br><br>
+            <a href="mailto:contact@adarshoilmill.com.np" class="btn btn-primary" style="padding: 12px 28px; font-size: 14px;">
+                <i class="bi bi-envelope"></i> Contact Support
+            </a>
+        {% endif %}
+        
+    {% else %}
+        <!-- ===== UNSUBSCRIBE FORM ===== -->
+        
+        {% if exists %}
+            <div class="icon-circle warning">
+                <i class="bi bi-envelope-exclamation"></i>
+            </div>
+            <h1>Unsubscribe from Newsletter</h1>
+            <p class="subtitle">
+                You are currently subscribed to the 
+                <strong>{{ business_name }}</strong> newsletter.
+            </p>
+            
+            <div class="email-display">
+                📧 <span>{{ email }}</span>
+            </div>
+            
+            <form method="POST" action="{{ url_for('public.unsubscribe_confirm', email=email) }}">
+                <select name="reason" class="reason-select" required>
+                    <option value="">Select a reason </option>
+                    <option value="too_many_emails">Too many emails</option>
+                    <option value="not_relevant">Content not relevant</option>
+                    <option value="never_subscribed">I never subscribed</option>
+                    <option value="spam">I consider this spam</option>
+                    <option value="other">Other reason</option>
+                </select>
+                
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to unsubscribe?')">
+                    <i class="bi bi-x-circle"></i> Unsubscribe
+                </button>
+            </form>
+            
+            <hr class="divider">
+            <a href="{{ url_for('public.home') }}" class="back-link">
+                <i class="bi bi-arrow-left"></i> No, take me back
+            </a>
+            
+        {% else %}
+            <div class="icon-circle info">
+                <i class="bi bi-search"></i>
+            </div>
+            <h1>Email Not Found</h1>
+            <p class="subtitle">
+                We couldn't find <strong>{{ email }}</strong> in our subscriber list.
+            </p>
+            <p class="subtitle" style="font-size: 14px; color: #94a3b8;">
+                You may have already unsubscribed, or this email was never subscribed.
+            </p>
+            <hr class="divider">
+            <a href="{{ url_for('public.home') }}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Return to Home
+            </a>
+            <br><br>
+            <a href="mailto:contact@adarshoilmill.com.np" class="back-link" style="font-size: 14px;">
+                <i class="bi bi-envelope"></i> Contact us if this is a mistake
+            </a>
+        {% endif %}
+        
+    {% endif %}
+    
+</div>
+
+</body>
+</html>
