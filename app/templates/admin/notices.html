@@ -1824,4 +1824,104 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endwith %}
 });
 </script>
+
+<!-- FORCE POPUP - VERCEL FIX -->
+<script>
+// This will run immediately and show the popup
+(function() {
+    console.log('🚀 FORCE POPUP SCRIPT RUNNING');
+    
+    // Create popup if it doesn't exist
+    if (!document.getElementById('noticePopup')) {
+        const popup = document.createElement('div');
+        popup.id = 'noticePopup';
+        popup.style.cssText = 'display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:999999; align-items:center; justify-content:center;';
+        popup.innerHTML = `
+            <div style="background:white; max-width:500px; width:100%; padding:30px; border-radius:16px; position:relative; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                <button onclick="this.closest('#noticePopup').style.display='none'" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.1); border:none; border-radius:50%; width:32px; height:32px; font-size:18px; cursor:pointer;">✕</button>
+                <div id="noticePopupTitle" style="font-size:1.5rem; font-weight:700; margin-bottom:12px; color:#111827;">Notice</div>
+                <div id="noticePopupContent" style="color:#4b5563; line-height:1.6; margin-bottom:20px;"></div>
+                <div style="text-align:center; font-size:0.85rem; color:#6b7280;">
+                    <span>Auto-closes in </span>
+                    <span id="countdownDisplay" style="font-weight:700; font-size:1.1rem; color:#0C5B3F;">15</span>
+                    <span> seconds</span>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+    
+    // Function to show popup
+    window.showNoticePopup = function(notice) {
+        console.log('📢 Showing popup:', notice);
+        const popup = document.getElementById('noticePopup');
+        if (!popup) return;
+        
+        document.getElementById('noticePopupTitle').textContent = notice.title || 'Notice';
+        document.getElementById('noticePopupContent').innerHTML = notice.content || '';
+        
+        popup.style.display = 'flex';
+        
+        let seconds = 15;
+        document.getElementById('countdownDisplay').textContent = seconds;
+        
+        clearInterval(window._countdownInterval);
+        clearTimeout(window._closeTimeout);
+        
+        window._countdownInterval = setInterval(() => {
+            seconds--;
+            document.getElementById('countdownDisplay').textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(window._countdownInterval);
+                popup.style.display = 'none';
+            }
+        }, 1000);
+        
+        window._closeTimeout = setTimeout(() => {
+            popup.style.display = 'none';
+            clearInterval(window._countdownInterval);
+        }, 15000);
+    };
+    
+    // Function to fetch notices
+    window.checkNotices = async function() {
+        try {
+            console.log('🔍 Fetching notices...');
+            const response = await fetch('/admin/api/notices/active');
+            const data = await response.json();
+            console.log('📦 Data:', data);
+            
+            if (data.success && data.notices && data.notices.length > 0) {
+                window.showNoticePopup(data.notices[0]);
+            } else {
+                console.log('ℹ️ No notices found');
+            }
+        } catch (e) {
+            console.error('❌ Error:', e);
+        }
+    };
+    
+    // Auto-run after page loads
+    if (document.readyState === 'complete') {
+        setTimeout(window.checkNotices, 1500);
+    } else {
+        document.addEventListener('readystatechange', function() {
+            if (document.readyState === 'complete') {
+                setTimeout(window.checkNotices, 1500);
+            }
+        });
+    }
+    
+    console.log('✅ Popup script loaded. Type testNotice() to test');
+    
+    // Manual test
+    window.testNotice = function() {
+        window.showNoticePopup({
+            title: 'Test Notice',
+            content: 'This is a test notice from console',
+            notice_type: 'info'
+        });
+    };
+})();
+</script>
 {% endblock %}
