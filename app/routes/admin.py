@@ -403,7 +403,11 @@ def add_sale():
                     if new_user:
                         customer_id_final = new_user.get('id')
                         customer_name = new_user.get('name')
-            
+                        
+                        # Auto-sync to newsletter if email exists
+                        if email:
+                            from app.models_supabase import Newsletter
+                            Newsletter.sync_from_customer(customer_id_final)
             products = request.form.getlist('product[]')
             qtys = request.form.getlist('qty[]')
             units = request.form.getlist('unit[]')
@@ -1185,19 +1189,24 @@ def add_customer():
             
             result = User.create(user_data)
             if result:
+                # Auto-sync to newsletter if email exists
+                if result.get('email'):
+                    from app.models_supabase import Newsletter
+                    Newsletter.sync_from_customer(result.get('id'))
+                
                 if is_ajax:
                     return jsonify({
                         'success': True,
-                        'message': f'Customer "{user_data["name"]}" added successfully!',
+                        'message': f'Customer "{user_data["name"]}" added successfully and subscribed to newsletter!',
                         'redirect': url_for('admin.customers_list')
                     })
-                flash('Customer added successfully', 'success')
+                flash(f'Customer "{user_data["name"]}" added successfully and subscribed to newsletter!', 'success')
             else:
                 if is_ajax:
                     return jsonify({'success': False, 'error': 'Failed to add customer'}), 500
                 flash('Failed to add customer', 'danger')
-            return redirect(url_for('admin.customers_list'))
-            
+            return redirect(url_for('admin.customers_list'))  
+        
         except Exception as e:
             if is_ajax:
                 return jsonify({'success': False, 'error': str(e)}), 500
@@ -1259,20 +1268,24 @@ def edit_customer(customer_id):
                 'address': request.form.get('address'),
                 'is_active': request.form.get('is_active') == 'on'
             })
-            
+
             if result:
+                # Auto-sync to newsletter if email exists
+                if result.get('email'):
+                    from app.models_supabase import Newsletter
+                    Newsletter.sync_from_customer(customer_id)
+                
                 if is_ajax:
                     return jsonify({
                         'success': True,
-                        'message': f'Customer "{request.form.get("name")}" updated successfully!',
+                        'message': f'Customer "{request.form.get("name")}" updated successfully and newsletter synced!',
                         'redirect': url_for('admin.customers_list')
                     })
-                flash('Customer updated successfully!', 'success')
+                flash('Customer updated successfully and newsletter synced!', 'success')
             else:
                 if is_ajax:
                     return jsonify({'success': False, 'error': 'Failed to update customer'}), 500
-                flash('Failed to update customer', 'danger')
-                
+                flash('Failed to update customer', 'danger')                
         except Exception as e:
             if is_ajax:
                 return jsonify({'success': False, 'error': str(e)}), 500
@@ -4114,5 +4127,650 @@ def get_batch_history():
         print(f"Error fetching batch history: {e}")
         return jsonify({'success': False, 'error': str(e)})
     
+# ============================================
+# NOTICE API ENDPOINT
+# ============================================
 
+@bp.route('/api/notices/active')
+def get_active_notices():
+    """API endpoint to get active notices for frontend"""
+    try:
+        from app.models_supabase import Notice
+        notices = Notice.get_active_notices()
+        return jsonify({
+            'success': True,
+            'notices': notices
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
     
+
+# ============================================
+# NOTICE MANAGEMENT ROUTES - FULLY AJAX
+# ============================================
+
+@bp.route('/notices')
+@login_required
+@admin_required
+def notices_list():
+    """List all notices with pagination - AJAX ready"""
+    from app.models_supabase import Notice
+    
+    # Check if AJAX request
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    if per_page not in [10, 25, 50, 100]:
+        per_page = 10
+    
+    notices_data, total = Notice.get_all_notices_paginated(page, per_page)
+    notices = Pagination(notices_data, page, per_page, total)
+    
+    # Get active and inactive counts for stats cards
+    all_notices, _ = Notice.get_all_notices_paginated(1, 9999)
+    active_count = sum(1 for n in all_notices if n.get('is_active', False))
+    inactive_count = sum(1 for n in all_notices if not n.get('is_active', False))
+    
+    # If AJAX request, return JSON
+    if is_ajax:
+        # Format notices for JSON response
+        notices_list = []
+        for notice in notices.items:
+            notices_list.append({
+                'id': notice.get('id'),
+                'title': notice.get('title'),
+                'content': notice.get('content'),
+                'notice_type': notice.get('notice_type'),
+                'is_active': notice.get('is_active'),
+                'show_from': notice.get('show_from'),
+                'show_until': notice.get('show_until'),
+                'image_url': notice.get('image_url'),
+                'image_alt_text': notice.get('image_alt_text', ''),
+                'created_at': notice.get('created_at')
+            })
+        
+        return jsonify({
+            'success': True,
+            'notices': notices_list,
+            'total': total,
+            'page': page,
+            'per_page': per_page,
+            'total_pages': notices.pages,
+            'active_count': active_count,
+            'inactive_count': inactive_count,
+            'has_prev': notices.has_prev,
+            'has_next': notices.has_next,
+            'prev_num': notices.prev_num,
+            'next_num': notices.next_num
+        })
+    
+    # Non-AJAX request - render the page (first load)
+    return render_template(
+        'admin/notices.html',
+        notices=notices,
+        per_page=per_page,
+        active_count=active_count,
+        inactive_count=inactive_count,
+        business_name=Config.BUSINESS_NAME
+    )
+
+
+@bp.route('/notices/add', methods=['POST'])
+@login_required
+@admin_required
+def add_notice():
+    """Add a new notice - AJAX only"""
+    from app.models_supabase import Notice
+    from app.cloudinary_client import upload_image_to_cloudinary
+    
+    # Must be AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return jsonify({'success': False, 'error': 'AJAX request required'}), 400
+    
+    try:
+        # Handle image upload
+        image_url = None
+        image_public_id = None
+        
+        if 'notice_image' in request.files:
+            file = request.files['notice_image']
+            if file and file.filename and file.filename != '':
+                allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+                if '.' in file.filename:
+                    ext = file.filename.rsplit('.', 1)[1].lower()
+                    if ext not in allowed_extensions:
+                        return jsonify({'success': False, 'error': f'Invalid file type. Allowed: {", ".join(allowed_extensions)}'}), 400
+                
+                upload_result = upload_image_to_cloudinary(file, folder="notices")
+                if upload_result:
+                    image_url = upload_result['url']
+                    image_public_id = upload_result['public_id']
+        
+        show_from = request.form.get('show_from')
+        if show_from == '':
+            show_from = None
+        
+        show_until = request.form.get('show_until')
+        if show_until == '':
+            show_until = None
+        
+        notice_data = {
+            'title': request.form.get('title') or 'Notice',
+            'content': request.form.get('content') or '',
+            'notice_type': request.form.get('notice_type', 'info'),
+            'is_active': request.form.get('is_active') == 'on',
+            'show_from': show_from,
+            'show_until': show_until,
+            'image_url': image_url,
+            'image_public_id': image_public_id,
+            'created_by': current_user.id
+        }
+        
+        result = Notice.create(notice_data)
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Notice added successfully!',
+                'notice': result
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to add notice'}), 500
+            
+    except Exception as e:
+        print(f"❌ Error adding notice: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/notices/<int:notice_id>/get', methods=['GET'])
+@login_required
+@admin_required
+def get_notice(notice_id):
+    """Get a single notice by ID for editing - AJAX only"""
+    from app.models_supabase import Notice
+    
+    # Must be AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return jsonify({'success': False, 'error': 'AJAX request required'}), 400
+    
+    try:
+        notice = Notice.get_by_id(notice_id)
+        
+        if not notice:
+            return jsonify({'success': False, 'error': 'Notice not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'notice': {
+                'id': notice.get('id'),
+                'title': notice.get('title'),
+                'content': notice.get('content'),
+                'notice_type': notice.get('notice_type'),
+                'is_active': notice.get('is_active'),
+                'show_from': notice.get('show_from'),
+                'show_until': notice.get('show_until'),
+                'image_url': notice.get('image_url'),
+                'image_alt_text': notice.get('image_alt_text', ''),
+                'image_public_id': notice.get('image_public_id')
+            }
+        })
+        
+    except Exception as e:
+        print(f"❌ Error fetching notice: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/notices/<int:notice_id>/edit', methods=['POST'])
+@login_required
+@admin_required
+def edit_notice(notice_id):
+    """Edit an existing notice - AJAX only"""
+    from app.models_supabase import Notice
+    from app.cloudinary_client import upload_image_to_cloudinary, delete_image_from_cloudinary
+    
+    # Must be AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return jsonify({'success': False, 'error': 'AJAX request required'}), 400
+    
+    notice = Notice.get_by_id(notice_id)
+    if not notice:
+        return jsonify({'success': False, 'error': 'Notice not found'}), 404
+    
+    try:
+        image_url = notice.get('image_url')
+        image_public_id = notice.get('image_public_id')
+        remove_image = request.form.get('remove_image') == 'on'
+        
+        if 'notice_image' in request.files:
+            file = request.files['notice_image']
+            if file and file.filename and file.filename != '':
+                allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+                if '.' in file.filename:
+                    ext = file.filename.rsplit('.', 1)[1].lower()
+                    if ext not in allowed_extensions:
+                        return jsonify({'success': False, 'error': 'Invalid file type'}), 400
+                
+                if image_public_id:
+                    delete_image_from_cloudinary(image_public_id)
+                
+                upload_result = upload_image_to_cloudinary(file, folder="notices")
+                if upload_result:
+                    image_url = upload_result['url']
+                    image_public_id = upload_result['public_id']
+        
+        if remove_image and image_public_id:
+            delete_image_from_cloudinary(image_public_id)
+            image_url = None
+            image_public_id = None
+        
+        show_from = request.form.get('show_from')
+        if show_from == '':
+            show_from = None
+        
+        show_until = request.form.get('show_until')
+        if show_until == '':
+            show_until = None
+        
+        notice_data = {
+            'title': request.form.get('title') or 'Notice',
+            'content': request.form.get('content') or '',
+            'notice_type': request.form.get('notice_type', 'info'),
+            'is_active': request.form.get('is_active') == 'on',
+            'show_from': show_from,
+            'show_until': show_until,
+            'image_url': image_url,
+            'image_public_id': image_public_id
+        }
+        
+        result = Notice.update(notice_id, notice_data)
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Notice updated successfully!',
+                'notice': result
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to update notice'}), 500
+            
+    except Exception as e:
+        print(f"❌ Error updating notice: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/notices/<int:notice_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_notice(notice_id):
+    """Delete a notice - AJAX only"""
+    from app.models_supabase import Notice
+    from app.cloudinary_client import delete_image_from_cloudinary
+    
+    # Must be AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return jsonify({'success': False, 'error': 'AJAX request required'}), 400
+    
+    try:
+        notice = Notice.get_by_id(notice_id)
+        if not notice:
+            return jsonify({'success': False, 'error': 'Notice not found'}), 404
+        
+        # Delete image from Cloudinary if exists
+        if notice.get('image_public_id'):
+            delete_image_from_cloudinary(notice.get('image_public_id'))
+        
+        result = Notice.delete(notice_id)
+        
+        if result:
+            return jsonify({'success': True, 'message': 'Notice deleted successfully!'})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to delete notice'}), 500
+            
+    except Exception as e:
+        print(f"Error deleting notice: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/notices/<int:notice_id>/toggle', methods=['POST'])
+@login_required
+@admin_required
+def toggle_notice(notice_id):
+    """Toggle notice active status - AJAX only"""
+    from app.models_supabase import Notice
+    
+    # Must be AJAX
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if not is_ajax:
+        return jsonify({'success': False, 'error': 'AJAX request required'}), 400
+    
+    try:
+        result = Notice.toggle_status(notice_id)
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Notice status toggled!',
+                'is_active': result.get('is_active')
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to toggle notice'}), 500
+            
+    except Exception as e:
+        print(f"Error toggling notice: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================
+# NEWSLETTER MANAGEMENT ROUTES
+# ============================================
+
+
+@bp.route('/newsletter')
+@login_required
+@admin_required
+def newsletter_list():
+    """View all newsletter subscribers"""
+    from app.models_supabase import Newsletter
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    search = request.args.get('search', '')
+    
+    if per_page not in [10, 25, 50, 100]:
+        per_page = 10
+    
+    # ✅ Change this: show ALL subscribers (active + inactive)
+    subscribers_data, total = Newsletter.get_all_subscribers(active_only=False, page=page, per_page=per_page, search=search)
+    subscribers = Pagination(subscribers_data, page, per_page, total)
+    
+    total_subscribers = Newsletter.get_total_subscribers()
+    
+    return render_template(
+        'admin/newsletter.html',
+        subscribers=subscribers,
+        search=search,
+        per_page=per_page,
+        total_subscribers=total_subscribers,
+        business_name=Config.BUSINESS_NAME
+    )
+
+@bp.route('/newsletter/send', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def newsletter_send():
+    """Send newsletter to all subscribers"""
+    from app.models_supabase import Newsletter
+    from app.brevo_service import send_newsletter_campaign
+    
+    # ✅ GET TOTAL SUBSCRIBERS
+    total_subscribers = Newsletter.get_total_subscribers()
+    
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    if request.method == 'POST':
+        try:
+            subject = request.form.get('subject')
+            content = request.form.get('content')
+            
+            if not subject or not content:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'Subject and content are required'}), 400
+                flash('Subject and content are required', 'danger')
+                return redirect(url_for('admin.newsletter_list'))
+            
+            # Get all active subscribers
+            subscribers, total = Newsletter.get_all_subscribers(active_only=True)
+            emails = [s.get('email') for s in subscribers if s.get('email')]
+            
+            if not emails:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': 'No active subscribers found'}), 400
+                flash('No active subscribers found', 'warning')
+                return redirect(url_for('admin.newsletter_list'))
+            
+            # Send newsletter
+            result = send_newsletter_campaign(subject, content, emails)
+            
+            if result['success']:
+                # Record campaign
+                campaign_data = {
+                    'subject': subject,
+                    'content': content,
+                    'sent_count': result['sent_count'],
+                    'sent_at': get_nepal_time().isoformat(),
+                    'created_by': current_user.id
+                }
+                supabase.table("newsletter_campaigns").insert(campaign_data).execute()
+                
+                if is_ajax:
+                    return jsonify({
+                        'success': True,
+                        'message': f'Newsletter sent to {result["sent_count"]} subscribers!'
+                    })
+                flash(f'Newsletter sent to {result["sent_count"]} subscribers!', 'success')
+            else:
+                if is_ajax:
+                    return jsonify({'success': False, 'error': result['message']}), 500
+                flash(f'Failed to send: {result["message"]}', 'danger')
+            
+            return redirect(url_for('admin.newsletter_list'))
+            
+        except Exception as e:
+            print(f"❌ Error sending newsletter: {e}")
+            if is_ajax:
+                return jsonify({'success': False, 'error': str(e)}), 500
+            flash(f'Error: {str(e)}', 'danger')
+            return redirect(url_for('admin.newsletter_list'))
+    
+    # ✅ PASS total_subscribers TO TEMPLATE
+    return render_template(
+        'admin/newsletter_send.html', 
+        business_name=Config.BUSINESS_NAME,
+        total_subscribers=total_subscribers  # ✅ ADD THIS
+    )
+
+
+@bp.route('/newsletter/subscriber/<int:subscriber_id>/toggle', methods=['POST'])
+@login_required
+@admin_required
+def newsletter_toggle_subscriber(subscriber_id):
+    """Toggle subscriber active status"""
+    from app.models_supabase import Newsletter
+    
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    try:
+        # Get current subscriber
+        response = supabase.table("newsletter_subscribers")\
+            .select("*")\
+            .eq("id", subscriber_id)\
+            .execute()
+        
+        if not response.data:
+            return jsonify({'success': False, 'error': 'Subscriber not found'}), 404
+        
+        subscriber = response.data[0]
+        new_status = not subscriber.get('is_active', True)
+        
+        update_response = supabase.table("newsletter_subscribers")\
+            .update({'is_active': new_status})\
+            .eq("id", subscriber_id)\
+            .execute()
+        
+        if update_response.data:
+            if is_ajax:
+                return jsonify({
+                    'success': True,
+                    'message': f'Subscriber {"activated" if new_status else "deactivated"}!',
+                    'is_active': new_status
+                })
+            flash(f'Subscriber {"activated" if new_status else "deactivated"}!', 'success')
+        else:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Failed to update subscriber'}), 500
+            flash('Failed to update subscriber', 'danger')
+            
+    except Exception as e:
+        print(f"Error toggling subscriber: {e}")
+        if is_ajax:
+            return jsonify({'success': False, 'error': str(e)}), 500
+        flash(f'Error: {str(e)}', 'danger')
+    
+    if not is_ajax:
+        return redirect(url_for('admin.newsletter_list'))
+    return jsonify({'success': True})
+
+
+@bp.route('/newsletter/subscriber/<int:subscriber_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def newsletter_delete_subscriber(subscriber_id):
+    """Delete a subscriber"""
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    try:
+        response = supabase.table("newsletter_subscribers")\
+            .delete()\
+            .eq("id", subscriber_id)\
+            .execute()
+        
+        if response.data:
+            if is_ajax:
+                return jsonify({'success': True, 'message': 'Subscriber deleted successfully!'})
+            flash('Subscriber deleted successfully!', 'success')
+        else:
+            if is_ajax:
+                return jsonify({'success': False, 'error': 'Failed to delete subscriber'}), 500
+            flash('Failed to delete subscriber', 'danger')
+            
+    except Exception as e:
+        print(f"Error deleting subscriber: {e}")
+        if is_ajax:
+            return jsonify({'success': False, 'error': str(e)}), 500
+        flash(f'Error: {str(e)}', 'danger')
+    
+    if not is_ajax:
+        return redirect(url_for('admin.newsletter_list'))
+    return jsonify({'success': True})
+
+
+@bp.route('/newsletter/export', methods=['GET'])
+@login_required
+@admin_required
+def newsletter_export():
+    """Export subscribers to CSV"""
+    from app.models_supabase import Newsletter
+    import csv
+    import io
+    
+    try:
+        subscribers, total = Newsletter.get_all_subscribers(active_only=False)
+        
+        # Create CSV
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow(['Email', 'Name', 'Source', 'Subscribed At', 'Status'])
+        
+        # Write data
+        for sub in subscribers:
+            writer.writerow([
+                sub.get('email', ''),
+                sub.get('name', ''),
+                sub.get('source', ''),
+                sub.get('subscribed_at', '')[:10] if sub.get('subscribed_at') else '',
+                'Active' if sub.get('is_active') else 'Inactive'
+            ])
+        
+        output.seek(0)
+        
+        return send_file(
+            io.BytesIO(output.getvalue().encode('utf-8')),
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name=f'newsletter_subscribers_{get_nepal_time().strftime("%Y%m%d")}.csv'
+        )
+        
+    except Exception as e:
+        print(f"Error exporting subscribers: {e}")
+        flash('Failed to export subscribers', 'danger')
+        return redirect(url_for('admin.newsletter_list'))
+    
+# ============================================
+# PUBLIC NEWSLETTER API
+# ============================================
+
+@bp.route('/api/newsletter/subscribe', methods=['POST'])
+def api_newsletter_subscribe():
+    """Public API endpoint for newsletter subscription (AJAX)"""
+    from app.models_supabase import Newsletter
+    from app.brevo_service import send_newsletter_welcome_email
+    
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip()
+        
+        if not email or not '@' in email:
+            return jsonify({'success': False, 'error': 'Please enter a valid email address'}), 400
+        
+        # Subscribe user
+        subscriber = Newsletter.subscribe(email, source='footer')
+        
+        if subscriber:
+            # Send welcome email
+            send_newsletter_welcome_email(email)
+            
+            return jsonify({
+                'success': True,
+                'message': '✅ Subscribed successfully! Check your email for confirmation.'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to subscribe. Please try again.'}), 500
+            
+    except Exception as e:
+        print(f"❌ Newsletter subscription error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    
+
+@bp.route('/api/newsletter/subscribers', methods=['GET'])
+@login_required
+@admin_required
+def api_newsletter_subscribers():
+    """AJAX API for newsletter subscribers"""
+    from app.models_supabase import Newsletter
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    search = request.args.get('search', '')
+    
+    # ✅ Change this: show ALL subscribers (active + inactive)
+    subscribers_data, total = Newsletter.get_all_subscribers(active_only=False, page=page, per_page=per_page, search=search)
+    
+    # Calculate stats
+    all_subs, _ = Newsletter.get_all_subscribers(active_only=False)
+    total_subscribers = len(all_subs)
+    active_count = sum(1 for s in all_subs if s.get('is_active'))
+    inactive_count = sum(1 for s in all_subs if not s.get('is_active'))
+    customer_count = sum(1 for s in all_subs if s.get('source') in ['customer_sync', 'customer_add'])
+    
+    return jsonify({
+        'success': True,
+        'subscribers': subscribers_data,
+        'total': total,
+        'current_page': page,
+        'per_page': per_page,
+        'total_pages': (total + per_page - 1) // per_page if total > 0 else 1,
+        'total_subscribers': total_subscribers,
+        'active_count': active_count,
+        'inactive_count': inactive_count,
+        'customer_count': customer_count
+    })

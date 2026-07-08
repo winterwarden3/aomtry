@@ -288,7 +288,8 @@ def profile():
             except Exception as e:
                 print(f"Error checking email: {e}")
             
-            # Update email in database
+
+            # Update the email
             try:
                 response = supabase.table("users")\
                     .update({"email": new_email})\
@@ -299,12 +300,26 @@ def profile():
                     # Update current_user email
                     current_user.email = new_email
                     
-                    if is_ajax:
-                        return jsonify({
-                            'success': True, 
-                            'message': 'Email updated successfully!',
-                            'email': new_email
-                        })
+                    # 🆕 SYNC TO NEWSLETTER
+                    try:
+                        from app.models_supabase import Newsletter
+                        Newsletter.sync_from_customer(current_user.id)
+                        print(f"✅ Newsletter synced for customer {current_user.id}")
+                    except Exception as e:
+                        print(f"⚠️ Failed to sync newsletter: {e}")
+                    
+                    # Clean up any remaining OTPs
+                    supabase.table("otp_requests")\
+                        .delete()\
+                        .eq("username", current_user.username)\
+                        .eq("purpose", "email_verification")\
+                        .execute()
+                    
+                    return jsonify({
+                        'success': True,
+                        'message': 'Email updated successfully and synced to newsletter!',
+                        'email': new_email
+                    })
                     
                     flash('Email updated successfully!', 'success')
                     return redirect(url_for('customer.profile'))

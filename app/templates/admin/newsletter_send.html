@@ -1,0 +1,763 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Send Newsletter - {{ business_name }}{% endblock %}
+
+{% block content %}
+
+<style>
+/* ============================================
+   PROFESSIONAL UI - FULLY MOBILE OPTIMIZED
+   ============================================ */
+
+:root {
+    --primary: #0C5B3F;
+    --primary-light: #138A52;
+    --primary-dark: #09452F;
+    --accent: #138A52;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Modal Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+}
+
+/* Container */
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Cards */
+.stat-card, .card-ui {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+}
+
+.stat-card {
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-ui {
+    padding: 0;
+    overflow: hidden;
+}
+
+.stat-card h6 {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--gray-800);
+}
+
+.stat-footer {
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    margin-top: 0.25rem;
+}
+
+.icon-box {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* Header */
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+}
+
+.page-header p {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+/* Buttons */
+.btn-ui {
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+}
+
+.btn-primary-ui {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary-ui:hover {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.btn-primary-ui:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-outline-ui {
+    background: transparent;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+}
+
+.btn-outline-ui:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-secondary-ui {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.btn-secondary-ui:hover {
+    background: var(--gray-300);
+    transform: translateY(-1px);
+}
+
+/* Form Styles */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+}
+
+.form-label .required {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: 0.6rem 0.875rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(19,138,82,0.1);
+}
+
+.form-control::placeholder {
+    color: var(--gray-400);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 200px;
+}
+
+/* Alert/Info Box */
+.info-box {
+    background: #f0f7f4;
+    border-left: 4px solid var(--primary);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+}
+
+.info-box .info-icon {
+    color: var(--primary);
+    font-size: 1.2rem;
+    margin-right: 0.75rem;
+}
+
+.info-box .info-text {
+    color: var(--gray-700);
+    font-size: 0.9rem;
+}
+
+.info-box .info-text strong {
+    color: var(--primary);
+}
+
+/* Toast Notification */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background: white;
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+    animation: slideIn 0.3s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.toast-success {
+    border-left-color: var(--success);
+}
+
+.toast-error {
+    border-left-color: var(--danger);
+}
+
+.toast-warning {
+    border-left-color: var(--warning);
+}
+
+.toast-icon {
+    font-size: 20px;
+}
+
+.toast-success .toast-icon {
+    color: var(--success);
+}
+
+.toast-error .toast-icon {
+    color: var(--danger);
+}
+
+.toast-warning .toast-icon {
+    color: var(--warning);
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--gray-700);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray-400);
+    font-size: 18px;
+    padding: 0 4px;
+}
+
+.toast-close:hover {
+    color: var(--gray-600);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 450px;
+    width: 90%;
+    padding: 28px;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+.modal-success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-success-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-error-icon {
+    width: 80px;
+    height: 80px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-error-icon i {
+    font-size: 48px;
+    color: white;
+}
+
+.modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--gray-800);
+}
+
+.modal-message {
+    color: var(--gray-600);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.modal-button-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.modal-button-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.modal-button-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-button-secondary:hover {
+    background: var(--gray-300);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.75rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .page-header .d-flex {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .page-header .d-flex .btn-ui {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .form-card {
+        padding: 1.25rem;
+    }
+    
+    .form-control, .form-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .info-box {
+        padding: 0.75rem 1rem;
+    }
+    
+    .toast {
+        min-width: auto;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-card {
+        padding: 1rem;
+    }
+    
+    .modal-container {
+        padding: 20px;
+    }
+    
+    .modal-title {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 360px) {
+    .form-card {
+        padding: 0.75rem;
+    }
+    
+    .info-box .info-text {
+        font-size: 0.8rem;
+    }
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1><i class="bi bi-send"></i> Send Newsletter</h1>
+            <p>Send email to all active subscribers</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.newsletter_list') }}" class="btn-ui btn-outline-ui">
+                <i class="bi bi-arrow-left"></i> Back to Subscribers
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Form -->
+    <div class="form-container">
+        <div class="form-card">
+            <form id="newsletterForm" onsubmit="sendNewsletter(event)">
+                <!-- Subject -->
+                <div class="mb-3">
+                    <label class="form-label" for="newsletterSubject">
+                        Subject <span class="required">*</span>
+                    </label>
+                    <input type="text" id="newsletterSubject" name="subject" class="form-control" 
+                           placeholder="Enter newsletter subject" required>
+                </div>
+
+                <!-- Content -->
+                <div class="mb-3">
+                    <label class="form-label" for="newsletterContent">
+                        Content <span class="required">*</span>
+                    </label>
+                    <textarea id="newsletterContent" name="content" class="form-control" rows="12" 
+                              placeholder="Write your newsletter content here..." required></textarea>
+
+                </div>
+
+                <!-- Info Box -->
+                <div class="info-box">
+                    <div class="d-flex align-items-start">
+                        <span class="info-icon"><i class="bi bi-info-circle-fill"></i></span>
+                        <span class="info-text">
+                            This will be sent to <strong>{{ total_subscribers }}</strong> active subscriber{% if total_subscribers != 1 %}s{% endif %}.
+                            {% if total_subscribers == 0 %}
+                            <br><span style="color: var(--danger);">⚠️ You have no active subscribers. Add some first!</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-flex gap-2 flex-wrap mt-3">
+                    <button type="submit" class="btn-ui btn-primary-ui" id="sendBtn" 
+                            {% if total_subscribers == 0 %}disabled{% endif %}>
+                        <i class="bi bi-send"></i> 
+                        <span id="sendBtnText">Send Newsletter</span>
+                    </button>
+                    <a href="{{ url_for('admin.newsletter_list') }}" class="btn-ui btn-secondary-ui">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// TOAST NOTIFICATION SYSTEM
+// ============================================
+function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toastContainer') || (() => {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+        return container;
+    })();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    const icons = {
+        success: 'bi-check-circle-fill',
+        error: 'bi-x-circle-fill',
+        warning: 'bi-exclamation-triangle-fill'
+    };
+    const icon = icons[type] || 'bi-info-circle-fill';
+    toast.innerHTML = `
+        <i class="bi ${icon} toast-icon"></i>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+// ============================================
+// SHOW MODAL
+// ============================================
+function showModal(title, message, type = 'success', redirectUrl = null) {
+    // Remove existing modals
+    document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+    
+    const modalHtml = `
+        <div class="modal-overlay" id="resultModal">
+            <div class="modal-container">
+                <div class="modal-${type === 'success' ? 'success' : 'error'}-icon">
+                    <i class="bi bi-${type === 'success' ? 'check-lg' : 'x-lg'}"></i>
+                </div>
+                <div class="modal-title">${title}</div>
+                <div class="modal-message">${message}</div>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="modalCloseBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    document.getElementById('modalCloseBtn').onclick = function() {
+        document.getElementById('resultModal').remove();
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        }
+    };
+}
+
+// ============================================
+// SEND NEWSLETTER (AJAX)
+// ============================================
+function sendNewsletter(e) {
+    e.preventDefault();
+    
+    const subject = document.getElementById('newsletterSubject').value.trim();
+    const content = document.getElementById('newsletterContent').value.trim();
+    const sendBtn = document.getElementById('sendBtn');
+    const sendBtnText = document.getElementById('sendBtnText');
+    
+    if (!subject) {
+        showToast('Please enter a subject', 'warning');
+        document.getElementById('newsletterSubject').focus();
+        return;
+    }
+    
+    if (!content) {
+        showToast('Please enter the newsletter content', 'warning');
+        document.getElementById('newsletterContent').focus();
+        return;
+    }
+    
+    // Confirm before sending
+    if (!confirm(`Send newsletter to all subscribers?\n\nSubject: ${subject}\n\nThis action cannot be undone.`)) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('subject', subject);
+    formData.append('content', content);
+    
+    // Show loading state
+    sendBtnText.innerHTML = '<span class="loading-spinner"></span> Sending...';
+    sendBtn.disabled = true;
+    
+    fetch('/admin/newsletter/send', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showModal(
+                '✅ Newsletter Sent!',
+                `${data.message}`,
+                'success',
+                '{{ url_for("admin.newsletter_list") }}'
+            );
+            document.getElementById('newsletterForm').reset();
+        } else {
+            showToast(data.error || 'Failed to send newsletter', 'error');
+            sendBtnText.textContent = 'Send Newsletter';
+            sendBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error. Please try again.', 'error');
+        sendBtnText.textContent = 'Send Newsletter';
+        sendBtn.disabled = false;
+    });
+}
+
+// ============================================
+// INITIALIZE ON PAGE LOAD
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Show flashed messages as toasts
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                showToast('{{ message|safe }}', '{{ category }}');
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    // Auto-focus on subject
+    document.getElementById('newsletterSubject')?.focus();
+});
+</script>
+{% endblock %}

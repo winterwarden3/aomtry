@@ -116,3 +116,187 @@ def send_email_in_background(to_email: str, subject: str, html_body: str, email_
     """
     print("⚠️ send_email_in_background is now synchronous on Vercel")
     return send_email_via_brevo(to_email, subject, html_body, email_type)
+
+
+# ============================================
+# NEWSLETTER EMAIL FUNCTIONS
+# ============================================
+
+def send_newsletter_welcome_email(email, name=None):
+    """
+    Send welcome email to new newsletter subscriber
+    
+    Args:
+        email: Subscriber's email address
+        name: Subscriber's name (optional)
+    
+    Returns:
+        bool: True if sent successfully
+    """
+    try:
+        from app.config import Config
+        
+        # Prepare contact name
+        contact_name = name or 'Valued Customer'
+        
+        # Email subject and content
+        subject = f"Welcome to {Config.BUSINESS_NAME} Newsletter!"
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Welcome to Our Newsletter</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 16px; }}
+                .header {{ text-align: center; padding-bottom: 20px; border-bottom: 2px solid #0C5B3F; }}
+                .header h2 {{ color: #0C5B3F; margin: 0; }}
+                .content {{ padding: 20px 0; }}
+                .footer {{ text-align: center; font-size: 12px; color: #888; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; }}
+                .btn {{ display: inline-block; padding: 12px 30px; background: #0C5B3F; color: white; text-decoration: none; border-radius: 8px; }}
+                .unsubscribe {{ color: #888; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h2>📬 Welcome to Our Newsletter!</h2>
+                    <p>{Config.BUSINESS_NAME}</p>
+                </div>
+                
+                <div class="content">
+                    <p>Dear <strong>{contact_name}</strong>,</p>
+                    
+                    <p>Thank you for subscribing to our newsletter! We're excited to have you on board.</p>
+                    
+                    <p>You'll now receive:</p>
+                    <ul>
+                        <li>📢 Latest updates and announcements</li>
+                        <li>🛍️ Special offers and promotions</li>
+                        <li>📅 Upcoming events and news</li>
+                        <li>🌟 New product launches</li>
+                    </ul>
+                    
+                    <p style="text-align: center; margin: 30px 0;">
+                        <a href="#" class="btn">Visit Our Website</a>
+                    </p>
+                    
+                    <p>We promise to keep you updated with valuable content and never spam your inbox.</p>
+                    
+                    <p>Best regards,<br>
+                    <strong>{Config.BUSINESS_NAME} Team</strong></p>
+                </div>
+                
+                <div class="footer">
+                    <p>{Config.BUSINESS_NAME}<br>Mainapokhar, Bardiya, Nepal</p>
+                    <p class="unsubscribe">
+                        <a href="#" style="color: #888;">Unsubscribe</a> anytime.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Send using Brevo API
+        url = "https://api.brevo.com/v3/smtp/email"
+        
+        payload = {
+            "sender": {
+                "name": "Adarsh Oil Mill - Newsletter",
+                "email": Config.MAIL_DEFAULT_SENDER
+            },
+            "to": [
+                {
+                    "email": email,
+                    "name": contact_name
+                }
+            ],
+            "subject": subject,
+            "htmlContent": html_content
+        }
+        
+        headers = {
+            "accept": "application/json",
+            "api-key": Config.BREVO_API_KEY,
+            "content-type": "application/json"
+        }
+        
+        response = requests.post(url, json=payload, headers=headers)
+        
+        if response.status_code == 201:
+            print(f"✅ Welcome email sent to {email}")
+            return True
+        else:
+            print(f"❌ Failed to send welcome email: {response.text}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error sending welcome email: {e}")
+        return False
+
+
+def send_newsletter_campaign(subject, content, recipient_emails, from_name=None):
+    """
+    Send newsletter campaign to multiple recipients
+    
+    Args:
+        subject: Email subject
+        content: HTML email content
+        recipient_emails: List of email addresses
+        from_name: Sender name (optional - not used, Brevo default is used)
+    
+    Returns:
+        dict: {'success': True/False, 'sent_count': int, 'message': str}
+    """
+    try:
+        from app.config import Config
+        
+        if not recipient_emails:
+            return {'success': False, 'message': 'No recipients found'}
+        
+        # Limit to 500 recipients per batch (Brevo limit)
+        if len(recipient_emails) > 500:
+            recipient_emails = recipient_emails[:500]
+        
+        # Format recipients
+        recipients = [{"email": email} for email in recipient_emails]
+        
+        # Send using Brevo API
+        url = "https://api.brevo.com/v3/smtp/email"
+        
+        payload = {
+            "sender": {
+                "name": "Adarsh Oil Mill - Newsletter",
+                "email": Config.MAIL_DEFAULT_SENDER
+            },
+            "to": recipients,
+            "subject": subject,
+            "htmlContent": content
+        }
+        
+        headers = {
+            "accept": "application/json",
+            "api-key": Config.BREVO_API_KEY,
+            "content-type": "application/json"
+        }
+        
+        response = requests.post(url, json=payload, headers=headers)
+        
+        if response.status_code == 201:
+            return {
+                'success': True,
+                'sent_count': len(recipient_emails),
+                'message': f'Newsletter sent to {len(recipient_emails)} subscribers'
+            }
+        else:
+            return {
+                'success': False,
+                'message': f'Failed to send: {response.text}'
+            }
+            
+    except Exception as e:
+        print(f"❌ Error sending newsletter: {e}")
+        return {'success': False, 'message': str(e)}

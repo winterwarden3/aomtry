@@ -27,7 +27,13 @@ class Config:
     BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
     BREVO_SENDER_EMAIL_INVOICE = os.environ.get('BREVO_SENDER_EMAIL_INVOICE', 'invoice@adarshoilmill.com.np')
     BREVO_SENDER_EMAIL_RESET = os.environ.get('BREVO_SENDER_EMAIL_RESET', 'reset@adarshoilmill.com.np')
+    BREVO_SENDER_EMAIL_VERIFICATION = os.environ.get('BREVO_SENDER_EMAIL_VERIFICATION', 'verify@adarshoilmill.com.np')
+    BREVO_SENDER_EMAIL_NEWSLETTER = os.environ.get('BREVO_SENDER_EMAIL_NEWSLETTER', 'noreply@adarshoilmill.com.np')  # ADD THIS
     BREVO_SENDER_NAME = os.environ.get('BREVO_SENDER_NAME', 'Adarsh Oil Mill')
+    
+    # Email Configuration - Now BREVO_SENDER_EMAIL_NEWSLETTER exists
+    MAIL_DEFAULT_SENDER = BREVO_SENDER_EMAIL_NEWSLETTER
+    MAIL_DEFAULT_SENDER_NAME = BREVO_SENDER_NAME
     
     # ============================================
     # BUSINESS SETTINGS
@@ -51,7 +57,6 @@ class Config:
     # ============================================
     # FLASK SETTINGS
     # ============================================
-    # Session settings for production
     SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
@@ -89,9 +94,3 @@ class Config:
             raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
         
         return True
-
-# For backward compatibility - but print warning
-if hasattr(Config, 'SQLALCHEMY_DATABASE_URI'):
-    import warnings
-    warnings.warn("SQLALCHEMY_DATABASE_URI is deprecated and will be ignored. Using Supabase instead.")
-    delattr(Config, 'SQLALCHEMY_DATABASE_URI')

@@ -1,7 +1,7 @@
 from app.supabase_client import supabase
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import pytz
 # ============================================
 # USER MODEL (COMPLETE WITH ADVANCE BALANCE)
 # ============================================
@@ -1084,4 +1084,330 @@ def get_by_email(email):
             return response.count or 0
         except Exception as e:
             print(f"Error counting sales for customer {customer_id}: {e}")
+            return 0
+        
+# ============================================
+# NOTICE MODEL (UPDATED WITH IMAGE SUPPORT)
+# ============================================
+
+class Notice:
+    """Notice/Announcement model for Supabase"""
+    
+    @staticmethod
+    def get_active_notices():
+        """Get all active notices that should be displayed"""
+        try:
+            now = datetime.now().isoformat()
+            
+            response = supabase.table("notices")\
+                .select("*")\
+                .eq("is_active", True)\
+                .execute()
+            
+            # Filter manually to handle NULL dates properly
+            active_notices = []
+            for notice in response.data:
+                show_from = notice.get('show_from')
+                show_until = notice.get('show_until')
+                
+                show = True
+                if show_from and show_from > now:
+                    show = False
+                if show_until and show_until < now:
+                    show = False
+                
+                if show:
+                    active_notices.append(notice)
+            
+            return active_notices
+        except Exception as e:
+            print(f"Error fetching notices: {e}")
+            return []
+    
+    @staticmethod
+    def get_all_notices_paginated(page=1, per_page=10):
+        """Get all notices with pagination for admin panel"""
+        try:
+            offset = (page - 1) * per_page
+            response = supabase.table("notices")\
+                .select("*", count="exact")\
+                .order("created_at", desc=True)\
+                .range(offset, offset + per_page - 1)\
+                .execute()
+            
+            total = response.count or 0
+            return response.data if response.data else [], total
+        except Exception as e:
+            print(f"Error fetching notices: {e}")
+            return [], 0
+    
+    @staticmethod
+    def get_by_id(notice_id):
+        """Get a single notice by ID"""
+        try:
+            response = supabase.table("notices")\
+                .select("*")\
+                .eq("id", notice_id)\
+                .execute()
+            return response.data[0] if response.data else None
+        except Exception as e:
+            print(f"Error fetching notice: {e}")
+            return None
+    
+    @staticmethod
+    def create(notice_data):
+        """Create a new notice with image support"""
+        try:
+            # Remove None values so Supabase uses defaults
+            clean_data = {k: v for k, v in notice_data.items() if v is not None}
+            clean_data['created_at'] = datetime.now().isoformat()
+            clean_data['updated_at'] = datetime.now().isoformat()
+            
+            # Ensure image fields are included
+            if 'image_url' not in clean_data:
+                clean_data['image_url'] = None
+            if 'image_public_id' not in clean_data:
+                clean_data['image_public_id'] = None
+            if 'image_alt_text' not in clean_data:
+                clean_data['image_alt_text'] = None
+            
+            response = supabase.table("notices").insert(clean_data).execute()
+            return response.data[0] if response.data else None
+        except Exception as e:
+            print(f"Error creating notice: {e}")
+            return None
+    
+    @staticmethod
+    def update(notice_id, notice_data):
+        """Update an existing notice with image support"""
+        try:
+            # Remove None values
+            clean_data = {k: v for k, v in notice_data.items() if v is not None}
+            clean_data['updated_at'] = datetime.now().isoformat()
+            
+            response = supabase.table("notices")\
+                .update(clean_data)\
+                .eq("id", notice_id)\
+                .execute()
+            return response.data[0] if response.data else None
+        except Exception as e:
+            print(f"Error updating notice: {e}")
+            return None
+    
+    @staticmethod
+    def delete(notice_id):
+        """Delete a notice and its image from Cloudinary"""
+        try:
+            # Get notice to check if it has an image
+            notice = Notice.get_by_id(notice_id)
+            
+            # Delete image from Cloudinary if exists
+            if notice and notice.get('image_public_id'):
+                try:
+                    from app.cloudinary_client import delete_image_from_cloudinary
+                    delete_image_from_cloudinary(notice.get('image_public_id'))
+                except Exception as e:
+                    print(f"Error deleting image from Cloudinary: {e}")
+            
+            response = supabase.table("notices")\
+                .delete()\
+                .eq("id", notice_id)\
+                .execute()
+            return True if response.data else False
+        except Exception as e:
+            print(f"Error deleting notice: {e}")
+            return False
+    
+    @staticmethod
+    def toggle_status(notice_id):
+        """Toggle notice active status"""
+        try:
+            notice = Notice.get_by_id(notice_id)
+            if not notice:
+                return False
+            
+            new_status = not notice.get('is_active', True)
+            response = supabase.table("notices")\
+                .update({
+                    'is_active': new_status,
+                    'updated_at': datetime.now().isoformat()
+                })\
+                .eq("id", notice_id)\
+                .execute()
+            return response.data[0] if response.data else None
+        except Exception as e:
+            print(f"Error toggling notice: {e}")
+            return False
+        
+# ============================================
+# NEWSLETTER MODEL
+# ============================================
+
+class Newsletter:
+    """Newsletter subscriber and campaign management"""
+    
+    @staticmethod
+    def subscribe(email, name=None, source='footer', customer_id=None):
+        """Subscribe a user to newsletter"""
+        try:
+            # Check if already subscribed
+            existing = supabase.table("newsletter_subscribers")\
+                .select("*")\
+                .eq("email", email)\
+                .execute()
+            
+            if existing.data:
+                # Update existing subscriber
+                subscriber = existing.data[0]
+                update_data = {
+                    'is_active': True,
+                    'source': source
+                }
+                if name:
+                    update_data['name'] = name
+                if customer_id:
+                    update_data['customer_id'] = customer_id
+                
+                response = supabase.table("newsletter_subscribers")\
+                    .update(update_data)\
+                    .eq("id", subscriber['id'])\
+                    .execute()
+                
+                return response.data[0] if response.data else None
+            
+            # Create new subscriber
+            data = {
+                'email': email,
+                'name': name,
+                'source': source,
+                'customer_id': customer_id,
+                'is_active': True
+            }
+            
+            response = supabase.table("newsletter_subscribers")\
+                .insert(data)\
+                .execute()
+            
+            return response.data[0] if response.data else None
+            
+        except Exception as e:
+            print(f"Error subscribing to newsletter: {e}")
+            return None
+    
+    @staticmethod
+    def unsubscribe(email):
+        """Unsubscribe a user from newsletter"""
+        try:
+            response = supabase.table("newsletter_subscribers")\
+                .update({'is_active': False})\
+                .eq("email", email)\
+                .execute()
+            return response.data[0] if response.data else None
+        except Exception as e:
+            print(f"Error unsubscribing: {e}")
+            return None
+    
+    @staticmethod
+    def get_all_subscribers(active_only=True, page=1, per_page=50, search=""):
+        """Get all subscribers with pagination"""
+        try:
+            offset = (page - 1) * per_page
+            query = supabase.table("newsletter_subscribers").select("*", count="exact")
+            
+            if active_only:
+                query = query.eq("is_active", True)
+            
+            if search:
+                query = query.ilike("email", f"%{search}%")
+            
+            response = query.range(offset, offset + per_page - 1)\
+                .order("subscribed_at", desc=True)\
+                .execute()
+            
+            return response.data, response.count
+        except Exception as e:
+            print(f"Error getting subscribers: {e}")
+            return [], 0
+    
+    @staticmethod
+    def get_subscriber_by_email(email):
+        """Get subscriber by email"""
+        try:
+            response = supabase.table("newsletter_subscribers")\
+                .select("*")\
+                .eq("email", email)\
+                .execute()
+            return response.data[0] if response.data else None
+        except Exception as e:
+            print(f"Error getting subscriber: {e}")
+            return None
+    
+    @staticmethod
+    def sync_from_customer(customer_id):
+        """Sync customer email to newsletter"""
+        try:
+            from app.models_supabase import User
+            customer = User.get_by_id(customer_id)
+            if not customer or not customer.get('email'):
+                return None
+            
+            email = customer.get('email')
+            name = customer.get('name')
+            
+            # Check if already subscribed
+            existing = supabase.table("newsletter_subscribers")\
+                .select("*")\
+                .eq("email", email)\
+                .execute()
+            
+            if existing.data:
+                # Update existing
+                response = supabase.table("newsletter_subscribers")\
+                    .update({
+                        'name': name,
+                        'customer_id': customer_id,
+                        'is_active': True,
+                        'source': 'customer_sync'
+                    })\
+                    .eq("id", existing.data[0]['id'])\
+                    .execute()
+                return response.data[0] if response.data else None
+            else:
+                # Create new
+                return Newsletter.subscribe(
+                    email=email,
+                    name=name,
+                    source='customer_sync',
+                    customer_id=customer_id
+                )
+                
+        except Exception as e:
+            print(f"Error syncing customer to newsletter: {e}")
+            return None
+    
+    @staticmethod
+    def get_total_subscribers():
+        """Get total active subscribers count"""
+        try:
+            response = supabase.table("newsletter_subscribers")\
+                .select("id", count="exact")\
+                .eq("is_active", True)\
+                .execute()
+            return response.count or 0
+        except Exception as e:
+            print(f"Error counting subscribers: {e}")
+            return 0
+    
+    @staticmethod
+    def get_new_subscribers_since(date):
+        """Get new subscribers since date"""
+        try:
+            response = supabase.table("newsletter_subscribers")\
+                .select("id", count="exact")\
+                .eq("is_active", True)\
+                .gte("subscribed_at", date.isoformat())\
+                .execute()
+            return response.count or 0
+        except Exception as e:
+            print(f"Error counting new subscribers: {e}")
             return 0

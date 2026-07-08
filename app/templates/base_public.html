@@ -804,6 +804,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <hr class="my-4" style="border-color:rgba(255,255,255,0.08);">
 
+
+
+
+                <!-- NEWSLETTER SIGNUP - Add this inside your footer -->
+        <div class="col-lg-4">
+            <h5 style="font-size: 1.1rem; margin-bottom: 15px;">
+                <i class="bi bi-envelope"></i> Newsletter
+            </h5>
+            <p style="font-size: 0.85rem; margin-bottom: 10px;">
+                Subscribe to get updates, offers, and news from us.
+            </p>
+            <form id="newsletterForm" onsubmit="subscribeNewsletter(event)" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <input type="email" id="newsletterEmail" placeholder="Your email address" required
+                    style="flex: 1; min-width: 180px; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; background: rgba(255,255,255,0.1); color: white; font-size: 0.85rem;">
+                <button type="submit" id="newsletterSubscribeBtn" 
+                        style="padding: 10px 24px; background: linear-gradient(135deg,var(--primary),var(--accent)); color: white; border: none; border-radius: 100px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; white-space: nowrap;">
+                    <span id="newsletterBtnText">Subscribe</span>
+                </button>
+            </form>
+            <div id="newsletterMessage" style="margin-top: 8px; font-size: 0.8rem; display: none;"></div>
+            <small style="font-size: 0.7rem; color: rgba(255,255,255,0.5);">We respect your privacy. No spam, unsubscribe anytime.</small>
+        </div>
+
+
         <div class="text-center">
             <small style="font-size: 0.75rem;">
                 © 2026 Adarsh Oil Mill. All Rights Reserved.
@@ -821,5 +845,441 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {% block extra_js %}{% endblock %}
 
+
+<!-- ============================================ -->
+<!-- NOTICE - IMAGE WITH TITLE BELOW -->
+<!-- ============================================ -->
+<div id="noticePopup" class="notice-popup-overlay" style="display: none;">
+    
+    <!-- Image Container -->
+    <div id="noticeImageContainer" style="display: none; position: relative; max-width: 90vw; max-height: 85vh;">
+        <!-- Image -->
+        <img id="noticeImageDisplay" src="" alt="Notice image" 
+             style="max-width: 90vw; max-height: 70vh; object-fit: contain; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        
+        <!-- Title below image -->
+        <div class="notice-image-title" id="noticeImageTitle">Notice Title</div>
+        
+        <!-- Bottom bar with counter and button -->
+        <div class="notice-image-footer">
+            <div class="notice-popup-timer">
+                <i class="bi bi-clock-history"></i>
+                <span>Closing in <strong id="countdownImage">15</strong>s</span>
+            </div>
+            <button class="notice-popup-btn" onclick="closeNoticePopup()">
+                Got it <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Text Only - Shown when no image -->
+    <div id="noticeTextContainer" style="display: none; background: white; padding: 40px; border-radius: 24px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <div class="notice-popup-badge" id="noticeBadgeText">📢 Important</div>
+        <h2 class="notice-popup-title" id="noticeTitle">Notice</h2>
+        <div class="notice-popup-body" id="noticeContent"></div>
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
+            <div class="notice-popup-timer">
+                <i class="bi bi-clock-history"></i>
+                <span>Closing in <strong id="countdownText">15</strong>s</span>
+            </div>
+            <button class="notice-popup-btn" onclick="closeNoticePopup()">
+                Got it <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ============================================
+   NOTICE - IMAGE WITH TITLE BELOW
+   ============================================ */
+
+.notice-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* When showing image - transparent */
+.notice-popup-overlay.image-mode {
+    background: transparent !important;
+}
+
+/* When showing text - semi-transparent */
+.notice-popup-overlay.text-mode {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   IMAGE MODE
+   ============================================ */
+
+#noticeImageContainer {
+    position: relative;
+    max-width: 90vw;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#noticeImageDisplay {
+    max-width: 90vw;
+    max-height: 65vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    background: transparent;
+}
+
+/* Title below image */
+.notice-image-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0C5B3F;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 8px 24px;
+    border-radius: 100px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    max-width: 90%;
+}
+
+/* Footer with counter and button */
+.notice-image-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    border-radius: 100px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: auto;
+    min-width: 280px;
+}
+
+.notice-image-footer .notice-popup-timer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.notice-image-footer .notice-popup-timer strong {
+    color: #0C5B3F;
+    font-weight: 700;
+    min-width: 24px;
+    display: inline-block;
+}
+
+.notice-image-footer .notice-popup-btn {
+    padding: 8px 28px;
+    background: #0C5B3F;
+    color: white;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.notice-image-footer .notice-popup-btn:hover {
+    background: #09452F;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(12, 91, 63, 0.3);
+}
+
+/* ============================================
+   TEXT MODE
+   ============================================ */
+
+#noticeTextContainer {
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    max-width: 500px;
+    width: 100%;
+    cursor: default;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.notice-popup-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0C5B3F;
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+}
+
+.notice-popup-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.5px;
+}
+
+.notice-popup-body {
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.notice-popup-timer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.notice-popup-timer strong {
+    color: #0C5B3F;
+    font-weight: 700;
+    min-width: 24px;
+    display: inline-block;
+}
+
+.notice-popup-btn {
+    padding: 10px 30px;
+    background: #0C5B3F;
+    color: white;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.notice-popup-btn:hover {
+    background: #09452F;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(12, 91, 63, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    #noticeTextContainer {
+        padding: 24px;
+        margin: 10px;
+    }
+    
+    .notice-image-footer {
+        min-width: auto;
+        width: 100%;
+        padding: 10px 16px;
+        border-radius: 50px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .notice-image-title {
+        font-size: 16px;
+        padding: 6px 18px;
+    }
+}
+</style>
+
+<script>
+let countdownInterval = null;
+let closeTimer = null;
+
+async function checkNotices() {
+    try {
+        const response = await fetch('/admin/api/notices/active');
+        const data = await response.json();
+        
+        if (data.success && data.notices && data.notices.length > 0) {
+            const notice = data.notices[0];
+            showNoticePopup(notice);
+        }
+    } catch (error) {
+        console.error('❌ Error fetching notices:', error);
+    }
+}
+
+function showNoticePopup(notice) {
+    const popup = document.getElementById('noticePopup');
+    const title = document.getElementById('noticeTitle');
+    const content = document.getElementById('noticeContent');
+    const badgeText = document.getElementById('noticeBadgeText');
+    const countdownImage = document.getElementById('countdownImage');
+    const countdownText = document.getElementById('countdownText');
+    const imageContainer = document.getElementById('noticeImageContainer');
+    const imageDisplay = document.getElementById('noticeImageDisplay');
+    const textContainer = document.getElementById('noticeTextContainer');
+    const imageTitle = document.getElementById('noticeImageTitle');
+    
+    const hasImage = notice.image_url && notice.image_url.trim() !== '';
+    
+    if (hasImage) {
+        // SHOW IMAGE with title below
+        imageDisplay.src = notice.image_url;
+        imageDisplay.alt = notice.title || 'Notice';
+        imageTitle.textContent = notice.title || 'Notice';
+        
+        imageContainer.style.display = 'flex';
+        textContainer.style.display = 'none';
+        popup.className = 'notice-popup-overlay image-mode';
+    } else {
+        // SHOW TEXT ONLY
+        imageContainer.style.display = 'none';
+        textContainer.style.display = 'block';
+        title.textContent = notice.title || 'Notice';
+        content.innerHTML = notice.content || '';
+        badgeText.textContent = getBadgeText(notice.notice_type);
+        popup.className = 'notice-popup-overlay text-mode';
+    }
+    
+    popup.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    let seconds = 15;
+    countdownImage.textContent = seconds;
+    countdownText.textContent = seconds;
+    
+    clearInterval(countdownInterval);
+    clearTimeout(closeTimer);
+    
+    countdownInterval = setInterval(() => {
+        seconds--;
+        countdownImage.textContent = seconds;
+        countdownText.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            closeNoticePopup();
+        }
+    }, 1000);
+    
+    closeTimer = setTimeout(() => {
+        clearInterval(countdownInterval);
+        closeNoticePopup();
+    }, 15000);
+}
+
+function getBadgeText(type) {
+    const badgeMap = {
+        info: '📢 Important',
+        danger: '🔴 Urgent',
+        success: '✅ Announcement',
+        warning: '⚠️ Notice'
+    };
+    return badgeMap[type] || '📢 Important';
+}
+
+function closeNoticePopup() {
+    const popup = document.getElementById('noticePopup');
+    popup.style.display = 'none';
+    document.body.style.overflow = '';
+    clearInterval(countdownInterval);
+    clearTimeout(closeTimer);
+}
+
+// Close on ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeNoticePopup();
+});
+
+// ============================================
+// SESSION BASED - SHOW ONLY ONCE PER SESSION
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const noticeShown = sessionStorage.getItem('noticeShown');
+    if (!noticeShown) {
+        setTimeout(checkNotices, 1500);
+        sessionStorage.setItem('noticeShown', 'true');
+    }
+});
+
+
+// ============================================
+// NEWSLETTER SUBSCRIPTION (AJAX)
+// ============================================
+function subscribeNewsletter(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('newsletterEmail').value;
+    const btn = document.getElementById('newsletterSubscribeBtn');
+    const btnText = document.getElementById('newsletterBtnText');
+    const messageDiv = document.getElementById('newsletterMessage');
+    
+    // Validate email
+    if (!email || !email.includes('@')) {
+        messageDiv.style.color = '#ef4444';
+        messageDiv.textContent = 'Please enter a valid email address.';
+        messageDiv.style.display = 'block';
+        return;
+    }
+    
+    // Disable button
+    btnText.textContent = 'Subscribing...';
+    btn.disabled = true;
+    messageDiv.style.display = 'none';
+    
+    // Send AJAX request
+    fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageDiv.style.color = '#22c55e';
+            messageDiv.textContent = data.message || '✅ Subscribed successfully! Check your email.';
+            messageDiv.style.display = 'block';
+            document.getElementById('newsletterEmail').value = '';
+        } else {
+            messageDiv.style.color = '#ef4444';
+            messageDiv.textContent = data.error || 'Something went wrong. Please try again.';
+            messageDiv.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        messageDiv.style.color = '#ef4444';
+        messageDiv.textContent = 'Network error. Please try again.';
+        messageDiv.style.display = 'block';
+    })
+    .finally(() => {
+        btnText.textContent = 'Subscribe';
+        btn.disabled = false;
+    });
+}
+
+</script>
 </body>
 </html>
