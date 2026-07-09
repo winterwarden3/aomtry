@@ -231,7 +231,6 @@ def view_invoice(sale_id):
                          current_user=current_user,
                          advance_balance=advance_balance)
 
-
 @bp.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -241,6 +240,38 @@ def profile():
     if current_user.role != 'customer':
         flash('This page is for customers only.', 'warning')
         return redirect(url_for('admin.dashboard'))
+    
+    # ✅ FORCE REFRESH: Get fresh user data from database
+    fresh_user = User.get_by_id(current_user.id)
+    if not fresh_user:
+        flash('User not found', 'danger')
+        return redirect(url_for('auth.logout'))
+    
+    # ✅ Update current_user with fresh data
+    for key, value in fresh_user.items():
+        if hasattr(current_user, key):
+            setattr(current_user, key, value)
+    
+    # ✅ Convert to dict for template
+    user_data = dict(fresh_user)
+    
+    # ✅ FIX: Convert created_at from string to datetime object
+    if 'created_at' in user_data and user_data['created_at']:
+        try:
+            # If it's a string, parse it
+            if isinstance(user_data['created_at'], str):
+                from datetime import datetime
+                # Try common formats
+                try:
+                    user_data['created_at'] = datetime.fromisoformat(user_data['created_at'].replace('Z', '+00:00'))
+                except:
+                    try:
+                        user_data['created_at'] = datetime.strptime(user_data['created_at'], '%Y-%m-%d %H:%M:%S')
+                    except:
+                        # Keep as string if parsing fails
+                        pass
+        except Exception as e:
+            print(f"Error parsing created_at: {e}")
     
     if request.method == 'POST':
         action = request.form.get('action')
@@ -288,7 +319,6 @@ def profile():
             except Exception as e:
                 print(f"Error checking email: {e}")
             
-
             # Update the email
             try:
                 response = supabase.table("users")\
@@ -300,7 +330,7 @@ def profile():
                     # Update current_user email
                     current_user.email = new_email
                     
-                    # 🆕 SYNC TO NEWSLETTER
+                    # Sync to newsletter
                     try:
                         from app.models_supabase import Newsletter
                         Newsletter.sync_from_customer(current_user.id)
@@ -315,11 +345,12 @@ def profile():
                         .eq("purpose", "email_verification")\
                         .execute()
                     
-                    return jsonify({
-                        'success': True,
-                        'message': 'Email updated successfully and synced to newsletter!',
-                        'email': new_email
-                    })
+                    if is_ajax:
+                        return jsonify({
+                            'success': True,
+                            'message': 'Email updated successfully!',
+                            'email': new_email
+                        })
                     
                     flash('Email updated successfully!', 'success')
                     return redirect(url_for('customer.profile'))
@@ -336,8 +367,12 @@ def profile():
                 flash('Database error. Please try again.', 'danger')
                 return redirect(url_for('customer.profile'))
     
-    # GET request - show profile page
-    return render_template('customer/customer_profile.html', user=current_user)
+    # ✅ Pass user_data (fresh) to template
+    return render_template(
+        'customer/customer_profile.html', 
+        user=user_data,  # ← FRESH DATA with datetime object!
+        cache_buster=int(datetime.now().timestamp())
+    )
 
 
 @bp.route('/profile/send-verification', methods=['POST'])

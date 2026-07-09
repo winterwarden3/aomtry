@@ -557,7 +557,29 @@ document.getElementById('editCustomerForm').addEventListener('submit', async fun
         const data = await response.json();
         
         if (data.success) {
-            showModal('Success!', data.message || 'Customer updated successfully!', 'success', data.redirect || '{{ url_for("admin.customers_list") }}');
+            // ✅ NEW: Update the customer row in the parent page
+            if (data.customer) {
+                // Try to update the row in the parent page
+                try {
+                    if (window.parent && window.parent !== window) {
+                        // If in iframe or modal, use parent
+                        if (typeof window.parent.updateCustomerRow === 'function') {
+                            window.parent.updateCustomerRow(data.customer);
+                        } else {
+                            // Store in sessionStorage for reload
+                            sessionStorage.setItem('customer_updated_' + data.customer.id, JSON.stringify(data.customer));
+                        }
+                    } else {
+                        // Direct page - update row if exists
+                        updateCustomerRowDirect(data.customer);
+                    }
+                } catch (e) {
+                    console.log('Row update skipped, will redirect:', e);
+                }
+            }
+            
+            // Show success and redirect
+            showModal('Success!', data.message, 'success', data.redirect || '{{ url_for("admin.customers_list") }}');
         } else {
             showModal('Error', data.error || 'Failed to update customer', 'error');
             isSubmitting = false;
@@ -572,6 +594,129 @@ document.getElementById('editCustomerForm').addEventListener('submit', async fun
         submitBtn.innerHTML = '<i class="bi bi-save"></i> Update Customer';
     }
 });
+
+// ✅ FIXED: Function to update customer row directly
+function updateCustomerRowDirect(customer) {
+    // Find the row in the customers table
+    const row = document.querySelector(`tr[data-customer-id="${customer.id}"]`);
+    if (!row) {
+        console.log('Customer row not found, will redirect');
+        return;
+    }
+    
+    console.log('Updating row for customer:', customer);
+    
+    // Update each column using data-label matching
+    const cells = row.querySelectorAll('td');
+    cells.forEach(cell => {
+        const label = cell.getAttribute('data-label');
+        if (!label) return;
+        
+        switch(label) {
+            case 'Customer':
+                const nameSpan = cell.querySelector('.customer-name');
+                if (nameSpan) nameSpan.textContent = customer.name || '-';
+                break;
+                
+            case 'Contact':
+                const contactDiv = cell.querySelector('.customer-contact');
+                if (contactDiv) {
+                    let contactHtml = '';
+                    if (customer.email) {
+                        contactHtml += `<i class="bi bi-envelope"></i> ${customer.email}<br>`;
+                    }
+                    if (customer.phone) {
+                        contactHtml += `<i class="bi bi-telephone"></i> ${customer.phone}`;
+                    }
+                    contactDiv.innerHTML = contactHtml || '-';
+                }
+                break;
+                
+            case 'Username':
+                const usernameSpan = cell.querySelector('.username-badge');
+                if (usernameSpan) usernameSpan.textContent = customer.username || '-';
+                break;
+                
+            case 'Spending':
+                // Keep as is - spending comes from sales data
+                break;
+                
+            case 'Due':
+                // Keep as is - due comes from sales data
+                break;
+                
+            case 'Advance':
+                // Keep as is - advance comes from sales data
+                break;
+                
+            case 'Status':
+                const statusSpan = cell.querySelector('.status-badge');
+                if (statusSpan) {
+                    if (customer.is_active) {
+                        statusSpan.className = 'status-badge status-active';
+                        statusSpan.innerHTML = '<i class="bi bi-check-circle"></i> Active';
+                    } else {
+                        statusSpan.className = 'status-badge status-inactive';
+                        statusSpan.innerHTML = '<i class="bi bi-x-circle"></i> Inactive';
+                    }
+                }
+                break;
+                
+            case 'Joined':
+                // ✅ FIX: Format the date properly
+                if (cell) {
+                    if (customer.created_at_formatted) {
+                        // Use formatted date if available
+                        cell.textContent = customer.created_at_formatted.split(' ')[0]; // Just date part
+                    } else if (customer.created_at) {
+                        // Fallback: format from raw date
+                        const date = new Date(customer.created_at);
+                        if (!isNaN(date)) {
+                            cell.textContent = date.toISOString().split('T')[0]; // YYYY-MM-DD
+                        } else {
+                            cell.textContent = customer.created_at.substring(0, 10) || '-';
+                        }
+                    } else {
+                        cell.textContent = '-';
+                    }
+                }
+                break;
+                
+            // ✅ NEW: Add case for Address
+            case 'Address':
+                // Check if address column exists
+                if (cell) {
+                    cell.textContent = customer.address || '-';
+                }
+                break;
+                
+            default:
+                // If no specific handler, just update text content for simple fields
+                if (cell && customer[label.toLowerCase()] !== undefined) {
+                    cell.textContent = customer[label.toLowerCase()] || '-';
+                }
+                break;
+        }
+    });
+    
+    // ✅ Update any data attributes
+    row.dataset.customerName = customer.name;
+    if (customer.address) {
+        row.dataset.customerAddress = customer.address;
+    }
+    
+    // ✅ Add a highlight effect to show the update
+    row.style.transition = 'background-color 0.5s ease';
+    row.style.backgroundColor = '#d4edda';
+    setTimeout(() => {
+        row.style.backgroundColor = '';
+    }, 3000);
+    
+    // ✅ Show toast notification
+    if (typeof showToast === 'function') {
+        showToast(`Customer "${customer.name}" updated successfully!`, 'success');
+    }
+}
 </script>
 
 {% endblock %}

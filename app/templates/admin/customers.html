@@ -987,6 +987,7 @@ body {
                         <th>Customer</th>
                         <th>Contact</th>
                         <th>Username</th>
+                        <th>Address</th>  
                         <th>Spending</th>
                         <th>Due</th>
                         <th>Advance</th>
@@ -1000,7 +1001,7 @@ body {
                     {% set total_spending = customer.total_spending or 0 %}
                     {% set total_due = customer.total_due or 0 %}
                     {% set advance_balance = customer.advance_balance or 0 %}
-                    <tr data-customer-id="{{ customer.id }}" data-customer-name="{{ customer.name }}">
+                   <tr data-customer-id="{{ customer.id }}" data-customer-name="{{ customer.name }}">
                         <td data-label="Customer">
                             <span class="customer-name">{{ customer.name }}</span>
                         </td>
@@ -1059,11 +1060,11 @@ body {
                                     <i class="bi bi-trash"></i> Delete
                                 </button>
                             </div>
-                         </td>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="empty-state">
                                 <div class="empty-icon"><i class="bi bi-people"></i></div>
                                 <div class="empty-title">No customers found</div>
@@ -1535,6 +1536,153 @@ document.querySelector('.per-page-select')?.addEventListener('change', function(
         {% endfor %}
     {% endif %}
 {% endwith %}
+// ============================================
+// UPDATE CUSTOMER ROW - Called from edit page
+// ============================================
+function updateCustomerRow(customer) {
+    console.log('Updating customer row:', customer);
+    
+    const row = document.querySelector(`tr[data-customer-id="${customer.id}"]`);
+    if (!row) {
+        console.log('Customer row not found, will reload on redirect');
+        return;
+    }
+    
+    const cells = row.querySelectorAll('td');
+    cells.forEach(cell => {
+        const label = cell.getAttribute('data-label');
+        if (!label) return;
+        
+        switch(label) {
+            case 'Customer':
+                const nameSpan = cell.querySelector('.customer-name');
+                if (nameSpan) nameSpan.textContent = customer.name || '-';
+                break;
+                
+            case 'Contact':
+                const contactDiv = cell.querySelector('.customer-contact');
+                if (contactDiv) {
+                    let contactHtml = '';
+                    if (customer.email) {
+                        contactHtml += `<i class="bi bi-envelope"></i> ${customer.email}<br>`;
+                    }
+                    if (customer.phone) {
+                        contactHtml += `<i class="bi bi-telephone"></i> ${customer.phone}`;
+                    }
+                    contactDiv.innerHTML = contactHtml || '-';
+                }
+                break;
+                
+            case 'Username':
+                const usernameSpan = cell.querySelector('.username-badge');
+                if (usernameSpan) usernameSpan.textContent = customer.username || '-';
+                break;
+                
+            case 'Address':
+                if (cell) {
+                    cell.textContent = customer.address || '-';
+                }
+                break;
+                
+            case 'Spending':
+                const spendingSpan = cell.querySelector('.amount-spending');
+                if (spendingSpan) {
+                    spendingSpan.textContent = `Rs ${(customer.total_spending || 0).toFixed(2)}`;
+                }
+                break;
+                
+            case 'Due':
+                if (cell) {
+                    const dueAmount = customer.total_due || 0;
+                    if (dueAmount > 0) {
+                        cell.innerHTML = `<span class="amount-due">Rs ${dueAmount.toFixed(2)}</span>`;
+                    } else {
+                        cell.innerHTML = `<span class="text-muted">Rs 0</span>`;
+                    }
+                }
+                break;
+                
+            case 'Advance':
+                if (cell) {
+                    const advanceAmount = customer.advance_balance || 0;
+                    if (advanceAmount > 0) {
+                        cell.innerHTML = `<span class="amount-advance">Rs ${advanceAmount.toFixed(2)}</span>`;
+                    } else {
+                        cell.innerHTML = `<span class="text-muted">Rs 0</span>`;
+                    }
+                }
+                break;
+                
+            case 'Status':
+                const statusSpan = cell.querySelector('.status-badge');
+                if (statusSpan) {
+                    if (customer.is_active) {
+                        statusSpan.className = 'status-badge status-active';
+                        statusSpan.innerHTML = '<i class="bi bi-check-circle"></i> Active';
+                    } else {
+                        statusSpan.className = 'status-badge status-inactive';
+                        statusSpan.innerHTML = '<i class="bi bi-x-circle"></i> Inactive';
+                    }
+                }
+                break;
+                
+            case 'Joined':
+                if (cell) {
+                    if (customer.created_at_formatted) {
+                        cell.textContent = customer.created_at_formatted.split(' ')[0];
+                    } else if (customer.created_at) {
+                        const date = new Date(customer.created_at);
+                        if (!isNaN(date)) {
+                            cell.textContent = date.toISOString().split('T')[0];
+                        } else {
+                            cell.textContent = customer.created_at.substring(0, 10) || '-';
+                        }
+                    } else {
+                        cell.textContent = '-';
+                    }
+                }
+                break;
+                
+            default:
+                if (cell && customer[label.toLowerCase()] !== undefined) {
+                    cell.textContent = customer[label.toLowerCase()] || '-';
+                }
+                break;
+        }
+    });
+    
+    // Update data attributes
+    row.dataset.customerName = customer.name;
+    if (customer.address) {
+        row.dataset.customerAddress = customer.address;
+    }
+    if (customer.phone) {
+        row.dataset.customerPhone = customer.phone;
+    }
+    
+    // Update the Edit button href
+    const editBtn = row.querySelector('.btn-ui[href*="edit_customer"]');
+    if (editBtn) {
+        editBtn.href = `/admin/customers/${customer.id}/edit`;
+    }
+    
+    // Update the Advance button data attributes
+    const advanceBtn = row.querySelector('.open-advance-modal');
+    if (advanceBtn) {
+        advanceBtn.dataset.customerName = customer.name;
+        advanceBtn.dataset.customerBalance = customer.advance_balance || 0;
+    }
+    
+    // Highlight effect
+    row.style.transition = 'background-color 0.5s ease';
+    row.style.backgroundColor = '#d4edda';
+    setTimeout(() => {
+        row.style.backgroundColor = '';
+    }, 3000);
+    
+    showToast(`Customer "${customer.name}" updated successfully!`, 'success');
+}
+
 </script>
 
 {% endblock %}

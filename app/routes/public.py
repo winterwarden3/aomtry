@@ -21,7 +21,7 @@ def index():
 def home():
     """Homepage - Public landing page with products from database"""
     all_products = Product.get_all()
-    featured_products = all_products[:4] if all_products else []
+    featured_products = all_products[:3] if all_products else []
     return render_template('pages/home.html', products=featured_products)
 
 @bp.route('/about')

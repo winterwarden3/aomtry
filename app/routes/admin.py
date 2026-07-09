@@ -17,7 +17,7 @@ from app.brevo_service import send_invoice_email
 from app.config import Config
 from werkzeug.security import generate_password_hash
 bp = Blueprint('admin', __name__, url_prefix='/admin')
-
+from app.models_supabase import format_datetime_nepal 
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
@@ -1234,7 +1234,6 @@ def customer_invoices(customer_id):
         business_name=Config.BUSINESS_NAME
     )
 
-
 @bp.route('/customers/<int:customer_id>/edit', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -1260,6 +1259,7 @@ def edit_customer(customer_id):
                 flash('Username already exists!', 'danger')
                 return redirect(url_for('admin.edit_customer', customer_id=customer_id))
             
+            # Update customer
             result = User.update(customer_id, {
                 'name': request.form.get('name'),
                 'username': username,
@@ -1275,11 +1275,21 @@ def edit_customer(customer_id):
                     from app.models_supabase import Newsletter
                     Newsletter.sync_from_customer(customer_id)
                 
+                # ✅ FIX: Get the updated customer with ALL data
+                updated_customer = User.get_by_id(customer_id)
+                
+                # ✅ Add formatted dates for display
+                from app.models_supabase import format_datetime_nepal
+                updated_customer['created_at_formatted'] = format_datetime_nepal(updated_customer.get('created_at'))
+                updated_customer['updated_at_formatted'] = format_datetime_nepal(updated_customer.get('updated_at'))
+                
                 if is_ajax:
+                    # ✅ Return customer data so the frontend can update the row
                     return jsonify({
                         'success': True,
-                        'message': f'Customer "{request.form.get("name")}" updated successfully and newsletter synced!',
-                        'redirect': url_for('admin.customers_list')
+                        'message': f'Customer "{updated_customer.get("name")}" updated successfully!',
+                        'customer': updated_customer,  # ← THIS IS THE KEY FIX!
+                        'redirect': url_for('admin.customers_list')  # Keep this for fallback
                     })
                 flash('Customer updated successfully and newsletter synced!', 'success')
             else:
