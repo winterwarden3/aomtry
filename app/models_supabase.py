@@ -1,7 +1,108 @@
 from app.supabase_client import supabase
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import pytz
+
+# ============================================
+# TIMEZONE CONFIGURATION
+# ============================================
+NEPAL_TZ = pytz.timezone('Asia/Kathmandu')
+UTC_TZ = pytz.UTC
+
+def get_nepal_now():
+    """Get current time in Nepal timezone (UTC+5:45)"""
+    return datetime.now(NEPAL_TZ)
+
+def get_utc_now():
+    """Get current time in UTC"""
+    return datetime.now(UTC_TZ)
+
+def to_utc(dt):
+    """Convert any datetime to UTC"""
+    if dt is None:
+        return None
+    
+    # If string, parse it
+    if isinstance(dt, str):
+        try:
+            dt = datetime.fromisoformat(dt)
+        except:
+            try:
+                dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
+            except:
+                return None
+    
+    # If naive, assume Nepal time
+    if dt.tzinfo is None:
+        dt = NEPAL_TZ.localize(dt)
+    
+    # Convert to UTC
+    return dt.astimezone(UTC_TZ)
+
+def to_nepal(dt):
+    """Convert any datetime to Nepal timezone"""
+    if dt is None:
+        return None
+    
+    # If string, parse it
+    if isinstance(dt, str):
+        try:
+            dt = datetime.fromisoformat(dt)
+        except:
+            try:
+                dt = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S')
+            except:
+                return None
+    
+    # If naive, assume UTC
+    if dt.tzinfo is None:
+        dt = UTC_TZ.localize(dt)
+    
+    # Convert to Nepal time
+    return dt.astimezone(NEPAL_TZ)
+
+def format_datetime_nepal(dt):
+    """Format datetime for display in Nepal time"""
+    if dt is None:
+        return None
+    
+    nepal_dt = to_nepal(dt)
+    if nepal_dt:
+        return nepal_dt.strftime('%Y-%m-%d %H:%M:%S')
+    return None
+
+def parse_datetime_safe(date_str):
+    """Parse datetime string safely with timezone awareness"""
+    if not date_str:
+        return None
+    
+    try:
+        # Try ISO format
+        dt = datetime.fromisoformat(date_str)
+        # If naive, assume Nepal time
+        if dt.tzinfo is None:
+            dt = NEPAL_TZ.localize(dt)
+        return dt
+    except:
+        try:
+            # Try common formats
+            formats = [
+                '%Y-%m-%d %H:%M:%S',
+                '%Y-%m-%d %H:%M',
+                '%Y-%m-%d'
+            ]
+            for fmt in formats:
+                try:
+                    dt = datetime.strptime(date_str, fmt)
+                    dt = NEPAL_TZ.localize(dt)
+                    return dt
+                except ValueError:
+                    continue
+            return None
+        except:
+            return None
+
+
 # ============================================
 # USER MODEL (COMPLETE WITH ADVANCE BALANCE)
 # ============================================
@@ -24,6 +125,22 @@ class User:
             return response.data[0] if response.data else None
         except Exception as e:
             print(f"Error getting user: {e}")
+            return None
+    
+    @staticmethod
+    def get_by_email(email):
+        """Get user by email"""
+        try:
+            response = supabase.table("users")\
+                .select("*")\
+                .ilike("email", email)\
+                .execute()
+            
+            if response.data:
+                return response.data[0]
+            return None
+        except Exception as e:
+            print(f"Error getting user by email: {e}")
             return None
     
     @staticmethod
@@ -128,8 +245,8 @@ class User:
                 data['password_hash'] = generate_password_hash('1234')
             if 'advance_balance' not in data:
                 data['advance_balance'] = 0
-            if 'is_active' not in data:      # ← ADD THIS
-              data['is_active'] = True
+            if 'is_active' not in data:
+                data['is_active'] = True
             response = supabase.table(User.table_name).insert(data).execute()
             return response.data[0] if response.data else None
         except Exception as e:
@@ -308,7 +425,7 @@ class User:
                     'amount': amount,
                     'type': 'deposit',
                     'notes': notes,
-                    'date': datetime.now().isoformat()
+                    'date': get_utc_now().isoformat()
                 }
                 supabase.table("advance_transactions").insert(transaction_data).execute()
                 return result
@@ -335,7 +452,7 @@ class User:
                     'amount': amount,
                     'type': 'withdraw',
                     'notes': notes,
-                    'date': datetime.now().isoformat()
+                    'date': get_utc_now().isoformat()
                 }
                 supabase.table("advance_transactions").insert(transaction_data).execute()
                 return result
@@ -410,6 +527,19 @@ class User:
             return total
         except Exception as e:
             print(f"Error getting total advance balance: {e}")
+            return 0
+    
+    @staticmethod
+    def count_sales(customer_id):
+        """Count total sales for a customer - for delete validation"""
+        try:
+            response = supabase.table("sales")\
+                .select("id", count="exact")\
+                .eq("customer_id", customer_id)\
+                .execute()
+            return response.count or 0
+        except Exception as e:
+            print(f"Error counting sales for customer {customer_id}: {e}")
             return 0
 
 
@@ -832,7 +962,7 @@ class Sale:
                     'amount': advance_used,
                     'type': 'redeem',
                     'notes': f'Redeemed for invoice {sale["invoice_number"]}',
-                    'date': datetime.now().isoformat()
+                    'date': get_utc_now().isoformat()
                 }
                 supabase.table("advance_transactions").insert(transaction_data).execute()
             
@@ -846,7 +976,7 @@ class Sale:
                     'amount': advance_amount,
                     'type': 'deposit',
                     'notes': f'Overpayment from invoice {sale["invoice_number"]}',
-                    'date': datetime.now().isoformat()
+                    'date': get_utc_now().isoformat()
                 }
                 supabase.table("advance_transactions").insert(transaction_data).execute()
             
@@ -1036,7 +1166,7 @@ class Payment:
     def create(data):
         try:
             if 'date' not in data:
-                data['date'] = datetime.now().isoformat()
+                data['date'] = get_utc_now().isoformat()
             
             response = supabase.table(Payment.table_name).insert(data).execute()
             print(f"Payment created: {response.data}")
@@ -1053,150 +1183,318 @@ class Payment:
         except Exception as e:
             print(f"Error deleting payment: {e}")
             return False
-        
 
 
-@staticmethod
-def get_by_email(email):
-    """Get user by email"""
-    try:
-        response = supabase.table("users")\
-            .select("*")\
-            .ilike("email", email)\
-            .execute()
-        
-        if response.data:
-            return response.data[0]
-        return None
-    except Exception as e:
-        print(f"Error getting user by email: {e}")
-        return None
-
-
-    @staticmethod
-    def count_sales(customer_id):
-        """Count total sales for a customer - for delete validation"""
-        try:
-            response = supabase.table("sales")\
-                .select("id", count="exact")\
-                .eq("customer_id", customer_id)\
-                .execute()
-            return response.count or 0
-        except Exception as e:
-            print(f"Error counting sales for customer {customer_id}: {e}")
-            return 0
-        
 # ============================================
-# NOTICE MODEL (UPDATED WITH IMAGE SUPPORT)
+# NOTICE MODEL (COMPLETE WITH TIMEZONE FIX)
 # ============================================
 
 class Notice:
-    """Notice/Announcement model for Supabase"""
+    """Notice/Announcement model with unified timezone handling"""
+    
+    @staticmethod
+    def _get_notice_status(notice):
+        """Determine notice status based on current UTC time"""
+        now_utc = get_utc_now()
+        show_from = notice.get('show_from')
+        show_until = notice.get('show_until')
+        
+        # Parse dates if strings
+        if show_from and isinstance(show_from, str):
+            show_from_dt = parse_datetime_safe(show_from)
+            show_from = to_utc(show_from_dt) if show_from_dt else None
+        elif show_from and not isinstance(show_from, datetime):
+            show_from = None
+        
+        if show_until and isinstance(show_until, str):
+            show_until_dt = parse_datetime_safe(show_until)
+            show_until = to_utc(show_until_dt) if show_until_dt else None
+        elif show_until and not isinstance(show_until, datetime):
+            show_until = None
+        
+        is_active = notice.get('is_active', True)
+        
+        if not is_active:
+            return 'inactive'
+        elif show_from and now_utc < show_from:
+            return 'scheduled'
+        elif show_until and now_utc > show_until:
+            return 'expired'
+        else:
+            return 'active'
     
     @staticmethod
     def get_active_notices():
-        """Get all active notices that should be displayed"""
+        """Get all active notices with proper timezone filtering"""
         try:
-            now = datetime.now().isoformat()
+            now_utc = get_utc_now()
             
+            # Get all active notices
             response = supabase.table("notices")\
                 .select("*")\
                 .eq("is_active", True)\
                 .execute()
             
-            # Filter manually to handle NULL dates properly
+            if not response.data:
+                return []
+            
             active_notices = []
             for notice in response.data:
                 show_from = notice.get('show_from')
                 show_until = notice.get('show_until')
                 
                 show = True
-                if show_from and show_from > now:
-                    show = False
-                if show_until and show_until < now:
-                    show = False
+                
+                # Compare in UTC
+                if show_from:
+                    show_from_dt = parse_datetime_safe(show_from)
+                    show_from_utc = to_utc(show_from_dt) if show_from_dt else None
+                    if show_from_utc and now_utc < show_from_utc:
+                        show = False
+                
+                if show_until:
+                    show_until_dt = parse_datetime_safe(show_until)
+                    show_until_utc = to_utc(show_until_dt) if show_until_dt else None
+                    if show_until_utc and now_utc > show_until_utc:
+                        show = False
                 
                 if show:
+                    # Add formatted dates for display in Nepal time
+                    notice['time_status'] = Notice._get_notice_status(notice)
+                    notice['show_from_formatted'] = format_datetime_nepal(notice.get('show_from'))
+                    notice['show_until_formatted'] = format_datetime_nepal(notice.get('show_until'))
+                    notice['created_at_formatted'] = format_datetime_nepal(notice.get('created_at'))
+                    notice['updated_at_formatted'] = format_datetime_nepal(notice.get('updated_at'))
                     active_notices.append(notice)
+            
+            # Sort by show_from (most recent first)
+            active_notices.sort(key=lambda x: x.get('show_from', ''), reverse=True)
             
             return active_notices
         except Exception as e:
-            print(f"Error fetching notices: {e}")
+            print(f"❌ Error fetching active notices: {e}")
             return []
     
     @staticmethod
-    def get_all_notices_paginated(page=1, per_page=10):
-        """Get all notices with pagination for admin panel"""
+    def get_all_notices_paginated(page=1, per_page=10, status_filter=None):
+        """Get all notices with pagination and timezone-aware formatting"""
         try:
             offset = (page - 1) * per_page
-            response = supabase.table("notices")\
-                .select("*", count="exact")\
-                .order("created_at", desc=True)\
+            query = supabase.table("notices").select("*", count="exact")
+            
+            if status_filter:
+                if status_filter == 'active':
+                    query = query.eq("is_active", True)
+                elif status_filter == 'inactive':
+                    query = query.eq("is_active", False)
+            
+            response = query.order("created_at", desc=True)\
                 .range(offset, offset + per_page - 1)\
                 .execute()
             
+            notices = response.data if response.data else []
             total = response.count or 0
-            return response.data if response.data else [], total
+            
+            # Add time information formatted in Nepal time
+            for notice in notices:
+                notice['time_status'] = Notice._get_notice_status(notice)
+                notice['show_from_formatted'] = format_datetime_nepal(notice.get('show_from'))
+                notice['show_until_formatted'] = format_datetime_nepal(notice.get('show_until'))
+                notice['created_at_formatted'] = format_datetime_nepal(notice.get('created_at'))
+                notice['updated_at_formatted'] = format_datetime_nepal(notice.get('updated_at'))
+            
+            return notices, total
         except Exception as e:
-            print(f"Error fetching notices: {e}")
+            print(f"❌ Error fetching notices: {e}")
             return [], 0
     
     @staticmethod
     def get_by_id(notice_id):
-        """Get a single notice by ID"""
+        """Get a single notice with timezone-aware formatting"""
         try:
             response = supabase.table("notices")\
                 .select("*")\
                 .eq("id", notice_id)\
                 .execute()
-            return response.data[0] if response.data else None
+            
+            if response.data:
+                notice = response.data[0]
+                notice['time_status'] = Notice._get_notice_status(notice)
+                notice['show_from_formatted'] = format_datetime_nepal(notice.get('show_from'))
+                notice['show_until_formatted'] = format_datetime_nepal(notice.get('show_until'))
+                notice['created_at_formatted'] = format_datetime_nepal(notice.get('created_at'))
+                notice['updated_at_formatted'] = format_datetime_nepal(notice.get('updated_at'))
+                return notice
+            return None
         except Exception as e:
-            print(f"Error fetching notice: {e}")
+            print(f"❌ Error fetching notice: {e}")
             return None
     
     @staticmethod
     def create(notice_data):
-        """Create a new notice with image support"""
+        """Create a new notice with unified timezone handling"""
         try:
-            # Remove None values so Supabase uses defaults
-            clean_data = {k: v for k, v in notice_data.items() if v is not None}
-            clean_data['created_at'] = datetime.now().isoformat()
-            clean_data['updated_at'] = datetime.now().isoformat()
+            # Get current time in UTC
+            now_utc = get_utc_now()
             
-            # Ensure image fields are included
-            if 'image_url' not in clean_data:
-                clean_data['image_url'] = None
-            if 'image_public_id' not in clean_data:
-                clean_data['image_public_id'] = None
-            if 'image_alt_text' not in clean_data:
-                clean_data['image_alt_text'] = None
+            # Parse and validate dates
+            show_from = notice_data.get('show_from')
+            show_until = notice_data.get('show_until')
+            
+            # Handle show_from
+            if show_from:
+                try:
+                    show_from_dt = parse_datetime_safe(show_from)
+                    if show_from_dt:
+                        show_from_utc = to_utc(show_from_dt)
+                        show_from_str = show_from_utc.isoformat()
+                    else:
+                        print(f"❌ Invalid show_from date: {show_from}")
+                        return None
+                except Exception as e:
+                    print(f"❌ Error parsing show_from: {e}")
+                    return None
+            else:
+                # Default: now in UTC
+                show_from_str = now_utc.isoformat()
+            
+            # Handle show_until
+            if show_until:
+                try:
+                    show_until_dt = parse_datetime_safe(show_until)
+                    if show_until_dt:
+                        show_until_utc = to_utc(show_until_dt)
+                        show_until_str = show_until_utc.isoformat()
+                    else:
+                        print(f"❌ Invalid show_until date: {show_until}")
+                        return None
+                except Exception as e:
+                    print(f"❌ Error parsing show_until: {e}")
+                    return None
+            else:
+                # Default: 30 days from now
+                show_until_utc = now_utc + timedelta(days=30)
+                show_until_str = show_until_utc.isoformat()
+            
+            # Validate date range
+            if show_from_str and show_until_str:
+                if show_from_str > show_until_str:
+                    print(f"❌ Error: show_until ({show_until_str}) cannot be before show_from ({show_from_str})")
+                    return None
+            
+            # Clean data
+            clean_data = {k: v for k, v in notice_data.items() if v is not None}
+            
+            # Store ALL dates in UTC for consistency
+            clean_data['show_from'] = show_from_str
+            clean_data['show_until'] = show_until_str
+            clean_data['created_at'] = now_utc.isoformat()
+            clean_data['updated_at'] = now_utc.isoformat()
+            
+            # Ensure image fields
+            clean_data.setdefault('image_url', None)
+            clean_data.setdefault('image_public_id', None)
+            clean_data.setdefault('image_alt_text', None)
+            
+            # Auto-set is_active
+            if 'is_active' not in clean_data:
+                clean_data['is_active'] = True
+            
+            print(f"✅ Creating notice with UTC dates:")
+            print(f"   title: {clean_data.get('title')}")
+            print(f"   show_from: {show_from_str}")
+            print(f"   show_until: {show_until_str}")
+            print(f"   created_at: {now_utc.isoformat()}")
             
             response = supabase.table("notices").insert(clean_data).execute()
-            return response.data[0] if response.data else None
+            
+            if response.data:
+                notice = response.data[0]
+                # Format for display in Nepal time
+                notice['time_status'] = Notice._get_notice_status(notice)
+                notice['show_from_formatted'] = format_datetime_nepal(notice.get('show_from'))
+                notice['show_until_formatted'] = format_datetime_nepal(notice.get('show_until'))
+                notice['created_at_formatted'] = format_datetime_nepal(notice.get('created_at'))
+                notice['updated_at_formatted'] = format_datetime_nepal(notice.get('updated_at'))
+                return notice
+            return None
         except Exception as e:
-            print(f"Error creating notice: {e}")
+            print(f"❌ Error creating notice: {e}")
             return None
     
     @staticmethod
     def update(notice_id, notice_data):
-        """Update an existing notice with image support"""
+        """Update an existing notice with unified timezone handling"""
         try:
-            # Remove None values
+            now_utc = get_utc_now()
+            
+            # Parse and validate dates if provided
+            show_from = notice_data.get('show_from')
+            show_until = notice_data.get('show_until')
+            
+            if show_from:
+                try:
+                    show_from_dt = parse_datetime_safe(show_from)
+                    if show_from_dt:
+                        show_from_utc = to_utc(show_from_dt)
+                        notice_data['show_from'] = show_from_utc.isoformat()
+                    else:
+                        print(f"❌ Invalid show_from date: {show_from}")
+                        return None
+                except Exception as e:
+                    print(f"❌ Error parsing show_from: {e}")
+                    return None
+            
+            if show_until:
+                try:
+                    show_until_dt = parse_datetime_safe(show_until)
+                    if show_until_dt:
+                        show_until_utc = to_utc(show_until_dt)
+                        notice_data['show_until'] = show_until_utc.isoformat()
+                    else:
+                        print(f"❌ Invalid show_until date: {show_until}")
+                        return None
+                except Exception as e:
+                    print(f"❌ Error parsing show_until: {e}")
+                    return None
+            
+            # Update timestamp
+            notice_data['updated_at'] = now_utc.isoformat()
+            
+            # Clean data
             clean_data = {k: v for k, v in notice_data.items() if v is not None}
-            clean_data['updated_at'] = datetime.now().isoformat()
+            
+            print(f"✅ Updating notice {notice_id}:")
+            if 'title' in clean_data:
+                print(f"   title: {clean_data['title']}")
+            if 'show_from' in clean_data:
+                print(f"   show_from: {clean_data['show_from']}")
+            if 'show_until' in clean_data:
+                print(f"   show_until: {clean_data['show_until']}")
+            print(f"   updated_at: {now_utc.isoformat()}")
             
             response = supabase.table("notices")\
                 .update(clean_data)\
                 .eq("id", notice_id)\
                 .execute()
-            return response.data[0] if response.data else None
+            
+            if response.data:
+                notice = response.data[0]
+                # Format for display in Nepal time
+                notice['time_status'] = Notice._get_notice_status(notice)
+                notice['show_from_formatted'] = format_datetime_nepal(notice.get('show_from'))
+                notice['show_until_formatted'] = format_datetime_nepal(notice.get('show_until'))
+                notice['created_at_formatted'] = format_datetime_nepal(notice.get('created_at'))
+                notice['updated_at_formatted'] = format_datetime_nepal(notice.get('updated_at'))
+                return notice
+            return None
         except Exception as e:
-            print(f"Error updating notice: {e}")
+            print(f"❌ Error updating notice: {e}")
             return None
     
     @staticmethod
     def delete(notice_id):
-        """Delete a notice and its image from Cloudinary"""
+        """Delete a notice and its image"""
         try:
             # Get notice to check if it has an image
             notice = Notice.get_by_id(notice_id)
@@ -1207,7 +1505,7 @@ class Notice:
                     from app.cloudinary_client import delete_image_from_cloudinary
                     delete_image_from_cloudinary(notice.get('image_public_id'))
                 except Exception as e:
-                    print(f"Error deleting image from Cloudinary: {e}")
+                    print(f"⚠️ Error deleting image from Cloudinary: {e}")
             
             response = supabase.table("notices")\
                 .delete()\
@@ -1215,7 +1513,7 @@ class Notice:
                 .execute()
             return True if response.data else False
         except Exception as e:
-            print(f"Error deleting notice: {e}")
+            print(f"❌ Error deleting notice: {e}")
             return False
     
     @staticmethod
@@ -1224,21 +1522,112 @@ class Notice:
         try:
             notice = Notice.get_by_id(notice_id)
             if not notice:
-                return False
+                return None
             
             new_status = not notice.get('is_active', True)
+            now_utc = get_utc_now()
+            
             response = supabase.table("notices")\
                 .update({
                     'is_active': new_status,
-                    'updated_at': datetime.now().isoformat()
+                    'updated_at': now_utc.isoformat()
                 })\
                 .eq("id", notice_id)\
                 .execute()
-            return response.data[0] if response.data else None
+            
+            if response.data:
+                notice = response.data[0]
+                notice['time_status'] = Notice._get_notice_status(notice)
+                notice['show_from_formatted'] = format_datetime_nepal(notice.get('show_from'))
+                notice['show_until_formatted'] = format_datetime_nepal(notice.get('show_until'))
+                notice['created_at_formatted'] = format_datetime_nepal(notice.get('created_at'))
+                notice['updated_at_formatted'] = format_datetime_nepal(notice.get('updated_at'))
+                return notice
+            return None
         except Exception as e:
-            print(f"Error toggling notice: {e}")
-            return False
-        
+            print(f"❌ Error toggling notice: {e}")
+            return None
+    
+    @staticmethod
+    def auto_expire_notices():
+        """Automatically expire notices past their show_until date"""
+        try:
+            now_utc = get_utc_now()
+            now_utc_str = now_utc.isoformat()
+            
+            # Find active notices that should be expired
+            response = supabase.table("notices")\
+                .select("*")\
+                .eq("is_active", True)\
+                .lt("show_until", now_utc_str)\
+                .execute()
+            
+            if not response.data:
+                return 0
+            
+            expired_count = 0
+            for notice in response.data:
+                # Update to inactive
+                result = supabase.table("notices")\
+                    .update({
+                        'is_active': False,
+                        'updated_at': now_utc.isoformat()
+                    })\
+                    .eq("id", notice['id'])\
+                    .execute()
+                
+                if result.data:
+                    expired_count += 1
+                    print(f"⏰ Auto-expired notice {notice['id']}: {notice.get('title')}")
+            
+            return expired_count
+        except Exception as e:
+            print(f"❌ Error auto-expiring notices: {e}")
+            return 0
+    
+    @staticmethod
+    def auto_activate_notices():
+        """Automatically activate scheduled notices when show_from arrives"""
+        try:
+            now_utc = get_utc_now()
+            now_utc_str = now_utc.isoformat()
+            
+            # Find inactive notices that should be activated
+            response = supabase.table("notices")\
+                .select("*")\
+                .eq("is_active", False)\
+                .lte("show_from", now_utc_str)\
+                .execute()
+            
+            if not response.data:
+                return 0
+            
+            activated_count = 0
+            for notice in response.data:
+                # Check if show_until is in the future
+                show_until = notice.get('show_until')
+                if show_until and show_until < now_utc_str:
+                    continue  # Skip if already expired
+                
+                # Activate the notice
+                result = supabase.table("notices")\
+                    .update({
+                        'is_active': True,
+                        'updated_at': now_utc.isoformat()
+                    })\
+                    .eq("id", notice['id'])\
+                    .execute()
+                
+                if result.data:
+                    activated_count += 1
+                    print(f"⏰ Auto-activated notice {notice['id']}: {notice.get('title')}")
+            
+            return activated_count
+        except Exception as e:
+            print(f"❌ Error auto-activating notices: {e}")
+            return 0
+
+
 # ============================================
 # NEWSLETTER MODEL
 # ============================================
@@ -1261,7 +1650,8 @@ class Newsletter:
                 subscriber = existing.data[0]
                 update_data = {
                     'is_active': True,
-                    'source': source
+                    'source': source,
+                    'updated_at': get_utc_now().isoformat()
                 }
                 if name:
                     update_data['name'] = name
@@ -1281,7 +1671,8 @@ class Newsletter:
                 'name': name,
                 'source': source,
                 'customer_id': customer_id,
-                'is_active': True
+                'is_active': True,
+                'subscribed_at': get_utc_now().isoformat()
             }
             
             response = supabase.table("newsletter_subscribers")\
@@ -1299,7 +1690,10 @@ class Newsletter:
         """Unsubscribe a user from newsletter"""
         try:
             response = supabase.table("newsletter_subscribers")\
-                .update({'is_active': False})\
+                .update({
+                    'is_active': False,
+                    'updated_at': get_utc_now().isoformat()
+                })\
                 .eq("email", email)\
                 .execute()
             return response.data[0] if response.data else None
@@ -1324,7 +1718,13 @@ class Newsletter:
                 .order("subscribed_at", desc=True)\
                 .execute()
             
-            return response.data, response.count
+            # Format dates for display
+            subscribers = response.data if response.data else []
+            for sub in subscribers:
+                sub['subscribed_at_formatted'] = format_datetime_nepal(sub.get('subscribed_at'))
+                sub['updated_at_formatted'] = format_datetime_nepal(sub.get('updated_at'))
+            
+            return subscribers, response.count
         except Exception as e:
             print(f"Error getting subscribers: {e}")
             return [], 0
@@ -1337,7 +1737,13 @@ class Newsletter:
                 .select("*")\
                 .eq("email", email)\
                 .execute()
-            return response.data[0] if response.data else None
+            
+            if response.data:
+                sub = response.data[0]
+                sub['subscribed_at_formatted'] = format_datetime_nepal(sub.get('subscribed_at'))
+                sub['updated_at_formatted'] = format_datetime_nepal(sub.get('updated_at'))
+                return sub
+            return None
         except Exception as e:
             print(f"Error getting subscriber: {e}")
             return None
@@ -1367,7 +1773,8 @@ class Newsletter:
                         'name': name,
                         'customer_id': customer_id,
                         'is_active': True,
-                        'source': 'customer_sync'
+                        'source': 'customer_sync',
+                        'updated_at': get_utc_now().isoformat()
                     })\
                     .eq("id", existing.data[0]['id'])\
                     .execute()
@@ -1411,18 +1818,41 @@ class Newsletter:
         except Exception as e:
             print(f"Error counting new subscribers: {e}")
             return 0
-        
-@staticmethod
-def unsubscribe(email):
-    """Unsubscribe a user from newsletter"""
-    try:
-        response = supabase.table("newsletter_subscribers")\
-            .update({'is_active': False, 'updated_at': datetime.now().isoformat()})\
-            .eq("email", email)\
-            .execute()
-        return response.data[0] if response.data else None
-    except Exception as e:
-        print(f"Error unsubscribing: {e}")
-        return None
-    
 
+
+# ============================================
+# DEBUG HELPER FOR NOTICE TIMEZONES
+# ============================================
+
+def debug_notice_dates():
+    """Debug function to check notice timezone handling"""
+    from app.models_supabase import Notice
+    
+    print("\n" + "="*60)
+    print("🔍 NOTICE TIMEZONE DEBUG")
+    print("="*60)
+    
+    print(f"\n📅 Current Times:")
+    print(f"   UTC: {get_utc_now().isoformat()}")
+    print(f"   Nepal: {get_nepal_now().isoformat()}")
+    
+    # Get all notices
+    notices, total = Notice.get_all_notices_paginated(page=1, per_page=100)
+    
+    print(f"\n📋 Total Notices: {total}")
+    print("-"*60)
+    
+    for notice in notices:
+        print(f"\n📝 Notice #{notice['id']}: {notice.get('title')}")
+        print(f"   Active: {notice.get('is_active')}")
+        print(f"   Status: {notice.get('time_status')}")
+        print(f"   Show From (UTC): {notice.get('show_from')}")
+        print(f"   Show Until (UTC): {notice.get('show_until')}")
+        print(f"   Show From (Nepal): {notice.get('show_from_formatted')}")
+        print(f"   Show Until (Nepal): {notice.get('show_until_formatted')}")
+        print(f"   Created (Nepal): {notice.get('created_at_formatted')}")
+        print(f"   Updated (Nepal): {notice.get('updated_at_formatted')}")
+    
+    print("\n" + "="*60)
+    print("✅ Debug complete")
+    print("="*60 + "\n")
